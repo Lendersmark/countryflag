@@ -7,18 +7,20 @@ import country_converter as coco
 
 def run():
     # Initializing variable
-    countryFlag=''
+    country_flag=''
     # Fetches long country name from argument
     if len(sys.argv) <= 1:
         print ('countryflag: missing country name')
-        return
     else:
         for i in range(1, len(sys.argv)): 
             # Takes the argument
-            countryName = sys.argv[i]
+            country_name = sys.argv[i]
             # Converts long country name to ISO2 code, if needed
-            countryCode = coco.convert(names=countryName, to='ISO2')
-            # Returns the emoji flag
-            countryFlag += " "
-            countryFlag += (flag.flag(countryCode))
-        return countryFlag
+            country_code = coco.convert(names=country_name, to='ISO2')
+            # Returns emoji flags
+            if i>=2:
+                # If more than a country, adds a space as separator
+                country_flag += " "
+            country_flag += (flag.flag(country_code))
+        print(country_flag)
+    sys.exit()
