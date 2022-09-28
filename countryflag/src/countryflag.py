@@ -11,7 +11,7 @@ def run():
     country_flag = ""
     # Fetches long country name from argument
     if len(sys.argv) <= 1:
-        print("countryflag: missing country name")
+        print("usage: countryflag [<countryname_1] [<countryname_2>] [<countryname_n>] [...]")
     else:
         for i in range(1, len(sys.argv)):
             # Takes the argument
@@ -25,3 +25,4 @@ def run():
             country_flag += flag.flag(country_code)
         print(country_flag)
     sys.exit()
+

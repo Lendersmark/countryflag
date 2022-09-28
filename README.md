@@ -26,20 +26,38 @@ Source code is also available on
 
 Countryflag accepts one or more country name(s) as command line arguments, separated by spaces.
 Country names can be expressed in various classification schemes such as ISO-2, ISO-3, ISO-numeric, official name, etc.  
-Countryflag uses [Country Converter (coco)](https://pypi.org/project/country-converter/) to convert country names to ISO-2 codes before returning emoji flags, so please see [Country Converter README.md](https://github.com/konstantinstadler/country_converter/blob/master/README.md#classification-schemes) for further details about supported classification schemes.
 
     countryflag Germany BE Spain 'United States of America'
 
-The default output is a space separated list of emoji flags, one for each country.
+The default output is a space separated list of emoji flags, one for each country:
+
+`🇩🇪 🇧🇪 🇪🇸 🇺🇸`
+
+Countryflag uses [Country Converter (coco)](https://pypi.org/project/country-converter/) to convert country names to ISO-2 codes and [Emoji-country-flag](https://pypi.org/project/emoji-country-flag/) to render the emoji flags, so please see their documentation for further details.
+
+
+## How it works
+
+All the flag emoji are actually composed of two unicode letters. These are the 26 regional indicator symbols:
+
+🇦 🇧 🇨 🇩 🇪 🇫 🇬 🇭 🇮 🇯 🇰 🇱 🇲 🇳 🇴 🇵 🇶 🇷 🇸 🇹 🇺 🇻 🇼 🇽 🇾 🇿
+
+According to ISO 3166, pairing unicode letters of the country code, compatible browsers/phones/terminals will display the correspondent Emoji flag.
+For example BE is Belgium: 🇧 + 🇪 = 🇧🇪
+
+So, to encode an ASCII code like :BE: to 🇧🇪, Countrycode converts country names to the corresponding regional indicator symbols.
+
 
 ## Compatible terminals
 
-Some terminals, such as [iTerm2](https://iterm2.com/) on Mac Os, support Emoji Flags very well.
+Some terminals, such as [iTerm2](https://iterm2.com/) on Mac Os, support Emoji country flags very well.
 
-However, many others don't, such as Windows Terminal on Windows or Gnome Terminal on Linux: instead of the flag, they display country initials.  
+However, many others don't, such as Windows Terminal on Windows or Gnome Terminal on Linux: instead of the flag, they will display unicode letters.  
+For example, invoking `countryflag belgium` into Windows Terminal will return 🇧 🇪 as output, instead of the emojy country flag 🇧🇪.
+
 At least on Windows, the reason seems to be political/PR-related, as explained [here](https://answers.microsoft.com/en-us/windows/forum/all/flag-emoji/85b163bc-786a-4918-9042-763ccf4b6c05).
 
-Therefore, countryflag makes much more sense on systems that can properly render Emoji flags in terminal.
+Therefore, Countryflag makes much more sense when used on systems/terminals that can properly render Emoji country flags.
 
 ## Issues, bugs and enhancements
 

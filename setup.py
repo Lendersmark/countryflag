@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setuptools.setup(
     name="countryflag",
-    version="0.1.1rc1",
+    version="0.1.1rc2",
     author="Lendersmark",
     description="A Python package for converting country names into emoji flags",
     long_description=long_description,
