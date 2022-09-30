@@ -24,16 +24,34 @@ Source code is also available on
 
 ## Usage
 
-Countryflag accepts one or more country name(s) as command line arguments, separated by spaces.
-Country names can be expressed in various classification schemes such as ISO-2, ISO-3, ISO-numeric, official name, etc.  
+### Use within Python
+
+Convert various country names to emojy flags:
+
+    import countryflag
+    countries = ['Germany', 'BE', 'United States of America', 'Japan']
+    flags = countryflag.getflag(countries)
+    print(flags)
+
+Will result in:
+
+🇩🇪 🇧🇪 🇺🇸 🇯🇵
+
+### Command line usage
+
+Countryflag can also be used as a command line tool, specifying one or more country name(s) as command line arguments, separated by spaces.
 
     countryflag Germany BE Spain 'United States of America'
 
 The default output is a space separated list of emoji flags, one for each country:
 
-`🇩🇪 🇧🇪 🇪🇸 🇺🇸`
+🇩🇪 🇧🇪 🇪🇸 🇺🇸
 
-Countryflag uses [Country Converter (coco)](https://pypi.org/project/country-converter/) to convert country names to ISO-2 codes and [Emoji-country-flag](https://pypi.org/project/emoji-country-flag/) to render the emoji flags, so please see their documentation for further details.
+### Country names formats
+
+Country names can be expressed in various classification schemes such as ISO-2, ISO-3, ISO-numeric, official name, etc.
+The input format is determined automatically, based on ISO two letter, ISO three letter, ISO numeric or regular expression matching.
+Countryflag uses [Country Converter (coco)](https://pypi.org/project/country-converter/) to convert country names to ISO-2 codes and then [Emoji-country-flag](https://pypi.org/project/emoji-country-flag/) to render the emoji flags: please see their documentation for further details.
 
 
 ## How it works

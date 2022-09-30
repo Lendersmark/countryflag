@@ -2,12 +2,13 @@ import setuptools
 
 # reads the contents of README file
 from pathlib import Path
+
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
 setuptools.setup(
     name="countryflag",
-    version="0.1.1rc2",
+    version="0.1.1rc3",
     author="Lendersmark",
     description="A Python package for converting country names into emoji flags",
     long_description=long_description,
