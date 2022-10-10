@@ -14,7 +14,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Lendersmark/countryflag",
-    packages=setuptools.find_packages("src", exclude=["tests"]), # test is excluded
+    packages=setuptools.find_packages("src", exclude=["tests"]),  # test is excluded
     license="MIT",
     classifiers=[
         "Programming Language :: Python :: 3",

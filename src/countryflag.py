@@ -33,5 +33,6 @@ def main():
         flags = getflag(countries)
         print(flags)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
