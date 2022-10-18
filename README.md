@@ -3,6 +3,8 @@
 Countryflag is a Python package to convert country names into emoji flags.
 
 
+[![PyPI](https://img.shields.io/pypi/v/countryflag)]
+(https://pypi.org/project/countryflag)
 [![image](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![image](https://img.shields.io/github/license/lendersmark/countryflag)](https://opensource.org/licenses/MIT)
 
@@ -33,7 +35,7 @@ Convert various country names to emojy flags:
     flags = countryflag.getflag(countries)
     print(flags)
 
-Will result in:
+The default output is a space separated list of emoji flags, one for each country:
 
 🇩🇪 🇧🇪 🇺🇸 🇯🇵
 
@@ -43,7 +45,7 @@ Countryflag can also be used as a command line tool, specifying one or more coun
 
     countryflag Germany BE Spain 'United States of America'
 
-The default output is a space separated list of emoji flags, one for each country:
+Will result in:
 
 🇩🇪 🇧🇪 🇪🇸 🇺🇸
 

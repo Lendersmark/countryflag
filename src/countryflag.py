@@ -30,7 +30,11 @@ def main():
         )
     else:
         countries = sys.argv[1:]
-        flags = getflag(countries)
+        try:
+            flags = getflag(countries)
+        except ValueError as ve:
+            print("Please use one of the supported country names classifications.")
+            sys.exit(1)
         print(flags)
 
 
