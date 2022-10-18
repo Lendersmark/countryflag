@@ -3,8 +3,7 @@
 Countryflag is a Python package to convert country names into emoji flags.
 
 
-[![PyPI](https://img.shields.io/pypi/v/countryflag)]
-(https://pypi.org/project/countryflag)
+![PyPI](https://img.shields.io/pypi/v/countryflag)
 [![image](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![image](https://img.shields.io/github/license/lendersmark/countryflag)](https://opensource.org/licenses/MIT)
 
