@@ -48,3 +48,10 @@ def test_cli_multiplecountries():
     expected = "🇫🇷 🇧🇪 🇯🇵 🇺🇸\n"
     result = shell("countryflag France Belgium JP 'United States of America'")
     assert result.stdout == expected, "Output doesn't match with input countries!"
+
+
+def test_cli_notfound():
+    """Tests the error message when a country is not found in regex"""
+    expected = "Please use one of the supported country names classifications.\n"
+    result = shell("countryflag nonexistentcountry")
+    assert result.stdout == expected
