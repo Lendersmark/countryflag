@@ -8,13 +8,20 @@ def test_runas_module():
     assert result.exit_code == 0
 
 
-def test_module():
+def test_module_singlecountry():
+    """Tests the Python module output"""
+    expected = "🇫🇷"
+    result = countryflag.getflag(["France"])
+    assert result == expected, "Output doesn't match with input countries!"
+
+
+def test_module_multiplecountries():
     """Tests the Python module output"""
     expected = "🇫🇷 🇧🇪 🇯🇵 🇺🇸"
-    actual = countryflag.getflag(
+    result = countryflag.getflag(
         ["France", "Belgium", "JP", "United States of America"]
     )
-    assert actual == expected, "Output doesn't match with input countries!"
+    assert result == expected, "Output doesn't match with input countries!"
 
 
 def test_entrypoint():
@@ -24,8 +31,20 @@ def test_entrypoint():
 
 
 def test_example_command():
-    """
-    Is command available?
-    """
+    """Is command available?"""
     result = shell("countryflag france --help")
     assert result.exit_code == 0
+
+
+def test_cli_singlecountry():
+    """Tests the command line output"""
+    expected = "🇫🇷\n"
+    result = shell("countryflag France")
+    assert result.stdout == expected, "Output doesn't match with input countries!"
+
+
+def test_cli_multiplecountries():
+    """Tests the command line output"""
+    expected = "🇫🇷 🇧🇪 🇯🇵 🇺🇸\n"
+    result = shell("countryflag France Belgium JP 'United States of America'")
+    assert result.stdout == expected, "Output doesn't match with input countries!"
