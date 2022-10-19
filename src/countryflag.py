@@ -3,6 +3,7 @@
 
 import sys
 import flag
+import argparse
 import country_converter as coco
 
 
@@ -23,19 +24,25 @@ def getflag(country_name):
 def main():
     """Entry point to the script"""
 
-    # Check if missing arguments
-    if len(sys.argv) <= 1:
-        print(
-            "usage: countryflag [<countryname_1] [<countryname_2>] [<countryname_n>] [...]"
-        )
-    else:
-        countries = sys.argv[1:]
-        try:
-            flags = getflag(countries)
-        except ValueError as ve:
-            print("Please use one of the supported country names classifications.")
-            sys.exit(1)
-        print(flags)
+    # Parse arguments
+    parser = argparse.ArgumentParser(
+        description="Countryflag: a Python package for converting country names into emoji flags."
+    )
+    parser.add_argument(
+        "countries",
+        metavar="name",
+        nargs="+",
+        help="Country names to be converted into emojis, separated by spaces",
+    )
+    args = parser.parse_args()
+
+    # Converts country names into emojis
+    try:
+        flags = getflag(args.countries)
+    except ValueError as ve:
+        print("Please use one of the supported country names classifications.")
+        sys.exit(1)
+    print(flags)
 
 
 if __name__ == "__main__":
