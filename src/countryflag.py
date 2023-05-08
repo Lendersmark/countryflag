@@ -6,19 +6,28 @@ import flag
 import argparse
 import country_converter as coco
 
+# Initialize cache
+cache = {}
 
-def getflag(country_name):
+def getflag(country_names):
     # initialize variable
-    country_flag = ""
-    for i in range(0, len(country_name)):
-        # convert country name into ISO2 code
-        country_code = coco.convert(names=country_name[i], to="ISO2")
-        # convert ISO2 code into flag
-        if i >= 1:
-            # If more than a country, adds a space as separator
-            country_flag += " "
-        country_flag += flag.flag(country_code)
-    return country_flag
+    country_flags = []
+    for country_name in country_names:
+        if country_name in cache:
+            # Retrieve country flag from cache if available
+            country_flags.append(cache[country_name])
+        else:
+            # convert country name into ISO2 code
+            country_code = coco.convert(names=country_name, to="ISO2")
+            if country_code is None:
+                # If country code cannot be found, raise an error
+                raise ValueError(f"Could not find ISO2 code for {country_name}")
+            # convert ISO2 code into flag
+            country_flag = flag.flag(country_code)
+            # Add country flag to list of flags and to cache
+            country_flags.append(country_flag)
+            cache[country_name] = country_flag
+    return " ".join(country_flags)
 
 
 def main():
@@ -32,15 +41,21 @@ def main():
         "countries",
         metavar="name",
         nargs="+",
-        help="Country names to be converted into emojis, separated by spaces",
+        help="Country names to be converted into emojis, separated by spaces, commas, or semicolons",
     )
     args = parser.parse_args()
 
+    # Convert input to list of country names
+    country_names = []
+    for arg in args.countries:
+        country_names += arg.split(",") if "," in arg else arg.split(";")
+    country_names = [name.strip() for name in country_names]
+
     # Converts country names into emojis
     try:
-        flags = getflag(args.countries)
+        flags = getflag(country_names)
     except ValueError as ve:
-        print("Please use one of the supported country names classifications.")
+        print(str(ve))
         sys.exit(1)
     print(flags)
 
