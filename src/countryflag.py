@@ -7,17 +7,21 @@ import argparse
 import country_converter as coco
 
 
-def getflag(country_name):
-    # initialize variable
+def getflag(country_name: str | list[str]) -> str:
     country_flag = ""
-    for i in range(0, len(country_name)):
-        # convert country name into ISO2 code
-        country_code = coco.convert(names=country_name[i], to="ISO2")
-        # convert ISO2 code into flag
-        if i >= 1:
-            # If more than a country, adds a space as separator
-            country_flag += " "
+    
+    if isinstance(country_name, str):
+        country_code = coco.convert(names=country_name, to="ISO2")
         country_flag += flag.flag(country_code)
+    elif isinstance(country_name, list):
+        for i, name in enumerate(country_name):
+            country_code = coco.convert(names=name, to="ISO2")
+            if i > 0:
+                country_flag += " "
+            country_flag += flag.flag(country_code)
+    else:
+        raise ValueError("Input must be a string or a list of strings")
+    
     return country_flag
 
 
