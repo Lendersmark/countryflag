@@ -1,0 +1,153 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: countryflag-api
+  labels:
+    app: countryflag
+    component: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: countryflag
+      component: api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: countryflag
+        component: api
+    spec:
+      containers:
+      - name: countryflag-api
+        image: ${YOUR_REGISTRY}/countryflag-api:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: ENABLE_CACHE
+          value: "true"
+        - name: CACHE_TTL
+          value: "3600"
+        - name: REDIS_HOST
+          value: "countryflag-redis"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 20
+          periodSeconds: 15
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - countryflag
+              topologyKey: "kubernetes.io/hostname"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: countryflag-api
+  labels:
+    app: countryflag
+    component: api
+spec:
+  selector:
+    app: countryflag
+    component: api
+  ports:
+  - port: 80
+    targetPort: 8000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: countryflag-redis
+  labels:
+    app: countryflag
+    component: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: countryflag
+      component: redis
+  template:
+    metadata:
+      labels:
+        app: countryflag
+        component: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:alpine
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: countryflag-redis-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: countryflag-redis
+  labels:
+    app: countryflag
+    component: redis
+spec:
+  selector:
+    app: countryflag
+    component: redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: countryflag-redis-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: standard

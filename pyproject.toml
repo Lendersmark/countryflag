@@ -1,0 +1,170 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 88
+target-version = ['py36', 'py37', 'py38', 'py39']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--cov=countryflag --cov-report=term-missing"
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+
+[tool.coverage.run]
+source = ["countryflag"]
+omit = ["tests/*", "setup.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise ImportError",
+]
+
+[tool.mypy]
+python_version = "3.6"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+strict_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[project]
+name = "countryflag"
+version = "0.2.0"
+description = "A Python package for converting country names into emoji flags"
+readme = "README.md"
+requires-python = ">=3.6"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Lendersmark", email = "author@example.com"}
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+    "Typing :: Typed",
+]
+keywords = ["country", "flag", "emoji", "iso", "conversion", "geography"]
+dependencies = [
+    "emoji-country-flag",
+    "country_converter",
+    "typeguard",
+    "prompt_toolkit",
+    "aioconsole",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "isort",
+    "mypy",
+    "pytest",
+    "pytest-cov",
+    "pytest-benchmark",
+    "tox",
+    "pre-commit",
+    "sphinx",
+    "sphinx-rtd-theme",
+    "hypothesis",
+    "twine",
+    "build",
+    "flake8",
+    "flake8-docstrings",
+    "flake8-comprehensions",
+    "flake8-bugbear",
+    "flake8-annotations",
+]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pytest-benchmark",
+    "hypothesis",
+    "psutil",
+]
+docs = [
+    "sphinx",
+    "sphinx-rtd-theme",
+    "sphinxcontrib-napoleon",
+]
+benchmarks = [
+    "matplotlib",
+    "pandas",
+    "seaborn",
+    "psutil",
+]
+full = [
+    "matplotlib",
+    "pandas",
+    "seaborn",
+    "psutil",
+    "sphinx",
+    "sphinx-rtd-theme",
+    "sphinxcontrib-napoleon",
+    "pytest",
+    "pytest-cov",
+    "pytest-benchmark",
+    "hypothesis",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/lendersmark/countryflag"
+"Documentation" = "https://countryflag.readthedocs.io/"
+"Bug Tracker" = "https://github.com/lendersmark/countryflag/issues"
+"Changelog" = "https://github.com/lendersmark/countryflag/blob/main/CHANGELOG.md"
+"Source Code" = "https://github.com/lendersmark/countryflag"
+
+[project.scripts]
+countryflag = "countryflag.cli:main"
