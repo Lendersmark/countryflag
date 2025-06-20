@@ -54,7 +54,7 @@ from countryflag.core.exceptions import (
 )
 
 # Package metadata
-__version__ = "0.2.0"
+__version__ = "1.0.0"
 __author__ = "Lendersmark"
 __license__ = "MIT"
 __copyright__ = "Copyright 2025 Lendersmark"
