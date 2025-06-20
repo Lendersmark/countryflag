@@ -1,4 +1,4 @@
-Welcome to CountryFlag's documentation!
+Welcome to CountryFlag's Documentation!
 ====================================
 
 .. image:: https://img.shields.io/pypi/v/countryflag.svg
@@ -12,10 +12,6 @@ Welcome to CountryFlag's documentation!
 .. image:: https://img.shields.io/github/license/lendersmark/countryflag
    :target: https://opensource.org/licenses/MIT
    :alt: MIT License
-
-.. image:: https://img.shields.io/github/workflow/status/lendersmark/countryflag/CI
-   :target: https://github.com/lendersmark/countryflag/actions
-   :alt: Build Status
 
 CountryFlag is a Python package for converting country names to emoji flags and vice versa.
 
@@ -34,9 +30,6 @@ Features
 * Fuzzy matching for country names
 * Interactive CLI mode with autocompletion
 * Asynchronous and parallel processing
-* Memory and disk caching for improved performance
-* Thread-safe operations
-* Comprehensive type hinting
 
 Installation
 -----------
@@ -60,35 +53,20 @@ Quick Start
    # Command line usage
    # countryflag Germany BE Spain 'United States of America'
 
-   # Using the core classes (advanced)
-   from countryflag.core import CountryFlag
-   from countryflag.cache import MemoryCache
-   
-   # Create a CountryFlag instance with caching
-   cf = CountryFlag(cache=MemoryCache())
-   
-   # Convert country names to flags
-   flags, pairs = cf.get_flag(['Germany', 'France', 'Italy'])
-   print(flags)  # 🇩🇪 🇫🇷 🇮🇹
-   
-   # Output as JSON
-   json_output = cf.format_output(pairs, output_format='json')
-   print(json_output)
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    installation
    usage
-   api
+   quickstart
+   cli
    plugins
    caching
-   cli
    performance
    migration
+   api
    contributing
-   changelog
 
 Indices and tables
 ==================
