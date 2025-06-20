@@ -2,6 +2,74 @@
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "countryflag"
+version = "1.0.0"
+description = "A Python package for converting country names into emoji flags"
+readme = "README.md"
+requires-python = ">=3.6"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Lendersmark", email = "author@example.com"}
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing",
+    "Intended Audience :: Developers",
+]
+dependencies = [
+    "emoji-country-flag",
+    "country_converter",
+    "typeguard",
+    "prompt_toolkit",
+    "aioconsole",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "isort",
+    "mypy",
+    "pytest",
+    "pytest-cov",
+    "tox",
+    "pre-commit",
+    "sphinx",
+    "sphinx-rtd-theme",
+    "hypothesis",
+    "flake8",
+    "flake8-docstrings",
+    "flake8-comprehensions",
+    "flake8-bugbear",
+    "flake8-annotations",
+]
+test = [
+    "pytest",
+    "pytest-cov",
+    "hypothesis",
+]
+docs = [
+    "sphinx",
+    "sphinx-rtd-theme",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/lendersmark/countryflag"
+"Bug Tracker" = "https://github.com/lendersmark/countryflag/issues"
+"Documentation" = "https://countryflag.readthedocs.io/"
+
+[project.scripts]
+countryflag = "countryflag.cli:main"
+
 [tool.black]
 line-length = 88
 target-version = ['py36', 'py37', 'py38', 'py39']
@@ -66,105 +134,3 @@ warn_unreachable = true
 module = "tests.*"
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
-
-[project]
-name = "countryflag"
-version = "1.0.0"
-description = "A Python package for converting country names into emoji flags"
-readme = "README.md"
-requires-python = ">=3.6"
-license = {file = "LICENSE"}
-authors = [
-    {name = "Lendersmark", email = "author@example.com"}
-]
-classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Intended Audience :: Developers",
-    "Intended Audience :: Information Technology",
-    "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Topic :: Software Development :: Libraries",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Utilities",
-    "Typing :: Typed",
-]
-keywords = ["country", "flag", "emoji", "iso", "conversion", "geography"]
-dependencies = [
-    "emoji-country-flag",
-    "country_converter",
-    "typeguard",
-    "prompt_toolkit",
-    "aioconsole",
-]
-
-[project.optional-dependencies]
-dev = [
-    "black",
-    "isort",
-    "mypy",
-    "pytest",
-    "pytest-cov",
-    "pytest-benchmark",
-    "tox",
-    "pre-commit",
-    "sphinx",
-    "sphinx-rtd-theme",
-    "hypothesis",
-    "twine",
-    "build",
-    "flake8",
-    "flake8-docstrings",
-    "flake8-comprehensions",
-    "flake8-bugbear",
-    "flake8-annotations",
-]
-test = [
-    "pytest",
-    "pytest-cov",
-    "pytest-benchmark",
-    "hypothesis",
-    "psutil",
-]
-docs = [
-    "sphinx",
-    "sphinx-rtd-theme",
-    "sphinxcontrib-napoleon",
-]
-benchmarks = [
-    "matplotlib",
-    "pandas",
-    "seaborn",
-    "psutil",
-]
-full = [
-    "matplotlib",
-    "pandas",
-    "seaborn",
-    "psutil",
-    "sphinx",
-    "sphinx-rtd-theme",
-    "sphinxcontrib-napoleon",
-    "pytest",
-    "pytest-cov",
-    "pytest-benchmark",
-    "hypothesis",
-]
-
-[project.urls]
-"Homepage" = "https://github.com/lendersmark/countryflag"
-"Documentation" = "https://countryflag.readthedocs.io/"
-"Bug Tracker" = "https://github.com/lendersmark/countryflag/issues"
-"Changelog" = "https://github.com/lendersmark/countryflag/blob/main/CHANGELOG.md"
-"Source Code" = "https://github.com/lendersmark/countryflag"
-
-[project.scripts]
-countryflag = "countryflag.cli:main"

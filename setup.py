@@ -14,7 +14,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Lendersmark/countryflag",
-    packages=setuptools.find_packages("src", exclude=["tests"]),  # test is excluded
+    packages=setuptools.find_packages(exclude=["tests"]),  # test is excluded
     license="MIT",
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -22,8 +22,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",
-    py_modules=["countryflag"],
     package_dir={"": "src"},
     install_requires=["emoji-country-flag", "country_converter"],
-    entry_points={"console_scripts": ["countryflag=countryflag:main"]},
+    entry_points={"console_scripts": ["countryflag=countryflag.cli.main:main"]},
 )
