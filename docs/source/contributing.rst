@@ -1,14 +1,11 @@
 Contributing Guide
-================
-
+==================
 This guide explains how to contribute to the CountryFlag project.
 
 Setting Up Development Environment
-------------------------------
-
+----------------------------------
 1. Fork and Clone
-~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~
 First, fork the repository on GitHub, then clone your fork:
 
 .. code-block:: bash
@@ -17,8 +14,7 @@ First, fork the repository on GitHub, then clone your fork:
    cd countryflag
 
 2. Create Virtual Environment
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Create and activate a virtual environment:
 
 .. code-block:: bash
@@ -27,8 +23,7 @@ Create and activate a virtual environment:
    source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 3. Install Dependencies
-~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~
 Install development dependencies:
 
 .. code-block:: bash
@@ -36,8 +31,7 @@ Install development dependencies:
    pip install -e ".[dev]"
 
 4. Install Pre-commit Hooks
-~~~~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Set up pre-commit hooks:
 
 .. code-block:: bash
@@ -45,11 +39,9 @@ Set up pre-commit hooks:
    pre-commit install
 
 Making Changes
-------------
-
+--------------
 1. Create a Branch
-~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~
 Create a branch for your changes:
 
 .. code-block:: bash
@@ -57,8 +49,7 @@ Create a branch for your changes:
    git checkout -b feature/your-feature-name
 
 2. Code Style
-~~~~~~~~~~
-
+~~~~~~~~~~~~~
 - Follow PEP 8 guidelines
 - Use type hints
 - Write docstrings in Google style
@@ -66,8 +57,7 @@ Create a branch for your changes:
 - Run black for code formatting
 
 3. Testing
-~~~~~~~~
-
+~~~~~~~~~~
 Run tests before submitting changes:
 
 .. code-block:: bash
@@ -81,8 +71,7 @@ Run tests before submitting changes:
    pytest tests/performance/
 
 4. Documentation
-~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~
 Update documentation for any changes:
 
 .. code-block:: bash
@@ -91,11 +80,9 @@ Update documentation for any changes:
    sphinx-build -b html docs/source docs/build/html
 
 Submitting Changes
----------------
-
+------------------
 1. Commit Changes
-~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~
 Follow commit message guidelines:
 
 .. code-block:: bash
@@ -104,8 +91,7 @@ Follow commit message guidelines:
    git commit -m "feat: add new feature"
 
 2. Push Changes
-~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~
 Push to your fork:
 
 .. code-block:: bash
@@ -113,8 +99,7 @@ Push to your fork:
    git push origin feature/your-feature-name
 
 3. Create Pull Request
-~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~
 Create a pull request on GitHub with:
 
 - Clear description of changes
@@ -123,11 +108,9 @@ Create a pull request on GitHub with:
 - Test results
 
 Code Review Process
-----------------
-
+-------------------
 1. Automated Checks
-~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~
 Your PR will be checked for:
 
 - Test coverage
@@ -136,8 +119,7 @@ Your PR will be checked for:
 - Documentation
 
 2. Manual Review
-~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~
 A maintainer will review your PR for:
 
 - Code quality
@@ -146,63 +128,53 @@ A maintainer will review your PR for:
 - Overall design
 
 3. Feedback
-~~~~~~~~~
-
+~~~~~~~~~~~
 - Address any feedback promptly
 - Keep discussions focused
 - Ask questions if unclear
 
 Development Guidelines
--------------------
-
+----------------------
 1. Code Organization
-~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~
 - Keep modules focused
 - Follow existing structure
 - Use appropriate abstractions
 
 2. Testing
-~~~~~~~~
-
+~~~~~~~~~~
 - Write unit tests for new code
 - Add property tests for complex logic
 - Include performance tests when relevant
 
 3. Documentation
-~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~
 - Update API documentation
 - Add examples for new features
 - Keep README.md current
 
 4. Performance
-~~~~~~~~~~~
-
+~~~~~~~~~~~~~~
 - Consider caching where appropriate
 - Profile code changes
 - Test with large datasets
 
 5. Security
-~~~~~~~~~
-
+~~~~~~~~~~~
 - Never commit secrets
 - Validate all inputs
 - Use safe defaults
 
 Getting Help
-----------
-
+------------
 - Create an issue for bugs
 - Ask questions in discussions
 - Join our community chat
 
 Release Process
-------------
-
+---------------
 1. Version Updates
-~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~
 Update version in:
 
 - pyproject.toml
@@ -210,15 +182,13 @@ Update version in:
 - __init__.py
 
 2. Documentation
-~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~
 - Update CHANGELOG.md
 - Review all documentation
 - Update version references
 
 3. Testing
-~~~~~~~~
-
+~~~~~~~~~~
 Run full test suite:
 
 .. code-block:: bash
@@ -226,15 +196,13 @@ Run full test suite:
    tox
 
 4. Create Release
-~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~
 - Create and push tag
 - Create GitHub release
 - Upload to PyPI
 
 5. Announcements
-~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~
 - Update documentation site
 - Announce in discussions
 - Update any related projects

@@ -1,14 +1,11 @@
 Usage
 =====
-
 Basic Usage
-----------
-
+-----------
 CountryFlag provides several ways to convert country names to emoji flags.
 
 Python API
-~~~~~~~~~
-
+~~~~~~~~~~
 Using CountryFlag within Python:
 
 .. code-block:: python
@@ -37,8 +34,7 @@ Using CountryFlag within Python:
        print(f"{flag} is the flag of {country}")
 
 Command Line Interface
-~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~
 CountryFlag can also be used from the command line:
 
 .. code-block:: bash
@@ -75,11 +71,9 @@ CountryFlag can also be used from the command line:
    countryflag --validate "United States"
 
 Advanced Features
-----------------
-
+-----------------
 Fuzzy Matching
-~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~
 CountryFlag supports fuzzy matching for country names:
 
 .. code-block:: python
@@ -91,8 +85,7 @@ CountryFlag supports fuzzy matching for country names:
    print(flags)  # 🇩🇪 🇧🇪 🇪🇸
 
 Region-Based Lookup
-~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~
 You can get flags for all countries in a specific region:
 
 .. code-block:: python
@@ -104,8 +97,7 @@ You can get flags for all countries in a specific region:
    print(flags)  # All European country flags
 
 Asynchronous Processing
-~~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~
 For large files, you can use asynchronous processing:
 
 .. code-block:: python
@@ -123,8 +115,7 @@ For large files, you can use asynchronous processing:
    asyncio.run(main())
 
 Parallel Processing
-~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~
 For multiple files, you can use parallel processing:
 
 .. code-block:: python
@@ -139,7 +130,6 @@ For multiple files, you can use parallel processing:
 
 Caching
 ~~~~~~~
-
 To improve performance, you can use caching:
 
 .. code-block:: python
@@ -159,7 +149,6 @@ To improve performance, you can use caching:
 
 Plugins
 ~~~~~~~
-
 You can extend CountryFlag with plugins:
 
 .. code-block:: python

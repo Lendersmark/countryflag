@@ -1,11 +1,9 @@
 Plugin System
-===========
-
+=============
 The CountryFlag package includes a flexible plugin system that allows you to extend its functionality.
 
 Overview
 --------
-
 The plugin system allows you to:
 
 * Add custom data sources for country information
@@ -14,8 +12,7 @@ The plugin system allows you to:
 * Customize flag rendering
 
 Creating a Plugin
----------------
-
+-----------------
 To create a plugin, you need to implement the BasePlugin interface:
 
 .. code-block:: python
@@ -46,11 +43,9 @@ To create a plugin, you need to implement the BasePlugin interface:
            pass
 
 Example Plugins
--------------
-
+---------------
 Custom Data Source
-~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~
 Here\'s an example of a plugin that uses a JSON file as a data source:
 
 .. literalinclude:: ../../examples/plugins/custom_data_source_plugin.py
@@ -59,8 +54,7 @@ Here\'s an example of a plugin that uses a JSON file as a data source:
    :caption: custom_data_source_plugin.py
 
 Custom Cache
-~~~~~~~~~~
-
+~~~~~~~~~~~~
 Example of a Redis-based cache plugin:
 
 .. literalinclude:: ../../examples/plugins/custom_cache_plugin.py
@@ -69,8 +63,7 @@ Example of a Redis-based cache plugin:
    :caption: custom_cache_plugin.py
 
 Custom Output Format
-~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~
 Example of a plugin that adds HTML and XML output formats:
 
 .. literalinclude:: ../../examples/plugins/custom_output_format_plugin.py
@@ -79,8 +72,7 @@ Example of a plugin that adds HTML and XML output formats:
    :caption: custom_output_format_plugin.py
 
 Using Plugins
------------
-
+-------------
 To use a plugin:
 
 .. code-block:: python
@@ -98,16 +90,14 @@ To use a plugin:
    flags = cf.get_flag(["United States", "Canada"])
 
 Plugin API Reference
------------------
-
+--------------------
 .. autoclass:: countryflag.plugins.base.BasePlugin
    :members:
    :undoc-members:
    :show-inheritance:
 
 Best Practices
-------------
-
+--------------
 1. **Error Handling**: Always implement proper error handling in your plugins
 2. **Performance**: Consider caching results for better performance
 3. **Documentation**: Document your plugin\'s behavior and requirements

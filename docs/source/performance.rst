@@ -1,14 +1,11 @@
 Performance Optimization Guide
-==========================
-
+==============================
 This guide provides best practices and recommendations for optimizing the performance of the countryflag package, particularly when working with large datasets or in performance-critical applications.
 
 General Performance Best Practices
----------------------------------
-
+----------------------------------
 Optimize Input Size
-~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~
 * **Batch processing**: Process country names in batches of optimal size (around 100-500 items) rather than individually or in very large batches
 * **Avoid duplicates**: Remove duplicate country names before processing to avoid redundant conversions
 * **Prevalidate inputs**: Validate country names before conversion to avoid wasting time on invalid inputs
@@ -28,8 +25,7 @@ Optimize Input Size
    # ... process flags
 
 Use Efficient Data Structures
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * **List vs Generator**: Use generators for large datasets when iterating through results to reduce memory usage
 * **Join vs Concatenation**: Prefer join operations over string concatenation in loops for better performance
 * **Dictionary lookups**: Use dictionary lookups for frequently accessed data
@@ -46,26 +42,22 @@ Use Efficient Data Structures
 
 
 Caching Strategies
------------------
-
+------------------
 Built-in Caching Options
-~~~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~~
 CountryFlag provides two built-in caching implementations:
 
 1. **Memory Cache** (`MemoryCache`): Fast in-memory caching with no persistence
 2. **Disk Cache** (`DiskCache`): Persistent caching with slightly slower access
 
 When to Use Caching
-~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~
 * **Repetitive conversions**: When the same country names are converted multiple times
 * **Long-running applications**: For services or applications that run for extended periods
 * **Batch processing**: When processing large datasets with potential repeated values
 
 Choosing a Cache Implementation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * **Memory Cache**: Best for speed when persistence is not required and memory is plentiful
 * **Disk Cache**: Best for persistence between application runs or when memory is limited
 * **Custom Cache**: Implement your own cache by extending the `Cache` interface for specialized needs
@@ -95,15 +87,13 @@ Choosing a Cache Implementation
    cf = CountryFlag(cache=disk_cache)
 
 Cache Invalidation
-~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~
 * **When to invalidate**: Invalidate cache when country data might have changed
 * **Selective invalidation**: Delete specific cache entries rather than clearing the entire cache
 * **Cache size management**: Monitor cache size and implement policies to limit growth
 
 Benchmarking Results
-~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~
 Our benchmarks show significant performance improvements with caching:
 
 +------------------+------------------+-------------------+------------------+
@@ -120,11 +110,9 @@ Our benchmarks show significant performance improvements with caching:
 
 
 Handling Large Datasets
-----------------------
-
+-----------------------
 Strategies for Large Lists
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 * **Chunking**: Process very large lists in smaller chunks to avoid memory issues
 * **Streaming**: Use generators and streaming processing when possible
 * **Parallel processing**: Process chunks in parallel for better performance
@@ -147,8 +135,7 @@ Strategies for Large Lists
        return results
 
 File Processing Optimizations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * **Asynchronous I/O**: Use `process_file_input_async` for processing large files
 * **Parallel processing**: Use `process_multiple_files` for processing multiple files in parallel
 * **Streaming**: Process large files line by line rather than loading the entire content
@@ -173,11 +160,9 @@ File Processing Optimizations
 
 
 Concurrency Recommendations
--------------------------
-
+---------------------------
 Thread-Based Concurrency
-~~~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~~
 * **When to use**: For I/O-bound operations or when making multiple independent conversions
 * **Thread pool**: Use `ThreadPoolExecutor` for efficient thread management
 * **Shared resources**: Be careful with shared caches in multi-threaded environments
@@ -196,8 +181,7 @@ Thread-Based Concurrency
        results = list(executor.map(convert_countries, country_lists))
 
 Process-Based Concurrency
-~~~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~~~
 * **When to use**: For CPU-bound operations on large datasets
 * **Process pool**: Use `ProcessPoolExecutor` for true parallel processing
 * **Data serialization**: Be aware of the overhead of inter-process communication
@@ -219,8 +203,7 @@ Process-Based Concurrency
        results = list(executor.map(process_country_chunk, chunks))
 
 Asynchronous Processing
-~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~
 * **When to use**: For I/O-bound operations like file reading or network requests
 * **Event loop**: Use asyncio's event loop for coordinating asynchronous tasks
 * **Async functions**: Use `async/await` with the library's async functions
@@ -245,11 +228,9 @@ Asynchronous Processing
 
 
 Memory Usage Optimization
------------------------
-
+-------------------------
 Memory-Efficient Processing
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * **Generator expressions**: Use generator expressions instead of list comprehensions when appropriate
 * **Chunking**: Process data in manageable chunks to control memory usage
 * **Garbage collection**: Force garbage collection after processing large batches
@@ -279,15 +260,13 @@ Memory-Efficient Processing
        return results
 
 Object Lifecycle Management
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * **Reuse objects**: Create CountryFlag instances once and reuse them
 * **Limit cached data**: Control the size of caches with policies like LRU (Least Recently Used)
 * **Reference management**: Be aware of references that might prevent garbage collection
 
 Performance Profiling
-~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~
 * **Measure first**: Use the `cProfile` module or other profiling tools to identify bottlenecks
 * **Target optimizations**: Focus on optimizing the most time-consuming operations
 * **Benchmark regularly**: Regularly benchmark to ensure optimizations are effective
@@ -309,13 +288,11 @@ Performance Profiling
        p.sort_stats('cumulative').print_stats(20)
 
 Advanced Performance Tips
------------------------
-
+-------------------------
 * **JIT compilation**: For extreme performance, consider using PyPy or Numba for JIT compilation
 * **C extensions**: Critical parts could be rewritten as C extensions for maximum performance
 * **Distributed processing**: For massive datasets, consider distributed processing frameworks
 
 Conclusion
----------
-
+----------
 By applying these optimization strategies, you can significantly improve the performance of the countryflag package, especially when working with large datasets or in performance-critical applications. Always measure before and after optimization to ensure your changes are having the desired effect.

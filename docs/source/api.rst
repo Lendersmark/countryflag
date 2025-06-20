@@ -1,8 +1,10 @@
 API Reference
-=============
+============
 
 Core
 ----
+.. module:: countryflag.core
+   :no-index:
 
 .. automodule:: countryflag.core
    :members:
@@ -11,6 +13,8 @@ Core
 
 Models
 ~~~~~~
+.. module:: countryflag.core.models
+   :no-index:
 
 .. automodule:: countryflag.core.models
    :members:
@@ -18,7 +22,9 @@ Models
    :show-inheritance:
 
 Exceptions
-~~~~~~~~~~
+~~~~~~~~~
+.. module:: countryflag.core.exceptions
+   :no-index:
 
 .. automodule:: countryflag.core.exceptions
    :members:
@@ -26,15 +32,19 @@ Exceptions
    :show-inheritance:
 
 Converters
-----------
+~~~~~~~~~
+.. module:: countryflag.core.converters
+   :no-index:
 
-.. automodule:: countryflag.converters
+.. automodule:: countryflag.core.converters
    :members:
    :undoc-members:
    :show-inheritance:
 
 Caching
 -------
+.. module:: countryflag.cache
+   :no-index:
 
 .. automodule:: countryflag.cache
    :members:
@@ -43,6 +53,8 @@ Caching
 
 Memory Cache
 ~~~~~~~~~~~
+.. module:: countryflag.cache.memory
+   :no-index:
 
 .. automodule:: countryflag.cache.memory
    :members:
@@ -51,6 +63,8 @@ Memory Cache
 
 Disk Cache
 ~~~~~~~~~
+.. module:: countryflag.cache.disk
+   :no-index:
 
 .. automodule:: countryflag.cache.disk
    :members:
@@ -59,6 +73,8 @@ Disk Cache
 
 Plugins
 -------
+.. module:: countryflag.plugins
+   :no-index:
 
 .. automodule:: countryflag.plugins
    :members:
@@ -67,6 +83,8 @@ Plugins
 
 Base Plugin
 ~~~~~~~~~~
+.. module:: countryflag.plugins.base
+   :no-index:
 
 .. automodule:: countryflag.plugins.base
    :members:
@@ -75,6 +93,8 @@ Base Plugin
 
 CLI
 ---
+.. module:: countryflag.cli
+   :no-index:
 
 .. automodule:: countryflag.cli
    :members:
@@ -83,6 +103,8 @@ CLI
 
 Utils
 -----
+.. module:: countryflag.utils
+   :no-index:
 
 .. automodule:: countryflag.utils
    :members:

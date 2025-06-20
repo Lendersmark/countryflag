@@ -1,11 +1,9 @@
 Quickstart Guide
-===============
-
+================
 This quickstart guide will help you get up and running with CountryFlag quickly.
 
 Installation
------------
-
+------------
 Install CountryFlag using pip:
 
 .. code-block:: bash
@@ -13,11 +11,9 @@ Install CountryFlag using pip:
    pip install countryflag
 
 Basic Usage
-----------
-
+-----------
 Converting Country Names to Flags
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The simplest way to use CountryFlag is to import the package and use the `getflag()` function:
 
 .. code-block:: python
@@ -53,8 +49,7 @@ The `getflag()` function accepts various country name formats:
    print(flags)  # 🇩🇪 🇫🇷 🇮🇹
 
 Using the CountryFlag Class
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 For more advanced usage, you can use the `CountryFlag` class directly:
 
 .. code-block:: python
@@ -75,8 +70,7 @@ For more advanced usage, you can use the `CountryFlag` class directly:
    # [{"country": "Germany", "flag": "🇩🇪"}, {"country": "France", "flag": "🇫🇷"}, {"country": "Italy", "flag": "🇮🇹"}]
 
 Reverse Lookup
-~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~
 You can also convert flag emojis back to country names:
 
 .. code-block:: python
@@ -88,8 +82,7 @@ You can also convert flag emojis back to country names:
    print(pairs)  # [('🇩🇪', 'Germany'), ('🇫🇷', 'France'), ('🇮🇹', 'Italy')]
 
 Region-Based Lookup
-~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~
 Get flags for all countries in a specific region:
 
 .. code-block:: python
@@ -104,8 +97,7 @@ Get flags for all countries in a specific region:
    print(flags)  # All European country flags
 
 Command Line Usage
-----------------
-
+------------------
 CountryFlag can also be used from the command line:
 
 .. code-block:: bash
@@ -129,11 +121,9 @@ CountryFlag can also be used from the command line:
    countryflag --interactive
 
 Common Use Cases
---------------
-
+----------------
 Handling Invalid Country Names
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Use fuzzy matching to handle slightly misspelled country names:
 
 .. code-block:: python
@@ -150,8 +140,7 @@ Use fuzzy matching to handle slightly misspelled country names:
        print(f"Error: {e}")
 
 Caching for Performance
-~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~
 Use caching to improve performance for repeated lookups:
 
 .. code-block:: python
@@ -185,8 +174,7 @@ For persistent caching, use DiskCache:
    cf = CountryFlag(cache=cache)
 
 File Processing
-~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~
 Process country names from a file:
 
 .. code-block:: python
@@ -222,8 +210,7 @@ For large files, use asynchronous processing:
    asyncio.run(process_large_file())
 
 Best Practices
-------------
-
+--------------
 1. **Reuse CountryFlag Instances**
 
    Create a single CountryFlag instance and reuse it:
@@ -298,8 +285,7 @@ Best Practices
       csv_output = cf.format_output(pairs, output_format='csv')
 
 Performance Tips
---------------
-
+----------------
 1. **Use Memory Caching for Speed**
 
    Memory caching offers the best performance:
@@ -376,8 +362,7 @@ Performance Tips
           return countries
 
 Next Steps
----------
-
+----------
 Now that you've got the basics, check out these guides for more advanced usage:
 
 * :doc:`usage` - More detailed usage examples

@@ -1,14 +1,11 @@
 Caching System
-============
-
+==============
 CountryFlag includes a robust caching system to improve performance when working with repeated country name lookups.
 
 Built-in Cache Types
-------------------
-
+--------------------
 Memory Cache
-~~~~~~~~~~
-
+~~~~~~~~~~~~
 The simplest and fastest caching option, storing data in memory:
 
 .. code-block:: python
@@ -29,8 +26,7 @@ The simplest and fastest caching option, storing data in memory:
    flags2 = cf.get_flag(["United States", "Canada"])
 
 Disk Cache
-~~~~~~~~
-
+~~~~~~~~~~
 Persistent caching that survives program restarts:
 
 .. code-block:: python
@@ -44,8 +40,7 @@ Persistent caching that survives program restarts:
    cf = CountryFlag(cache=cache)
 
 Redis Cache
-~~~~~~~~~
-
+~~~~~~~~~~~
 For distributed systems, use the Redis cache plugin:
 
 .. code-block:: python
@@ -59,8 +54,7 @@ For distributed systems, use the Redis cache plugin:
    cf = CountryFlag(cache=cache)
 
 Cache Configuration
-----------------
-
+-------------------
 Common configuration options:
 
 .. code-block:: python
@@ -84,8 +78,7 @@ Common configuration options:
    )
 
 Creating Custom Caches
--------------------
-
+----------------------
 You can create custom cache implementations by extending the base Cache class:
 
 .. code-block:: python
@@ -115,8 +108,7 @@ You can create custom cache implementations by extending the base Cache class:
            pass
 
 Cache Performance
---------------
-
+-----------------
 Benchmarking results for different cache types:
 
 +-------------+------------+-------------+--------------+
@@ -128,8 +120,7 @@ Benchmarking results for different cache types:
 +-------------+------------+-------------+--------------+
 
 Best Practices
-------------
-
+--------------
 1. **Choose the Right Cache**:
    - Use MemoryCache for single-process applications
    - Use DiskCache for persistence between runs
@@ -151,8 +142,7 @@ Best Practices
    - Provide cache clearing mechanisms
 
 API Reference
------------
-
+-------------
 .. automodule:: countryflag.cache.base
    :members:
    :undoc-members:

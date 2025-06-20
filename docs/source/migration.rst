@@ -1,11 +1,9 @@
 Migration Guide
-==============
-
+===============
 This guide will help you migrate from countryflag v0.1.x to v0.2.0.
 
 Overview of Changes
------------------
-
+-------------------
 Version 0.2.0 is a major update with significant improvements:
 
 * Complete restructuring of the package architecture
@@ -15,8 +13,7 @@ Version 0.2.0 is a major update with significant improvements:
 * Many performance improvements and bug fixes
 
 Breaking Changes
---------------
-
+----------------
 While we've tried to maintain backward compatibility, there are a few breaking changes:
 
 1. The `getflag()` function now returns a tuple `(flags, pairs)` when used from the API. 
@@ -27,8 +24,7 @@ While we've tried to maintain backward compatibility, there are a few breaking c
 3. Error handling has been improved with specific exception types.
 
 Updating Code
------------
-
+-------------
 Basic usage remains compatible:
 
 .. code-block:: python
@@ -45,8 +41,7 @@ Basic usage remains compatible:
    print(pairs)  # [('Germany', '🇩🇪'), ('France', '🇫🇷'), ('Italy', '🇮🇹')]
 
 Using the Enhanced API
---------------------
-
+----------------------
 The new version provides a more powerful API through the `CountryFlag` class:
 
 .. code-block:: python
@@ -70,8 +65,7 @@ The new version provides a more powerful API through the `CountryFlag` class:
    europe_flags, europe_pairs = cf.get_flags_by_region('Europe')
 
 Using Caching
------------
-
+-------------
 One of the biggest performance improvements in v0.2.0 is the caching system:
 
 .. code-block:: python
@@ -91,8 +85,7 @@ One of the biggest performance improvements in v0.2.0 is the caching system:
    flags, pairs = cf.get_flag(['Germany', 'France', 'Italy'])
 
 Error Handling
-------------
-
+--------------
 The new version uses custom exceptions for better error handling:
 
 .. code-block:: python
@@ -109,8 +102,7 @@ The new version uses custom exceptions for better error handling:
        print(f"Invalid country: {e.country}")
 
 Command Line Interface
--------------------
-
+----------------------
 The command-line interface has been enhanced with many new options:
 
 .. code-block:: bash
@@ -129,12 +121,10 @@ The command-line interface has been enhanced with many new options:
    countryflag --cache  # Enable caching
 
 Performance Considerations
------------------------
-
+--------------------------
 See the :doc:`performance` guide for detailed information on optimizing performance in v0.2.0.
 
 Final Notes
----------
-
+-----------
 If you encounter any issues migrating to v0.2.0, please report them on the 
 `GitHub issue tracker <https://github.com/Lendersmark/countryflag/issues>`_.

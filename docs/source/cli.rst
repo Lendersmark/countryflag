@@ -1,14 +1,11 @@
 Command Line Interface
-===================
-
+======================
 CountryFlag provides a powerful command-line interface for converting country names to emoji flags.
 
 Basic Usage
----------
-
+-----------
 Converting Country Names
-~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~~
 Convert one or more country names to flags:
 
 .. code-block:: bash
@@ -23,11 +20,9 @@ Convert one or more country names to flags:
    countryflag "United States" DE France
 
 Options and Flags
---------------
-
+-----------------
 Format Options
-~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~
 Specify output format:
 
 .. code-block:: bash
@@ -42,8 +37,7 @@ Specify output format:
    countryflag --separator "|" Germany France Italy
 
 Fuzzy Matching
-~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~
 Enable fuzzy matching for misspelled country names:
 
 .. code-block:: bash
@@ -55,8 +49,7 @@ Enable fuzzy matching for misspelled country names:
    countryflag --fuzzy --threshold 0.8 Germny Frnace Itly
 
 Region-Based Lookup
-~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~
 Get flags for all countries in a region:
 
 .. code-block:: bash
@@ -68,8 +61,7 @@ Get flags for all countries in a region:
    countryflag --region Asia
 
 File Processing
-~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~
 Process country names from files:
 
 .. code-block:: bash
@@ -84,8 +76,7 @@ Process country names from files:
    countryflag --files file1.txt file2.txt --workers 4
 
 Interactive Mode
-~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~
 Run in interactive mode with autocompletion:
 
 .. code-block:: bash
@@ -93,8 +84,7 @@ Run in interactive mode with autocompletion:
    countryflag --interactive
 
 Utility Commands
-~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~
 Various utility commands:
 
 .. code-block:: bash
@@ -115,11 +105,9 @@ Various utility commands:
    countryflag --help
 
 Advanced Usage
------------
-
+--------------
 Caching
 ~~~~~~~
-
 Enable caching for better performance:
 
 .. code-block:: bash
@@ -131,8 +119,7 @@ Enable caching for better performance:
    countryflag --cache disk --cache-dir /path/to/cache Germany France Italy
 
 Asynchronous Processing
-~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~
 Use async processing for large files:
 
 .. code-block:: bash
@@ -141,8 +128,7 @@ Use async processing for large files:
    countryflag --async --file large_file.txt
 
 Environment Variables
-------------------
-
+---------------------
 The CLI supports several environment variables:
 
 * ``COUNTRYFLAG_CACHE_DIR``: Default cache directory
@@ -151,8 +137,7 @@ The CLI supports several environment variables:
 * ``COUNTRYFLAG_LANGUAGE``: Language for country names
 
 Exit Codes
---------
-
+----------
 The CLI uses the following exit codes:
 
 * ``0``: Success
@@ -163,8 +148,7 @@ The CLI uses the following exit codes:
 * ``5``: Cache error
 
 Examples
--------
-
+--------
 1. Basic conversion with custom format:
 
    .. code-block:: bash
@@ -190,8 +174,7 @@ Examples
       countryflag --interactive --cache disk --cache-dir ~/.cache/countryflag
 
 Error Handling
------------
-
+--------------
 The CLI provides detailed error messages:
 
 .. code-block:: bash
@@ -209,8 +192,7 @@ The CLI provides detailed error messages:
    Error: File not found: nonexistent.txt
 
 Best Practices
------------
-
+--------------
 1. Use appropriate output formats for different use cases
 2. Enable caching for repeated operations
 3. Use fuzzy matching when processing user input

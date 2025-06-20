@@ -1,9 +1,7 @@
 Installation Guide
-================
-
+==================
 Basic Installation
-----------------
-
+------------------
 The simplest way to install CountryFlag is via pip:
 
 .. code-block:: bash
@@ -13,8 +11,7 @@ The simplest way to install CountryFlag is via pip:
 This will install the latest stable version of the package along with all required dependencies.
 
 Requirements
------------
-
+------------
 CountryFlag requires:
 
 * Python 3.6 or newer
@@ -25,8 +22,7 @@ CountryFlag requires:
 * aioconsole
 
 Development Installation
-----------------------
-
+------------------------
 For development, you can install the package with additional dependencies:
 
 .. code-block:: bash
@@ -43,8 +39,7 @@ For development, you can install the package with additional dependencies:
    pip install -e ".[dev]"
 
 Docker Installation
------------------
-
+-------------------
 You can also run CountryFlag using Docker:
 
 .. code-block:: bash
@@ -56,8 +51,7 @@ You can also run CountryFlag using Docker:
    docker run -p 8000:8000 countryflag-api
 
 Verification
------------
-
+------------
 To verify your installation:
 
 .. code-block:: bash
@@ -69,8 +63,7 @@ To verify your installation:
    countryflag "United States" Germany France
 
 Next Steps
----------
-
+----------
 After installation, you might want to:
 
 * Read the :doc:`quickstart` guide
