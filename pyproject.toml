@@ -8,7 +8,7 @@ version = "1.0.1"
 description = "A Python package for converting country names into emoji flags"
 readme = "README.md"
 requires-python = ">=3.8"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Lendersmark", email = "author@example.com"}
 ]
