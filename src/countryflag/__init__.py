@@ -31,10 +31,10 @@ https://countryflag.readthedocs.io/
 """
 
 import logging
-import platform
 import os
+import platform
 import sys
-from typing import List, Tuple, Dict, Any, Union, Optional
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # Set up logging
 logging.basicConfig(
@@ -42,19 +42,20 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 
-# Import core functionality
-from countryflag.core.flag import CountryFlag
 from countryflag.core.exceptions import (
+    CacheError,
     CountryFlagError,
     InvalidCountryError,
-    ReverseConversionError,
-    RegionError,
-    CacheError,
     PluginError,
+    RegionError,
+    ReverseConversionError,
 )
 
+# Import core functionality
+from countryflag.core.flag import CountryFlag
+
 # Package metadata
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __author__ = "Lendersmark"
 __license__ = "MIT"
 __copyright__ = "Copyright 2025 Lendersmark"
@@ -69,18 +70,18 @@ def _setup_platform_optimizations() -> None:
     if platform.python_implementation() == "PyPy":
         # PyPy-specific optimizations (if any)
         pass
-    
+
     # Windows-specific optimizations
     if sys.platform.startswith("win"):
         # Windows doesn't render emoji flags correctly in many terminals
         # We could add a Windows-specific renderer or warning here
         pass
-    
+
     # macOS-specific optimizations
     elif sys.platform == "darwin":
         # macOS has good emoji support, no special handling needed
         pass
-    
+
     # Linux-specific optimizations
     elif sys.platform.startswith("linux"):
         # Check terminal capabilities for emoji support
@@ -91,39 +92,45 @@ def _setup_platform_optimizations() -> None:
 _setup_platform_optimizations()
 
 
-def getflag(country_names: List[str], separator: str = " ") -> Union[str, Tuple[str, List[Tuple[str, str]]]]:
+def getflag(
+    country_names: List[str], separator: str = " "
+) -> Union[str, Tuple[str, List[Tuple[str, str]]]]:
     """
     Convert country names to emoji flags.
-    
+
     This is a convenience function that creates a CountryFlag instance and calls
     get_flag() on it. For backward compatibility, it returns just the string of
     flags by default, but can optionally return the full tuple with pairs.
-    
+
     Args:
         country_names: A list of country names to convert to flags.
         separator: The separator to use between flags (default: space).
-        
+
     Returns:
         str: A string containing emoji flags separated by the specified separator.
-        
+
     Raises:
         InvalidCountryError: If a country name cannot be converted to a flag.
-        
+
     Example:
         >>> getflag(['Germany', 'BE', 'United States of America', 'Japan'])
         '🇩🇪 🇧🇪 🇺🇸 🇯🇵'
     """
     cf = CountryFlag()
     flags, pairs = cf.get_flag(country_names, separator)
-    
+
     # Check if we're being called from a module that imports from v0.2.0
     # If so, return the full result (flags, pairs)
     frame = sys._getframe(1)
-    if frame and 'self' in frame.f_locals and hasattr(frame.f_locals['self'], '__module__'):
-        module = frame.f_locals['self'].__module__
-        if module.startswith('countryflag.') and not module == 'countryflag.cli.main':
+    if (
+        frame
+        and "self" in frame.f_locals
+        and hasattr(frame.f_locals["self"], "__module__")
+    ):
+        module = frame.f_locals["self"].__module__
+        if module.startswith("countryflag.") and not module == "countryflag.cli.main":
             return flags, pairs
-    
+
     # Otherwise, maintain backward compatibility by returning just the flags string
     return flags
 
