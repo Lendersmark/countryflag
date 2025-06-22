@@ -1,17 +1,18 @@
 """
 Pytest configuration file with fixtures for countryflag tests.
 """
+
 import os
 import tempfile
 from pathlib import Path
-from typing import Dict, List, Generator, Any
+from typing import Any, Dict, Generator, List
 
-import pytest
 import pandas as pd
+import pytest
 from country_converter import CountryConverter
 
-from countryflag.core.models import CountryInfo
 from countryflag.cache import Cache, MemoryCache
+from countryflag.core.models import CountryInfo
 
 
 @pytest.fixture
@@ -58,7 +59,7 @@ def temp_countries_file() -> Generator[str, None, None]:
         temp_file_path = temp_file.name
 
     yield temp_file_path
-    
+
     # Clean up
     os.unlink(temp_file_path)
 
@@ -105,7 +106,7 @@ def mock_country_converter_data() -> pd.DataFrame:
 @pytest.fixture
 def mock_country_converter(monkeypatch, mock_country_converter_data) -> None:
     """Patch the CountryConverter to use mock data."""
-    
+
     def mock_coco_convert(names, to="ISO3"):
         """Mock country_converter.convert function."""
         # Handle single string input
@@ -113,64 +114,73 @@ def mock_country_converter(monkeypatch, mock_country_converter_data) -> None:
             name = names.strip().lower()
             # Look up in the mock data
             for _, row in mock_country_converter_data.iterrows():
-                if (row['name_short'].lower() == name or 
-                    row['ISO2'].lower() == name or 
-                    row['ISO3'].lower() == name):
+                if (
+                    row["name_short"].lower() == name
+                    or row["ISO2"].lower() == name
+                    or row["ISO3"].lower() == name
+                ):
                     if to == "ISO2":
-                        return row['ISO2']
+                        return row["ISO2"]
                     elif to == "ISO3":
-                        return row['ISO3']
+                        return row["ISO3"]
                     else:
-                        return row['name_short']
+                        return row["name_short"]
             return "not found"
-        
+
         # Handle list input (return list)
         if isinstance(names, list):
             return [mock_coco_convert(name, to) for name in names]
-        
+
         return "not found"
-    
+
     class MockCountryConverter:
         def __init__(self, *args, **kwargs):
             self.data = mock_country_converter_data
-        
+
         def convert(self, names, to="ISO2"):
             """Mock convert method that handles country name to ISO code conversion."""
             return mock_coco_convert(names, to)
-        
+
         def get_countries_by_region(self, region):
             """Mock method to get countries by region."""
-            from countryflag.core.models import CountryInfo
             import flag
-            
+
+            from countryflag.core.models import CountryInfo
+
             countries = []
             for _, row in self.data.iterrows():
-                if row['region'].lower() == region.lower():
+                if row["region"].lower() == region.lower():
                     try:
                         country_info = CountryInfo(
-                            name=row['name_short'],
-                            iso2=row['ISO2'],
-                            iso3=row['ISO3'],
-                            official_name=row['name_official'],
-                            region=row['region'],
-                            subregion=row['sub_region'],
-                            flag=flag.flag(row['ISO2'])
+                            name=row["name_short"],
+                            iso2=row["ISO2"],
+                            iso3=row["ISO3"],
+                            official_name=row["name_official"],
+                            region=row["region"],
+                            subregion=row["sub_region"],
+                            flag=flag.flag(row["ISO2"]),
                         )
                         countries.append(country_info)
                     except Exception:
                         # Skip if flag generation fails
                         pass
             return countries
-    
+
     # Patch the coco.convert function that's used directly
     import country_converter as coco
+
     monkeypatch.setattr(coco, "convert", mock_coco_convert)
-    
+
     # Patch the CountryConverter class methods
     monkeypatch.setattr(CountryConverter, "__init__", MockCountryConverter.__init__)
     monkeypatch.setattr(CountryConverter, "convert", MockCountryConverter.convert)
-    monkeypatch.setattr(CountryConverter, "get_countries_by_region", MockCountryConverter.get_countries_by_region)
-    
+    monkeypatch.setattr(
+        CountryConverter,
+        "get_countries_by_region",
+        MockCountryConverter.get_countries_by_region,
+    )
+
     # Reset the singleton to ensure clean state for tests
     from countryflag.core.converters import CountryConverterSingleton
+
     CountryConverterSingleton._CountryConverterSingleton__instance = None
