@@ -56,6 +56,8 @@ test = [
     "pytest",
     "pytest-cov",
     "hypothesis",
+    "psutil",
+    "cli_test_helpers",
 ]
 docs = [
     "sphinx",
