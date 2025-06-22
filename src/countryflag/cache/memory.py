@@ -4,6 +4,7 @@ Memory-based cache implementation for the countryflag package.
 This module contains the MemoryCache class, which implements in-memory caching.
 """
 
+import threading
 from typing import Any, Dict, Optional
 
 from countryflag.cache.base import Cache
@@ -25,6 +26,7 @@ class MemoryCache(Cache):
         """
         self._cache: Dict[str, Any] = {}
         self._hits = 0  # Initialize hit counter
+        self._lock = threading.Lock()  # Add a lock
 
     def get(self, key: str) -> Optional[Any]:
         """
@@ -44,10 +46,11 @@ class MemoryCache(Cache):
             >>> cache.get("nonexistent")
             None
         """
-        value = self._cache.get(key)
-        if value is not None:
-            self._hits += 1  # Increment hit counter
-        return value
+        with self._lock:
+            value = self._cache.get(key)
+            if value is not None:
+                self._hits += 1  # Increment hit counter
+            return value
 
     def set(self, key: str, value: Any) -> None:
         """
@@ -63,7 +66,8 @@ class MemoryCache(Cache):
             >>> cache.get("key")
             'value'
         """
-        self._cache[key] = value
+        with self._lock:
+            self._cache[key] = value
 
     def delete(self, key: str) -> None:
         """
@@ -79,8 +83,9 @@ class MemoryCache(Cache):
             >>> cache.get("key")
             None
         """
-        if key in self._cache:
-            del self._cache[key]
+        with self._lock:
+            if key in self._cache:
+                del self._cache[key]
 
     def clear(self) -> None:
         """
@@ -96,7 +101,8 @@ class MemoryCache(Cache):
             >>> cache.get("key2")
             None
         """
-        self._cache.clear()
+        with self._lock:
+            self._cache.clear()
 
     def contains(self, key: str) -> bool:
         """
@@ -116,7 +122,8 @@ class MemoryCache(Cache):
             >>> cache.contains("nonexistent")
             False
         """
-        return key in self._cache
+        with self._lock:
+            return key in self._cache
 
     def get_hits(self) -> int:
         """
@@ -125,10 +132,12 @@ class MemoryCache(Cache):
         Returns:
             int: The number of cache hits.
         """
-        return self._hits
+        with self._lock:
+            return self._hits
 
     def reset_hits(self) -> None:
         """
         Reset the cache hit counter.
         """
-        self._hits = 0
+        with self._lock:
+            self._hits = 0
