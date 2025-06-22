@@ -23,7 +23,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.8",
     package_dir={"": "src"},
     install_requires=["emoji-country-flag", "country_converter"],
     entry_points={"console_scripts": ["countryflag=countryflag.cli.main:main"]},
