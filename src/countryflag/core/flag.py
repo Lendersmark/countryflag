@@ -14,6 +14,7 @@ from typing import Any, Dict, List, Literal, Optional, Tuple, cast
 import flag
 
 from countryflag.cache.base import Cache
+from countryflag.cache.memory import MemoryCache
 from countryflag.core.converters import CountryConverterSingleton
 from countryflag.core.exceptions import (
     InvalidCountryError,
@@ -49,6 +50,9 @@ class CountryFlag:
         '🇺🇸 🇨🇦 🇲🇽'
     """
 
+    # Class-level shared cache instance
+    _global_cache: MemoryCache = MemoryCache()
+
     __slots__ = ("_converter", "_language", "_cache")
 
     def __init__(self, language: str = "en", cache: Optional[Cache] = None) -> None:
@@ -57,12 +61,27 @@ class CountryFlag:
 
         Args:
             language: The language code for output (default: 'en').
-            cache: The cache instance to use (optional).
+            cache: The cache instance to use (optional). If None, uses the shared global cache.
         """
         self._converter = CountryConverterSingleton()
         self._language = language
-        self._cache = cache
+        # Use the global cache if no cache is provided
+        self._cache = cache if cache is not None else self._global_cache
 
+    @classmethod
+    def clear_global_cache(cls) -> None:
+        """
+        Clear the global cache. Useful for testing or resetting cache state.
+        
+        This method clears the shared cache instance used by all CountryFlag
+        instances that don't have a custom cache provided.
+        
+        Example:
+            >>> CountryFlag.clear_global_cache()
+        """
+        cls._global_cache.clear()
+        cls._global_cache.reset_hits()
+    
     def set_language(self, language: str) -> None:
         """
         Set the language for country names.
