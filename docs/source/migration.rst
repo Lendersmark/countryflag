@@ -1,6 +1,70 @@
 Migration Guide
 ===============
-This guide will help you migrate from countryflag v0.1.x to v0.2.0.
+This guide will help you migrate between different versions of countryflag.
+
+Migrating to v1.0.1 from v1.0.0
+--------------------------------
+
+**Cache Singleton Behavior (Breaking Change)**
+
+Version 1.0.1 introduces automatic cache sharing across CountryFlag instances.
+
+**What Changed:**
+
+.. code-block:: python
+
+   # Before v1.0.1
+   cf1 = CountryFlag()  # No caching (cache=None)
+   cf2 = CountryFlag()  # No caching (cache=None)
+   
+   # From v1.0.1 onwards
+   cf1 = CountryFlag()  # Automatic global cache sharing
+   cf2 = CountryFlag()  # Same global cache as cf1
+
+**Impact:**
+
+- **Performance Improvement**: Instances now automatically benefit from shared caching
+- **Memory Efficiency**: Single cache instance reduces memory usage
+- **Thread Safety**: Enhanced with proper locking mechanisms
+- **Backward Compatibility**: Existing code continues to work unchanged
+
+**Migration Steps:**
+
+1. **No code changes required** - existing applications will automatically benefit
+2. **Test cache behavior** - if your tests depend on no caching, use ``CountryFlag.clear_global_cache()``
+3. **Monitor performance** - expect significant improvements in repeated operations
+
+**For Testing Code:**
+
+.. code-block:: python
+
+   import unittest
+   from countryflag.core import CountryFlag
+   
+   class MyTest(unittest.TestCase):
+       def setUp(self):
+           # Clear global cache before each test
+           CountryFlag.clear_global_cache()
+       
+       def test_something(self):
+           cf = CountryFlag()
+           # Test code here
+
+**Disabling Global Cache (if needed):**
+
+.. code-block:: python
+
+   from countryflag.cache.base import NoOpCache
+   
+   # Create instance with no caching (pre-v1.0.1 behavior)
+   cf = CountryFlag(cache=NoOpCache())
+
+Migrating to v1.0.0 from v0.2.0
+--------------------------------
+Version 1.0.0 is primarily focused on production readiness and deployment features. Most API changes are additive.
+
+Migrating to v0.2.0 from v0.1.x
+--------------------------------
 
 Overview of Changes
 -------------------

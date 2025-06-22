@@ -6,8 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.0.1] - YYYY-MM-DD
+
+### Added
+- **Cache Singleton Behavior**: Global shared cache automatically used by all CountryFlag instances without explicit cache parameter
+- **Enhanced Thread Safety**: All cache operations now use threading.Lock for concurrent access protection
+- **Cache Key Normalization**: Deterministic cache keys using sorted country names for improved cache hit rates
+- **Global Cache Management**: Added `CountryFlag.clear_global_cache()` class method for easy cache reset
+- **Cache Hit Accumulation**: Multiple instances now share cache data, improving performance across application lifecycle
+
+### Changed
+- **BREAKING**: Cache behavior changed - instances without explicit cache now share global cache instead of having no cache
+- **Cache Efficiency**: Improved cache key generation with order-independent normalization
+- **Memory Usage**: Reduced memory footprint through singleton cache pattern
+
 ### Fixed
-- Resolved two failing tests from 1.0.0 release.
+- Resolved two failing tests from 1.0.0 release
+- Fixed cache fragmentation issues with multiple CountryFlag instances
+- Improved cache hit rates through better key normalization
 
 ## [1.0.0] - 2025-06-20
 

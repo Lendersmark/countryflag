@@ -70,17 +70,28 @@ countryflag --interactive
 
 ### Caching
 
+CountryFlag includes automatic cache sharing for improved performance:
+
 ```python
 from countryflag.core import CountryFlag
 from countryflag.cache import MemoryCache, DiskCache
 
-# Memory cache
-cache = MemoryCache()
-cf = CountryFlag(cache=cache)
+# Automatic cache sharing (new in v1.0.1)
+cf1 = CountryFlag()  # Uses global shared cache
+cf2 = CountryFlag()  # Shares same cache as cf1
 
-# Disk cache
-cache = DiskCache("/path/to/cache")
-cf = CountryFlag(cache=cache)
+# First call (cache miss)
+flags1, _ = cf1.get_flag(["Germany"])
+
+# Second call from different instance (cache hit!)
+flags2, _ = cf2.get_flag(["Germany"])  # Much faster
+
+# Custom cache (if needed)
+cache = MemoryCache()
+cf = CountryFlag(cache=cache)  # Uses independent cache
+
+# Clear global cache (useful for testing)
+CountryFlag.clear_global_cache()
 ```
 
 ### Region-Based Lookup

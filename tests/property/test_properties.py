@@ -1097,6 +1097,7 @@ def test_concurrent_cache_access(tmp_path):
         assert results[tuple(country_list)] == len(country_list)
 
     # Check that cache has entries for all countries
+    cf = CountryFlag(cache=memory_cache)
     for country_list in country_lists:
-        cache_key = f"get_flag_{','.join(country_list)}_{' '}"
+        cache_key = f"get_flag_{cf._make_key(country_list, ' ')}"
         assert memory_cache.contains(cache_key)

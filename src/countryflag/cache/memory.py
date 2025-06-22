@@ -134,6 +134,16 @@ class MemoryCache(Cache):
         """
         with self._lock:
             return self._hits
+    
+    @property
+    def hits(self) -> int:
+        """
+        Property to get the number of cache hits.
+
+        Returns:
+            int: The number of cache hits.
+        """
+        return self.get_hits()
 
     def reset_hits(self) -> None:
         """

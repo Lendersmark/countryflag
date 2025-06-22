@@ -91,6 +91,24 @@ class CountryFlag:
         """
         self._language = language
 
+    def _make_key(self, country_names: List[str], separator: str) -> str:
+        """
+        Create a deterministic cache key by sorting country names.
+        
+        This ensures that the same logical country list in different orders
+        maps to the same cache entry. Only valid string entries are used for the key.
+        
+        Args:
+            country_names: List of country names.
+            separator: The separator used between flags.
+            
+        Returns:
+            str: A deterministic cache key.
+        """
+        # Filter to only valid string entries for the cache key
+        valid_names = [name for name in country_names if isinstance(name, str) and name.strip()]
+        return ','.join(sorted(valid_names)) + f'_{separator}'
+
     def validate_country_name(self, country_name: str) -> bool:
         """
         Validate if a country name can be converted to an ISO2 code.
@@ -250,10 +268,24 @@ class CountryFlag:
 
         # Check cache first if available and not using fuzzy matching
         if self._cache and not fuzzy_matching:
-            cache_key = f"get_flag_{','.join(country_names)}_{separator}"
+            cache_key = f"get_flag_{self._make_key(country_names, separator)}"
             cached_result = self._cache.get(cache_key)
             if cached_result is not None:
-                return cached_result
+                # Cached result exists, but we need to reorder it to match current input order
+                cached_flags, cached_pairs = cached_result
+                # Create a mapping from country name to flag from cached result
+                country_to_flag = {country: flag for country, flag in cached_pairs}
+                
+                # Reconstruct result in current input order
+                reordered_pairs = []
+                reordered_flags = []
+                for country_name in country_names:
+                    if isinstance(country_name, str) and country_name.strip() and country_name in country_to_flag:
+                        emoji_flag = country_to_flag[country_name]
+                        reordered_pairs.append((country_name, emoji_flag))
+                        reordered_flags.append(emoji_flag)
+                
+                return (separator.join(reordered_flags), reordered_pairs)
 
         # Use a list for better performance when concatenating strings
         flags_list = []
@@ -339,10 +371,21 @@ class CountryFlag:
 
         # Check cache first if available
         if self._cache:
-            cache_key = f"reverse_lookup_{','.join(emoji_flags)}"
+            cache_key = f"reverse_lookup_{self._make_key(emoji_flags, '')}"
             cached_result = self._cache.get(cache_key)
             if cached_result is not None:
-                return cached_result
+                # Cached result exists, but we need to reorder it to match current input order
+                # Create a mapping from flag to country from cached result
+                flag_to_country = {flag: country for flag, country in cached_result}
+                
+                # Reconstruct result in current input order
+                reordered_result = []
+                for emoji_flag in emoji_flags:
+                    if isinstance(emoji_flag, str) and emoji_flag in flag_to_country:
+                        country_name = flag_to_country[emoji_flag]
+                        reordered_result.append((emoji_flag, country_name))
+                
+                return reordered_result
 
         flag_to_country = self._converter.get_flag_to_country_mapping()
         result = []
