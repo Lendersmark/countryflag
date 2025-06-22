@@ -55,6 +55,8 @@ By participating in this project, you are expected to uphold our Code of Conduct
 - Run property-based tests: `pytest tests/property`
 - Run performance tests: `pytest tests/performance`
 
+**Note**: Cache hit assertions in tests rely on the `MemoryCache.get_hits()` method to verify caching behavior.
+
 ### Documentation
 
 - Build documentation: `sphinx-build -b html docs/source docs/build/html`
