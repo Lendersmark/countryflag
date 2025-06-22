@@ -54,6 +54,7 @@ dev = [
 test = [
     "pytest",
     "pytest-cov",
+    "pytest-benchmark",
     "hypothesis",
     "psutil",
     "cli_test_helpers",
