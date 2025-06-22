@@ -29,6 +29,8 @@ jobs:
         python -m pip install tox tox-gh-actions
 
     - name: Test with tox
+      # tox uses PEP-517 build process due to isolated_build = True in tox.ini
+      # This ensures the package is built and installed from pyproject.toml
       run: tox
 
     - name: Upload coverage to Codecov
@@ -77,3 +79,23 @@ jobs:
       with:
         name: documentation
         path: docs/build/html/
+
+  build-test:
+    # Explicit test of PEP-517 build process
+    # This job tests: python -m build && pip install dist/*.whl && pytest
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install tox
+
+    - name: Test PEP-517 build process
+      run: tox -e build
