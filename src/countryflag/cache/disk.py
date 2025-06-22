@@ -41,6 +41,7 @@ class DiskCache(Cache):
         """
         self._cache_dir = Path(cache_dir)
         self._index: Dict[str, str] = {}
+        self._hits = 0  # Initialize hit counter
         
         # Create the cache directory if it doesn't exist
         try:
@@ -117,6 +118,7 @@ class DiskCache(Cache):
         
         try:
             with open(cache_path, "r", encoding="utf-8") as f:
+                self._hits += 1  # Increment hit counter
                 return json.load(f)
         except Exception as e:
             logger.error(f"Error reading cache file for key '{key}': {e}")
@@ -196,6 +198,22 @@ class DiskCache(Cache):
         """
         for key in list(self._index.keys()):
             self.delete(key)
+        self._hits = 0  # Reset hit counter
+
+    def get_hits(self) -> int:
+        """
+        Get the number of cache hits.
+        
+        Returns:
+            int: The number of cache hits.
+        """
+        return self._hits
+
+    def reset_hits(self) -> None:
+        """
+        Reset the cache hit counter.
+        """
+        self._hits = 0
     
     def contains(self, key: str) -> bool:
         """

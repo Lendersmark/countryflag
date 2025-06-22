@@ -32,26 +32,26 @@ def test_entrypoint():
 
 def test_example_command():
     """Is command available?"""
-    result = shell("countryflag france --help")
+    result = shell("countryflag --countries france --help")
     assert result.exit_code == 0
 
 
 def test_cli_singlecountry():
     """Tests the command line output"""
     expected = "🇫🇷\n"
-    result = shell("countryflag France")
+    result = shell("countryflag --countries France")
     assert result.stdout == expected, "Output doesn't match with input countries!"
 
 
 def test_cli_multiplecountries():
     """Tests the command line output"""
     expected = "🇫🇷 🇧🇪 🇯🇵 🇺🇸\n"
-    result = shell("countryflag France Belgium JP 'United States of America'")
+    result = shell("countryflag --countries France Belgium JP 'United States of America'")
     assert result.stdout == expected, "Output doesn't match with input countries!"
 
 
 def test_cli_notfound():
     """Tests the error message when a country is not found in regex"""
     expected = "Please use one of the supported country names classifications.\n"
-    result = shell("countryflag nonexistentcountry")
+    result = shell("countryflag --countries nonexistentcountry")
     assert result.stdout == expected

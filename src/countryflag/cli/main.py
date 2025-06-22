@@ -198,7 +198,7 @@ def main() -> None:
     # Input group
     input_group = parser.add_mutually_exclusive_group(required=False)
     input_group.add_argument(
-        "countries",
+        "--countries",
         metavar="COUNTRY",
         nargs="*",
         help="Country names to be converted into emojis, separated by spaces",

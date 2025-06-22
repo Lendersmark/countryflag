@@ -278,7 +278,13 @@ class CountryFlag:
     
     def reverse_lookup(self, emoji_flags: List[str]) -> List[Tuple[str, str]]:
         """
-        Convert emoji flags to country names.
+        Convert emoji flags to country names with robust handling of edge cases.
+        
+        This method provides enhanced reverse lookup that handles:
+        - Standard regional indicator flags (🇺🇸 → United States)
+        - Alternative ISO codes (🇬🇧 and 🇺🇰 → United Kingdom)
+        - Special territories (🇦🇨 → Ascension Island)
+        - Regional indicator normalization
         
         Args:
             emoji_flags: A list of emoji flags to convert to country names.
@@ -291,9 +297,9 @@ class CountryFlag:
             
         Example:
             >>> cf = CountryFlag()
-            >>> pairs = cf.reverse_lookup(["🇺🇸", "🇨🇦"])
+            >>> pairs = cf.reverse_lookup(["🇺🇸", "🇬🇧", "🇺🇰", "🇦🇨"])
             >>> pairs
-            [('🇺🇸', 'United States'), ('🇨🇦', 'Canada')]
+            [('🇺🇸', 'United States'), ('🇬🇧', 'United Kingdom'), ('🇺🇰', 'United Kingdom'), ('🇦🇨', 'Ascension Island')]
         """
         if not emoji_flags:
             logger.warning("Empty list of emoji flags provided")
@@ -312,20 +318,29 @@ class CountryFlag:
         for i, emoji_flag in enumerate(emoji_flags):
             logger.debug(f"Processing flag: {emoji_flag}")
             
-            if not emoji_flag or not isinstance(emoji_flag, str):
+            if not isinstance(emoji_flag, str):
                 logger.warning(f"Invalid input at position {i}: {emoji_flag}")
                 continue
                 
-            # Clean the input flag
-            clean_flag = emoji_flag.strip()
-            
-            if clean_flag in flag_to_country:
-                country_name = flag_to_country[clean_flag]
-                result.append((clean_flag, country_name))
-            else:
-                error_msg = f"Cannot convert flag emoji to country name: {clean_flag}"
+            if not emoji_flag:  # Empty string should raise an error
+                error_msg = f"Cannot convert flag emoji to country name: {emoji_flag}"
                 logger.error(error_msg)
-                raise ReverseConversionError(error_msg, clean_flag)
+                raise ReverseConversionError(error_msg, emoji_flag)
+                
+            # Use the enhanced reverse lookup from the lookup module
+            from countryflag.lookup import reverse_lookup_flag
+            
+            country_name = reverse_lookup_flag(emoji_flag, flag_to_country)
+            
+            if country_name:
+                # Normalize the flag for consistent output
+                from countryflag.lookup import normalize_emoji_flag
+                normalized_flag = normalize_emoji_flag(emoji_flag)
+                result.append((normalized_flag, country_name))
+            else:
+                error_msg = f"Cannot convert flag emoji to country name: {emoji_flag}"
+                logger.error(error_msg)
+                raise ReverseConversionError(error_msg, emoji_flag)
         
         # Cache the result if cache is available
         if self._cache:

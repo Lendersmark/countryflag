@@ -16,6 +16,7 @@ from functools import lru_cache
 
 from countryflag.core.models import CountryInfo, RegionDefinitions
 from countryflag.core.exceptions import RegionError
+from countryflag.lookup import create_enhanced_flag_mapping, reverse_lookup_flag
 
 # Configure logging
 logger = logging.getLogger("countryflag.converters")
@@ -111,7 +112,9 @@ class CountryConverterSingleton:
     
     def get_iso2_to_country_mapping(self) -> Dict[str, str]:
         """
-        Get a mapping of ISO2 codes to country names.
+        Get a mapping of ISO2 codes to country names with enhanced regex handling.
+        
+        This method now properly handles regex patterns in ISO2 fields like '^GB$|^UK$'.
         
         Returns:
             Dict[str, str]: A dictionary mapping ISO2 codes to country names.
@@ -121,13 +124,27 @@ class CountryConverterSingleton:
             >>> mapping = converter.get_iso2_to_country_mapping()
             >>> mapping['US']
             'United States'
+            >>> mapping['GB']
+            'United Kingdom'
+            >>> mapping['UK']
+            'United Kingdom'
         """
         if 'iso2_mapping' not in self._cache:
+            from countryflag.lookup import extract_iso_codes_from_regex
+            
             result = {}
             for _, row in self.data.iterrows():
-                if row['ISO2'] != "not found":
-                    result[row['ISO2']] = row['name_short']
+                country_name = row['name_short']
+                iso2_field = row['ISO2']
+                
+                # Extract all ISO codes (handles regex patterns)
+                iso_codes = extract_iso_codes_from_regex(iso2_field)
+                
+                for iso_code in iso_codes:
+                    result[iso_code] = country_name
+                    
             self._cache['iso2_mapping'] = result
+            logger.debug(f"Created ISO2 mapping with {len(result)} entries")
             
         return self._cache['iso2_mapping']
         
@@ -193,7 +210,12 @@ class CountryConverterSingleton:
     
     def get_flag_to_country_mapping(self) -> Dict[str, str]:
         """
-        Get a mapping of flag emojis to country names.
+        Get a mapping of flag emojis to country names with enhanced support for edge cases.
+        
+        This method creates a comprehensive mapping that handles:
+        - Standard regional indicator flags (🇺🇸 → United States)
+        - Alternative ISO codes (🇬🇧 → United Kingdom, 🇺🇰 → United Kingdom)
+        - Special territories (🇦🇨 → Ascension Island)
         
         Returns:
             Dict[str, str]: A dictionary mapping flag emojis to country names.
@@ -203,12 +225,15 @@ class CountryConverterSingleton:
             >>> mapping = converter.get_flag_to_country_mapping()
             >>> mapping['🇺🇸']
             'United States'
+            >>> mapping['🇬🇧']
+            'United Kingdom'
+            >>> mapping['🇺🇰']
+            'United Kingdom'
         """
         if not self._reverse_cache:
-            iso2_mapping = self.get_iso2_to_country_mapping()
-            for iso2, country in iso2_mapping.items():
-                emoji_flag = flag.flag(iso2)
-                self._reverse_cache[emoji_flag] = country
+            # Use the enhanced mapping that handles regex patterns and edge cases
+            self._reverse_cache = create_enhanced_flag_mapping(self.data)
+            logger.debug(f"Created enhanced flag mapping with {len(self._reverse_cache)} entries")
         return self._reverse_cache
     
     def find_close_matches(self, name: str, cutoff: float = 0.6) -> List[Tuple[str, str]]:

@@ -24,6 +24,7 @@ class MemoryCache(Cache):
         Initialize the memory cache.
         """
         self._cache: Dict[str, Any] = {}
+        self._hits = 0  # Initialize hit counter
     
     def get(self, key: str) -> Optional[Any]:
         """
@@ -43,7 +44,10 @@ class MemoryCache(Cache):
             >>> cache.get("nonexistent")
             None
         """
-        return self._cache.get(key)
+        value = self._cache.get(key)
+        if value is not None:
+            self._hits += 1 # Increment hit counter
+        return value
     
     def set(self, key: str, value: Any) -> None:
         """
@@ -113,3 +117,18 @@ class MemoryCache(Cache):
             False
         """
         return key in self._cache
+    
+    def get_hits(self) -> int:
+        """
+        Get the number of cache hits.
+        
+        Returns:
+            int: The number of cache hits.
+        """
+        return self._hits
+    
+    def reset_hits(self) -> None:
+        """
+        Reset the cache hit counter.
+        """
+        self._hits = 0

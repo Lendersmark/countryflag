@@ -661,7 +661,6 @@ class TestCacheConsistency(RuleBasedStateMachine):
         """Initialize test state."""
         self.memory_cache = MemoryCache()
         self.cf = CountryFlag(cache=self.memory_cache)
-        self.cache_hits = {}
     
     @rule(target=countries, country=country_names_strategy)
     def add_country(self, country):
@@ -671,30 +670,35 @@ class TestCacheConsistency(RuleBasedStateMachine):
     @rule(countries=st.lists(countries, min_size=1, unique=True))
     def check_cache_consistency(self, countries):
         """Check that cached results are consistent."""
+        # Capture cache hits before the calls
+        hits_before = self.memory_cache.get_hits()
+        
         # First call (should be a cache miss for new countries)
         flags1, pairs1 = self.cf.get_flag(countries)
         
-        # Record cache hits
-        for country in countries:
-            if country not in self.cache_hits:
-                self.cache_hits[country] = 0
-        
         # Second call (should be a cache hit)
         flags2, pairs2 = self.cf.get_flag(countries)
+        
+        # Capture cache hits after the calls
+        hits_after = self.memory_cache.get_hits()
         
         # Results should be identical
         assert flags1 == flags2
         assert len(pairs1) == len(pairs2)
         
-        # Update cache hit count
-        for country in countries:
-            self.cache_hits[country] += 1
+        # Verify that the cache hit count increased
+        # Since get_hits() returns an int (global count), we verify the count increased
+        assert hits_after > hits_before, f"Cache hits should have increased: {hits_before} -> {hits_after}"
     
-    @rule()
-    def check_cache_hit_counts(self):
-        """Check that cache hits are being recorded."""
-        # After several operations, some countries should have multiple cache hits
-        assert any(count > 0 for count in self.cache_hits.values())
+    @rule(countries=st.lists(countries, min_size=1, unique=True))
+    def check_cache_hit_counts(self, countries):
+        """Check that cache hit counts are properly tracked."""
+        # Perform operations that should result in cache hits
+        self.cf.get_flag(countries)
+        self.cf.get_flag(countries)  # Second call should be cache hits
+        
+        # Replace previous manual assertion with one that queries the real cache
+        assert self.memory_cache.get_hits() > 0
 
 
 TestCacheStateMachine = TestCacheConsistency.TestCase
