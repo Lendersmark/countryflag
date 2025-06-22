@@ -52,6 +52,6 @@ def test_cli_multiplecountries():
 
 def test_cli_notfound():
     """Tests the error message when a country is not found in regex"""
-    expected = "Please use one of the supported country names classifications.\n"
+    expected = "Error: Country not found: nonexistentcountry\n\nUse --list-countries to see all supported country names\n"
     result = shell("countryflag --countries nonexistentcountry")
     assert result.stdout == expected
