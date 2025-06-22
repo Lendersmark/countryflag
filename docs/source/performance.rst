@@ -70,19 +70,19 @@ Choosing a Cache Implementation
 
    # Create a memory cache
    memory_cache = MemoryCache()
-   
+
    # Create a CountryFlag instance with caching
    cf = CountryFlag(cache=memory_cache)
-   
+
    # Subsequent calls will use the cache
    flags, pairs = cf.get_flag(["United States", "Canada", "Mexico"])
 
    # Using disk cache
    from countryflag.cache import DiskCache
-   
+
    # Create a disk cache
    disk_cache = DiskCache("/path/to/cache/dir")
-   
+
    # Create a CountryFlag instance with disk caching
    cf = CountryFlag(cache=disk_cache)
 
@@ -122,16 +122,16 @@ Strategies for Large Lists
    def process_large_country_list(countries, chunk_size=500):
        """Process a large list of countries in chunks."""
        from countryflag.core import CountryFlag
-       
+
        cf = CountryFlag()
        results = []
-       
+
        # Process in chunks
        for i in range(0, len(countries), chunk_size):
            chunk = countries[i:i+chunk_size]
            flags, pairs = cf.get_flag(chunk)
            results.extend(pairs)
-           
+
        return results
 
 File Processing Optimizations
@@ -145,16 +145,16 @@ File Processing Optimizations
    # Asynchronous file processing
    import asyncio
    from countryflag.utils.io import process_file_input_async
-   
+
    async def process_large_file(file_path):
        countries = await process_file_input_async(file_path)
        # Process countries...
-   
+
    asyncio.run(process_large_file("very_large_file.txt"))
 
    # Parallel processing of multiple files
    from countryflag.utils.io import process_multiple_files
-   
+
    file_paths = ["file1.txt", "file2.txt", "file3.txt", "file4.txt"]
    all_countries = process_multiple_files(file_paths, max_workers=4)
 
@@ -170,13 +170,13 @@ Thread-Based Concurrency
 .. code-block:: python
 
    from concurrent.futures import ThreadPoolExecutor
-   
+
    def convert_countries(countries):
        cf = CountryFlag()
        return cf.get_flag(countries)
-   
+
    country_lists = [list1, list2, list3, list4]
-   
+
    with ThreadPoolExecutor(max_workers=4) as executor:
        results = list(executor.map(convert_countries, country_lists))
 
@@ -189,15 +189,15 @@ Process-Based Concurrency
 .. code-block:: python
 
    from concurrent.futures import ProcessPoolExecutor
-   
+
    # Function to be executed in separate processes
    def process_country_chunk(chunk):
        cf = CountryFlag()
        return cf.get_flag(chunk)
-   
+
    # Split large list into chunks
    chunks = [large_list[i:i+1000] for i in range(0, len(large_list), 1000)]
-   
+
    # Process chunks in parallel
    with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
        results = list(executor.map(process_country_chunk, chunks))
@@ -211,19 +211,19 @@ Asynchronous Processing
 .. code-block:: python
 
    import asyncio
-   
+
    async def process_files(file_paths):
        from countryflag.utils.io import process_file_input_async
-       
+
        # Create tasks for each file
        tasks = [process_file_input_async(file_path) for file_path in file_paths]
-       
+
        # Run all tasks concurrently
        country_lists = await asyncio.gather(*tasks)
-       
+
        # Flatten the list of lists
        all_countries = [country for sublist in country_lists for country in sublist]
-       
+
        return all_countries
 
 
@@ -238,25 +238,25 @@ Memory-Efficient Processing
 .. code-block:: python
 
    import gc
-   
+
    # Process a very large dataset in memory-efficient way
    def memory_efficient_processing(very_large_list):
        cf = CountryFlag()
-       
+
        # Process in chunks to control memory usage
        chunk_size = 1000
        results = []
-       
+
        for i in range(0, len(very_large_list), chunk_size):
            chunk = very_large_list[i:i+chunk_size]
            flags, pairs = cf.get_flag(chunk)
-           
+
            # Process and store only what you need
            results.extend((country, flag) for country, flag in pairs)
-           
+
            # Force garbage collection after each chunk
            gc.collect()
-           
+
        return results
 
 Object Lifecycle Management
@@ -274,14 +274,14 @@ Performance Profiling
 .. code-block:: python
 
    import cProfile
-   
+
    # Profile the performance of a function
    def profile_countryflag():
        cf = CountryFlag()
        large_list = generate_large_country_list(1000)
-       
+
        cProfile.runctx('cf.get_flag(large_list)', globals(), locals(), 'prof_stats')
-       
+
        # Analyze the results
        import pstats
        p = pstats.Stats('prof_stats')

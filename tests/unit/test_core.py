@@ -1,6 +1,7 @@
 """Unit tests for the core functionality."""
 
 import pytest
+
 from countryflag.core import CountryFlag
 from countryflag.core.exceptions import InvalidCountryError
 

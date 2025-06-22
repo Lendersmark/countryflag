@@ -16,7 +16,7 @@ Breaking Changes
 ----------------
 While we've tried to maintain backward compatibility, there are a few breaking changes:
 
-1. The `getflag()` function now returns a tuple `(flags, pairs)` when used from the API. 
+1. The `getflag()` function now returns a tuple `(flags, pairs)` when used from the API.
    The first element is the flags string (same as before), and the second element is a list of (country, flag) pairs.
 
 2. Some command-line arguments have changed or been added.
@@ -47,20 +47,20 @@ The new version provides a more powerful API through the `CountryFlag` class:
 .. code-block:: python
 
    from countryflag.core import CountryFlag
-   
+
    # Create a CountryFlag instance
    cf = CountryFlag()
-   
+
    # Convert country names to flags
    flags, pairs = cf.get_flag(['Germany', 'France', 'Italy'])
-   
+
    # Format output in different formats
    json_output = cf.format_output(pairs, output_format='json')
    csv_output = cf.format_output(pairs, output_format='csv')
-   
+
    # Reverse lookup (flag to country)
    flag_country_pairs = cf.reverse_lookup(['🇩🇪', '🇫🇷', '🇮🇹'])
-   
+
    # Get flags for all countries in a region
    europe_flags, europe_pairs = cf.get_flags_by_region('Europe')
 
@@ -72,15 +72,15 @@ One of the biggest performance improvements in v0.2.0 is the caching system:
 
    from countryflag.core import CountryFlag
    from countryflag.cache import MemoryCache, DiskCache
-   
+
    # In-memory caching
    memory_cache = MemoryCache()
    cf = CountryFlag(cache=memory_cache)
-   
+
    # Persistent disk caching
    disk_cache = DiskCache('/path/to/cache/dir')
    cf = CountryFlag(cache=disk_cache)
-   
+
    # Subsequent calls with the same inputs will be much faster
    flags, pairs = cf.get_flag(['Germany', 'France', 'Italy'])
 
@@ -92,9 +92,9 @@ The new version uses custom exceptions for better error handling:
 
    from countryflag.core import CountryFlag
    from countryflag.core.exceptions import InvalidCountryError, ReverseConversionError
-   
+
    cf = CountryFlag()
-   
+
    try:
        flags, pairs = cf.get_flag(['Germany', 'Invalid Country'])
    except InvalidCountryError as e:
@@ -109,7 +109,7 @@ The command-line interface has been enhanced with many new options:
 
    # Basic usage (unchanged)
    countryflag Germany France Italy
-   
+
    # New options
    countryflag --format json Germany France Italy  # Output as JSON
    countryflag --separator "|" Germany France Italy  # Custom separator
@@ -126,5 +126,5 @@ See the :doc:`performance` guide for detailed information on optimizing performa
 
 Final Notes
 -----------
-If you encounter any issues migrating to v0.2.0, please report them on the 
+If you encounter any issues migrating to v0.2.0, please report them on the
 `GitHub issue tracker <https://github.com/Lendersmark/countryflag/issues>`_.

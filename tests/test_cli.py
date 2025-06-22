@@ -1,13 +1,14 @@
 """Test cases for the countryflag CLI module."""
 
-import pytest
 import subprocess
 import sys
+
+import pytest
 
 
 class ShellResult:
     """Simple result class to mimic cli_test_helpers.shell behavior."""
-    
+
     def __init__(self, exit_code, stdout, stderr):
         self.exit_code = exit_code
         self.stdout = stdout
@@ -18,11 +19,7 @@ def shell(command):
     """Simple shell command runner to replace cli_test_helpers.shell."""
     try:
         result = subprocess.run(
-            command,
-            shell=True,
-            capture_output=True,
-            text=True,
-            timeout=30
+            command, shell=True, capture_output=True, text=True, timeout=30
         )
         return ShellResult(result.returncode, result.stdout, result.stderr)
     except subprocess.TimeoutExpired:
@@ -49,7 +46,9 @@ def test_countries_flag_single_country():
 
 def test_countries_flag_multiple_countries():
     """Test CLI with --countries flag for multiple countries."""
-    result = shell("python -m countryflag --countries France Belgium JP 'United States of America'")
+    result = shell(
+        "python -m countryflag --countries France Belgium JP 'United States of America'"
+    )
     assert result.exit_code == 0
     expected_flags = ["🇫🇷", "🇧🇪", "🇯🇵", "🇺🇸"]
     for flag in expected_flags:
@@ -67,12 +66,12 @@ def test_mutually_exclusive_groups_valid():
     # Test --countries alone
     result = shell("python -m countryflag --countries Germany")
     assert result.exit_code == 0
-    
+
     # Test --file alone (if file exists)
     # Note: This test might need adjustment based on actual file existence
     # result = shell("python -m countryflag --file test_countries.txt")
     # We'll skip file test for now as we don't have a test file
-    
+
     # Test --reverse alone
     result = shell("python -m countryflag --reverse 🇩🇪")
     assert result.exit_code == 0
@@ -116,7 +115,7 @@ def test_region_filter():
     # --region is mutually exclusive with --countries
     result = shell("python -m countryflag --region Europe")
     assert result.exit_code == 0
-    
+
     # Test invalid combination
     result = shell("python -m countryflag --region Europe --countries Germany")
     assert result.exit_code != 0

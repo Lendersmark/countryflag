@@ -1,5 +1,6 @@
-from src import countryflag
 from cli_test_helpers import ArgvContext, shell
+
+from src import countryflag
 
 
 def test_runas_module():
@@ -46,7 +47,9 @@ def test_cli_singlecountry():
 def test_cli_multiplecountries():
     """Tests the command line output"""
     expected = "🇫🇷 🇧🇪 🇯🇵 🇺🇸\n"
-    result = shell("countryflag --countries France Belgium JP 'United States of America'")
+    result = shell(
+        "countryflag --countries France Belgium JP 'United States of America'"
+    )
     assert result.stdout == expected, "Output doesn't match with input countries!"
 
 

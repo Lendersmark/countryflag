@@ -15,13 +15,13 @@ The simplest and fastest caching option, storing data in memory:
 
    # Create a memory cache
    cache = MemoryCache()
-   
+
    # Create a CountryFlag instance with caching
    cf = CountryFlag(cache=cache)
-   
+
    # First call (cache miss)
    flags1 = cf.get_flag(["United States", "Canada"])
-   
+
    # Second call (cache hit - much faster)
    flags2 = cf.get_flag(["United States", "Canada"])
 
@@ -35,7 +35,7 @@ Persistent caching that survives program restarts:
 
    # Create a disk cache
    cache = DiskCache("/path/to/cache/dir")
-   
+
    # Use it with CountryFlag
    cf = CountryFlag(cache=cache)
 
@@ -49,7 +49,7 @@ For distributed systems, use the Redis cache plugin:
 
    # Create a Redis cache
    cache = RedisCache(host="localhost", port=6379)
-   
+
    # Use it with CountryFlag
    cf = CountryFlag(cache=cache)
 
@@ -157,4 +157,3 @@ API Reference
    :members:
    :undoc-members:
    :show-inheritance:
-

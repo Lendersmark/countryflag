@@ -5,8 +5,8 @@ This package contains the cache interface and implementations for different cach
 """
 
 from countryflag.cache.base import Cache
-from countryflag.cache.memory import MemoryCache
 from countryflag.cache.disk import DiskCache
+from countryflag.cache.memory import MemoryCache
 
 __all__ = [
     "Cache",

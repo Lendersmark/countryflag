@@ -102,4 +102,3 @@ Best Practices
 2. **Performance**: Consider caching results for better performance
 3. **Documentation**: Document your plugin\'s behavior and requirements
 4. **Testing**: Write comprehensive tests for your plugin
-
