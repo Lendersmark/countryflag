@@ -40,7 +40,7 @@ def load_pyproject_metadata():
                 "Topic :: Text Processing",
                 "Intended Audience :: Developers",
             ],
-            "python_requires": ">=3.8",
+            "python_requires": ">=3.9",
         }
     
     with open(pyproject_path, "rb") as f:

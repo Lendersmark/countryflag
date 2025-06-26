@@ -38,7 +38,7 @@ By participating in this project, you are expected to uphold our Code of Conduct
 
 ### Setup
 
-1. Install Python 3.6 or newer
+1. Install Python 3.9 or newer
 2. Clone the repository: `git clone https://github.com/lendersmark/countryflag.git`
 3. Create a virtual environment: `python -m venv venv`
 4. Activate the virtual environment:
