@@ -138,7 +138,8 @@ class CountryFlag:
                     return cached_result
 
             code = self._converter.convert(country_name)
-            result = code != "not found"
+            # Only accept single country results, reject lists or "not found"
+            result = isinstance(code, str) and code != "not found" and len(code) <= 3
 
             # Cache the result if cache is available
             if self._cache:

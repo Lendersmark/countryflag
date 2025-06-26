@@ -49,15 +49,23 @@ def _merge_country_tokens(tokens: List[str], cf: CountryFlag) -> List[str]:
     n = len(tokens)
 
     while i < n:
-        # try longest slice first
-        for j in range(n, i, -1):
+        # try longest slice first, but stop at reasonable boundaries
+        found_match = False
+        for j in range(min(n, i + 5), i, -1):  # Limit to max 5 tokens per country
             candidate = " ".join(tokens[i:j])
-            if cf.validate_country_name(candidate):
-                merged.append(candidate)
-                i = j
-                break
-        else:
-            # nothing matched – keep original token to trigger normal error
+            # Only merge if it's a multi-token candidate and validates as a single country
+            if j > i + 1 and cf.validate_country_name(candidate):
+                # Additional check: make sure we're not accidentally merging separate countries
+                # by checking if individual tokens are also valid countries
+                individual_tokens_valid = all(cf.validate_country_name(token) for token in tokens[i:j])
+                if not individual_tokens_valid:
+                    merged.append(candidate)
+                    i = j
+                    found_match = True
+                    break
+        
+        if not found_match:
+            # nothing matched – keep original token as-is
             merged.append(tokens[i])
             i += 1
     return merged
