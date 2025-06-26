@@ -48,7 +48,7 @@ def test_cli_multiplecountries():
     """Tests the command line output"""
     expected = "🇫🇷 🇧🇪 🇯🇵 🇺🇸\n"
     result = shell(
-        "countryflag --countries France Belgium JP 'United States of America'"
+        'countryflag --countries France Belgium JP "United States of America"'
     )
     assert result.stdout == expected, "Output doesn't match with input countries!"
 

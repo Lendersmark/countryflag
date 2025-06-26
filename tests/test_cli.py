@@ -47,7 +47,7 @@ def test_countries_flag_single_country():
 def test_countries_flag_multiple_countries():
     """Test CLI with --countries flag for multiple countries."""
     result = shell(
-        "python -m countryflag --countries France Belgium JP 'United States of America'"
+        'python -m countryflag --countries France Belgium JP "United States of America"'
     )
     assert result.exit_code == 0
     expected_flags = ["🇫🇷", "🇧🇪", "🇯🇵", "🇺🇸"]
