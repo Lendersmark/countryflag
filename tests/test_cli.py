@@ -61,6 +61,13 @@ def test_countries_flag_nonexistent_country():
     assert "Country not found" in result.stdout
 
 
+def test_countries_flag_windows_split():
+    # Simulate the unwanted splitting: feed tokens one by one without quotes
+    result = shell('python -m countryflag --countries United States of America')
+    # The merge routine will reconstruct the full name
+    assert "🇺🇸" in result.stdout
+
+
 def test_mutually_exclusive_groups_valid():
     """Test valid mutually exclusive argument combinations."""
     # Test --countries alone
