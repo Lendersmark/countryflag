@@ -22,6 +22,7 @@ from countryflag.core.exceptions import (
     ReverseConversionError,
 )
 from countryflag.core.models import CountryInfo
+from countryflag.utils.text import norm_newlines
 
 # Configure logging
 logger = logging.getLogger("countryflag.flag")
@@ -453,7 +454,7 @@ class CountryFlag:
                 {"country": country, "flag": flag}
                 for country, flag in country_flag_pairs
             ]
-            return json.dumps(result, ensure_ascii=False)
+            return norm_newlines(json.dumps(result, ensure_ascii=False))
 
         elif output_format == "csv":
             output = StringIO()
@@ -461,7 +462,7 @@ class CountryFlag:
             writer.writerow(["Country", "Flag"])
             for country, flag in country_flag_pairs:
                 writer.writerow([country, flag])
-            return output.getvalue()
+            return norm_newlines(output.getvalue())
 
         else:  # text format
-            return separator.join(flag for _, flag in country_flag_pairs)
+            return norm_newlines(separator.join(flag for _, flag in country_flag_pairs))

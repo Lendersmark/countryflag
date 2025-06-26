@@ -69,7 +69,7 @@ docs = [
 "Documentation" = "https://countryflag.readthedocs.io/"
 
 [project.scripts]
-countryflag = "countryflag.cli:main"
+countryflag = "countryflag.cli.main:main"
 
 [tool.black]
 line-length = 88

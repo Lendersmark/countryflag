@@ -31,6 +31,7 @@ from countryflag.utils.io import (
     process_file_input_async,
     process_multiple_files,
 )
+from countryflag.utils.text import norm_newlines
 
 # Configure logging
 logger = logging.getLogger("countryflag.cli")
@@ -161,8 +162,9 @@ async def run_async_main(args: argparse.Namespace) -> None:
                 country_flag_pairs, args.format, args.separator
             )
             if isinstance(output, str):
-                output = output.replace("\r\n", "\n")
-            print(output)
+                print(norm_newlines(output))
+            else:
+                print(output)
             return
 
         # Handle flag to country conversion (reverse lookup)
@@ -174,7 +176,8 @@ async def run_async_main(args: argparse.Namespace) -> None:
                     {"flag": flag, "country": country}
                     for flag, country in flag_country_pairs
                 ]
-                print(json.dumps(result, ensure_ascii=False))
+                output = json.dumps(result, ensure_ascii=False)
+                print(norm_newlines(output) if isinstance(output, str) else output)
             elif args.format == "csv":
                 output = StringIO()
                 writer = csv.writer(output)
@@ -182,9 +185,7 @@ async def run_async_main(args: argparse.Namespace) -> None:
                 for flag, country in flag_country_pairs:
                     writer.writerow([flag, country])
                 output_str = output.getvalue()
-                if isinstance(output_str, str):
-                    output_str = output_str.replace("\r\n", "\n")
-                print(output_str)
+                print(norm_newlines(output_str) if isinstance(output_str, str) else output_str)
             else:
                 for flag, country in flag_country_pairs:
                     print(f"{flag} -> {country}")
@@ -197,7 +198,7 @@ async def run_async_main(args: argparse.Namespace) -> None:
             output = country_flag.format_output(
                 country_flag_pairs, args.format, args.separator
             )
-            print(output)
+            print(norm_newlines(output) if isinstance(output, str) else output)
 
     except InvalidCountryError as ice:
         logger.error(str(ice))
@@ -380,9 +381,7 @@ def main() -> None:
         countries = country_flag.get_supported_countries()
         if args.format == "json":
             output = json.dumps(countries, ensure_ascii=False)
-            if isinstance(output, str):
-                output = output.replace("\r\n", "\n")
-            print(output)
+            print(norm_newlines(output) if isinstance(output, str) else output)
         elif args.format == "csv":
             output = StringIO()
             writer = csv.writer(output)
@@ -397,7 +396,8 @@ def main() -> None:
                         country.get("region", ""),
                     ]
                 )
-            print(output.getvalue())
+            output_str = output.getvalue()
+            print(norm_newlines(output_str) if isinstance(output_str, str) else output_str)
         else:
             for country in countries:
                 region = (
@@ -409,14 +409,16 @@ def main() -> None:
     if args.list_regions:
         regions = RegionDefinitions.REGIONS
         if args.format == "json":
-            print(json.dumps(regions, ensure_ascii=False))
+            output = json.dumps(regions, ensure_ascii=False)
+            print(norm_newlines(output) if isinstance(output, str) else output)
         elif args.format == "csv":
             output = StringIO()
             writer = csv.writer(output)
             writer.writerow(["Region"])
             for region in regions:
                 writer.writerow([region])
-            print(output.getvalue())
+            output_str = output.getvalue()
+            print(norm_newlines(output_str) if isinstance(output_str, str) else output_str)
         else:
             print("Supported regions/continents:")
             for region in regions:
@@ -475,7 +477,7 @@ def main() -> None:
             output = country_flag.format_output(
                 country_flag_pairs, args.format, args.separator
             )
-            print(output)
+            print(norm_newlines(output) if isinstance(output, str) else output)
             return
 
         # Handle flag to country conversion (reverse lookup)
@@ -487,14 +489,16 @@ def main() -> None:
                     {"flag": flag, "country": country}
                     for flag, country in flag_country_pairs
                 ]
-                print(json.dumps(result, ensure_ascii=False))
+                output = json.dumps(result, ensure_ascii=False)
+                print(norm_newlines(output) if isinstance(output, str) else output)
             elif args.format == "csv":
                 output = StringIO()
                 writer = csv.writer(output)
                 writer.writerow(["Flag", "Country"])
                 for flag, country in flag_country_pairs:
                     writer.writerow([flag, country])
-                print(output.getvalue())
+                output_str = output.getvalue()
+                print(norm_newlines(output_str) if isinstance(output_str, str) else output_str)
             else:
                 for flag, country in flag_country_pairs:
                     print(f"{flag} -> {country}")
@@ -507,7 +511,7 @@ def main() -> None:
             output = country_flag.format_output(
                 country_flag_pairs, args.format, args.separator
             )
-            print(output)
+            print(norm_newlines(output) if isinstance(output, str) else output)
 
     except InvalidCountryError as ice:
         logger.error(str(ice))

@@ -1,8 +1,9 @@
 """Test cases for the countryflag CLI module."""
 
+import os
 import subprocess
 import sys
-
+from src.countryflag.utils.text import norm_newlines
 import pytest
 
 
@@ -15,12 +16,33 @@ class ShellResult:
         self.stderr = stderr
 
 
-def shell(command):
-    """Simple shell command runner to replace cli_test_helpers.shell."""
+def shell(command, exe=None):
+    """Simple shell command runner to replace cli_test_helpers.shell.
+    
+    Args:
+        command: The command string to execute
+        exe: Python executable to use (defaults to sys.executable)
+    """
+    if exe is None:
+        exe = sys.executable
+    
+    # Replace 'python' with the actual executable path
+    if command.startswith('python '):
+        command = exe + command[6:]  # Replace 'python' with exe
+    elif command.startswith('python3 '):
+        command = exe + command[7:]  # Replace 'python3' with exe
+    
     try:
-        result = subprocess.run(
-            command, shell=True, capture_output=True, text=True, timeout=30
-        )
+        if os.name == "nt":  # Windows
+            # Wrap command in cmd /c to avoid PowerShell splitting issues
+            wrapped_command = f'cmd /c "{command}"'
+            result = subprocess.run(
+                wrapped_command, shell=True, capture_output=True, text=True, timeout=30
+            )
+        else:  # Unix-like systems
+            result = subprocess.run(
+                command, shell=True, capture_output=True, text=True, timeout=30
+            )
         return ShellResult(result.returncode, result.stdout, result.stderr)
     except subprocess.TimeoutExpired:
         return ShellResult(1, "", "Command timed out")
@@ -97,7 +119,7 @@ def test_no_arguments_provided():
     result = shell("python -m countryflag")
     # CLI exits cleanly with no output when no args provided
     assert result.exit_code == 0
-    assert result.stdout == ""
+    assert norm_newlines(result.stdout) == norm_newlines("")
 
 
 def test_interactive_mode():
@@ -142,13 +164,33 @@ def test_verbose_output():
 
 def test_entrypoint_with_new_format():
     """Test that the installed entrypoint script works with new format."""
-    result = shell("countryflag --countries France")
-    assert result.exit_code == 0
-    assert "🇫🇷" in result.stdout
+    # On Windows, probe both countryflag and countryflag.exe
+    commands_to_try = ["countryflag"]
+    if os.name == "nt":
+        commands_to_try.append("countryflag.exe")
+    
+    success = False
+    for cmd in commands_to_try:
+        result = shell(f"{cmd} --countries France")
+        if result.exit_code == 0 and "🇫🇷" in result.stdout:
+            success = True
+            break
+    
+    assert success, f"None of the commands {commands_to_try} worked successfully"
 
 
 def test_entrypoint_help():
     """Test that the installed entrypoint script help works."""
-    result = shell("countryflag --help")
-    assert result.exit_code == 0
-    assert "--countries" in result.stdout
+    # On Windows, probe both countryflag and countryflag.exe
+    commands_to_try = ["countryflag"]
+    if os.name == "nt":
+        commands_to_try.append("countryflag.exe")
+    
+    success = False
+    for cmd in commands_to_try:
+        result = shell(f"{cmd} --help")
+        if result.exit_code == 0 and "--countries" in result.stdout:
+            success = True
+            break
+    
+    assert success, f"None of the commands {commands_to_try} worked successfully"

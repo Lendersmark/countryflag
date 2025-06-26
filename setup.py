@@ -108,5 +108,5 @@ if __name__ == "__main__":
         # install_requires removed to prevent conflicts with pyproject.toml
         # Entry points are defined in pyproject.toml [project.scripts]
         # but kept here for backwards compatibility
-        entry_points={"console_scripts": ["countryflag=countryflag.cli:main"]},
+        entry_points={"console_scripts": ["countryflag=countryflag.cli.main:main"]},
     )
