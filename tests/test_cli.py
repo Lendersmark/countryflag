@@ -34,10 +34,12 @@ def shell(command, exe=None):
     
     try:
         if os.name == "nt":  # Windows
-            # Wrap command in cmd /c to avoid PowerShell splitting issues
-            wrapped_command = f'cmd /c "{command}"'
+            # On Windows, explicitly use UTF-8 encoding to handle Unicode properly
+            # and use cmd /c to avoid PowerShell splitting issues
+            wrapped_command = f'cmd /c "chcp 65001 >nul & {command}"'
             result = subprocess.run(
-                wrapped_command, shell=True, capture_output=True, text=True, timeout=30
+                wrapped_command, shell=True, capture_output=True, 
+                text=True, encoding='utf-8', timeout=30
             )
         else:  # Unix-like systems
             result = subprocess.run(
