@@ -41,7 +41,7 @@ def test_cli_singlecountry():
     """Tests the command line output"""
     expected = "🇫🇷\n"
     result = shell("countryflag --countries France")
-    assert result.stdout == expected, "Output doesn't match with input countries!"
+    assert result.stdout.replace('\r\n', '\n') == expected.replace('\r\n', '\n'), "Output doesn't match with input countries!"
 
 
 def test_cli_multiplecountries():
@@ -50,11 +50,11 @@ def test_cli_multiplecountries():
     result = shell(
         'countryflag --countries France Belgium JP "United States of America"'
     )
-    assert result.stdout == expected, "Output doesn't match with input countries!"
+    assert result.stdout.replace('\r\n', '\n') == expected.replace('\r\n', '\n'), "Output doesn't match with input countries!"
 
 
 def test_cli_notfound():
     """Tests the error message when a country is not found in regex"""
     expected = "Error: Country not found: nonexistentcountry\n\nUse --list-countries to see all supported country names\n"
     result = shell("countryflag --countries nonexistentcountry")
-    assert result.stdout == expected
+    assert result.stdout.replace('\r\n', '\n') == expected.replace('\r\n', '\n')
