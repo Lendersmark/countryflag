@@ -185,6 +185,6 @@ def mock_country_converter(monkeypatch, mock_country_converter_data) -> None:
     from countryflag.core.flag import CountryFlag
 
     CountryConverterSingleton._CountryConverterSingleton__instance = None
-    
+
     # Also reset the CountryFlag global cache to prevent cross-test pollution
     CountryFlag.clear_global_cache()

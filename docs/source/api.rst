@@ -1,8 +1,8 @@
 API Reference
-============
+=============
 
 Core
-----
+====
 .. module:: countryflag.core
    :no-index:
 
@@ -12,7 +12,7 @@ Core
    :show-inheritance:
 
 Models
-~~~~~~
+======
 .. module:: countryflag.core.models
    :no-index:
 
@@ -22,7 +22,7 @@ Models
    :show-inheritance:
 
 Exceptions
-~~~~~~~~~
+==========
 .. module:: countryflag.core.exceptions
    :no-index:
 
@@ -32,7 +32,7 @@ Exceptions
    :show-inheritance:
 
 Converters
-~~~~~~~~~
+==========
 .. module:: countryflag.core.converters
    :no-index:
 
@@ -52,7 +52,7 @@ Caching
    :show-inheritance:
 
 Memory Cache
-~~~~~~~~~~~
+============
 .. module:: countryflag.cache.memory
    :no-index:
 
@@ -62,7 +62,7 @@ Memory Cache
    :show-inheritance:
 
 Disk Cache
-~~~~~~~~~
+==========
 .. module:: countryflag.cache.disk
    :no-index:
 
@@ -82,7 +82,7 @@ Plugins
    :show-inheritance:
 
 Base Plugin
-~~~~~~~~~~
+===========
 .. module:: countryflag.plugins.base
    :no-index:
 

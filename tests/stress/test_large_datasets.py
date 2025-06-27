@@ -308,7 +308,7 @@ class TestCachePerformance:
         # Log results
         print(f"\nMemory cache miss time: {time_miss:.4f} seconds")
         print(f"Memory cache hit time: {time_hit:.4f} seconds")
-        
+
         # Handle case where timing is too fast to measure accurately
         if time_hit > 0:
             print(f"Speed improvement: {time_miss / time_hit:.2f}x")
@@ -326,7 +326,7 @@ class TestCachePerformance:
             timing_threshold = 0.5  # Strict timing for fast machines
         else:
             timing_threshold = 0.8  # Moderate timing for other platforms
-        
+
         # Only check timing if both times are measurable
         if time_hit > 0.0001 and time_miss > 0.0001:
             assert (
@@ -365,7 +365,7 @@ class TestCachePerformance:
         # Log results
         print(f"\nDisk cache miss time (avg): {time_miss:.4f} seconds")
         print(f"Disk cache hit time (avg): {time_hit:.4f} seconds")
-        
+
         # Handle case where timing is too fast to measure accurately
         if time_hit > 0:
             print(f"Speed improvement: {time_miss / time_hit:.2f}x")

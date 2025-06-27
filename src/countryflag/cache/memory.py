@@ -134,7 +134,7 @@ class MemoryCache(Cache):
         """
         with self._lock:
             return self._hits
-    
+
     @property
     def hits(self) -> int:
         """

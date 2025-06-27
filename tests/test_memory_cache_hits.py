@@ -28,11 +28,11 @@ class TestMemoryCacheHits(unittest.TestCase):
         """Test that getting a non-existent key does not increment hit counter."""
         # Initial state
         self.assertEqual(self.cache.get_hits(), 0)
-        
+
         # Get non-existent key
         result = self.cache.get("non_existent_key")
         self.assertIsNone(result)
-        
+
         # Hits should still be 0
         self.assertEqual(self.cache.get_hits(), 0)
 
@@ -40,12 +40,12 @@ class TestMemoryCacheHits(unittest.TestCase):
         """Test that set operations do not change hit counter."""
         # Initial state
         self.assertEqual(self.cache.get_hits(), 0)
-        
+
         # Set some values
         self.cache.set("key1", "value1")
         self.cache.set("key2", "value2")
         self.cache.set("key3", "value3")
-        
+
         # Hits should still be 0
         self.assertEqual(self.cache.get_hits(), 0)
 
@@ -54,7 +54,7 @@ class TestMemoryCacheHits(unittest.TestCase):
         # Set a value
         self.cache.set("test_key", "test_value")
         self.assertEqual(self.cache.get_hits(), 0)
-        
+
         # Get the value
         result = self.cache.get("test_key")
         self.assertEqual(result, "test_value")
@@ -65,12 +65,12 @@ class TestMemoryCacheHits(unittest.TestCase):
         # Set a value
         self.cache.set("test_key", "test_value")
         self.assertEqual(self.cache.get_hits(), 0)
-        
+
         # First get - hits should go from 0 to 1
         result1 = self.cache.get("test_key")
         self.assertEqual(result1, "test_value")
         self.assertEqual(self.cache.get_hits(), 1)
-        
+
         # Second get - hits should go from 1 to 2
         result2 = self.cache.get("test_key")
         self.assertEqual(result2, "test_value")
@@ -83,14 +83,14 @@ class TestMemoryCacheHits(unittest.TestCase):
         self.cache.set("key2", "value2")
         self.cache.set("key3", "value3")
         self.assertEqual(self.cache.get_hits(), 0)
-        
+
         # Get each value
         self.assertEqual(self.cache.get("key1"), "value1")
         self.assertEqual(self.cache.get_hits(), 1)
-        
+
         self.assertEqual(self.cache.get("key2"), "value2")
         self.assertEqual(self.cache.get_hits(), 2)
-        
+
         self.assertEqual(self.cache.get("key3"), "value3")
         self.assertEqual(self.cache.get_hits(), 3)
 
@@ -99,19 +99,19 @@ class TestMemoryCacheHits(unittest.TestCase):
         # Set one value
         self.cache.set("existing_key", "value")
         self.assertEqual(self.cache.get_hits(), 0)
-        
+
         # Get non-existing key - should not increment
         self.assertIsNone(self.cache.get("non_existing"))
         self.assertEqual(self.cache.get_hits(), 0)
-        
+
         # Get existing key - should increment
         self.assertEqual(self.cache.get("existing_key"), "value")
         self.assertEqual(self.cache.get_hits(), 1)
-        
+
         # Get non-existing key again - should not increment
         self.assertIsNone(self.cache.get("another_non_existing"))
         self.assertEqual(self.cache.get_hits(), 1)
-        
+
         # Get existing key again - should increment
         self.assertEqual(self.cache.get("existing_key"), "value")
         self.assertEqual(self.cache.get_hits(), 2)
@@ -121,7 +121,7 @@ class TestMemoryCacheHits(unittest.TestCase):
         # Set None as a value
         self.cache.set("none_key", None)
         self.assertEqual(self.cache.get_hits(), 0)
-        
+
         # Get the None value - this should NOT increment hits
         # because the get method checks for "value is not None"
         result = self.cache.get("none_key")
@@ -136,10 +136,10 @@ class TestMemoryCacheHits(unittest.TestCase):
         self.cache.get("key1")
         self.cache.get("key2")
         self.cache.get("key1")
-        
+
         # Verify hits are greater than 0
         self.assertGreater(self.cache.get_hits(), 0)
-        
+
         # Reset hits
         self.cache.reset_hits()
         self.assertEqual(self.cache.get_hits(), 0)
@@ -150,10 +150,10 @@ class TestMemoryCacheHits(unittest.TestCase):
         self.cache.set("test_key", "test_value")
         self.cache.get("test_key")
         self.assertEqual(self.cache.get_hits(), 1)
-        
+
         # Delete the key
         self.cache.delete("test_key")
-        
+
         # Hits should remain the same
         self.assertEqual(self.cache.get_hits(), 1)
 
@@ -165,10 +165,10 @@ class TestMemoryCacheHits(unittest.TestCase):
         self.cache.get("key1")
         self.cache.get("key2")
         self.assertEqual(self.cache.get_hits(), 2)
-        
+
         # Clear the cache
         self.cache.clear()
-        
+
         # Hits should remain the same
         self.assertEqual(self.cache.get_hits(), 2)
 
@@ -176,15 +176,15 @@ class TestMemoryCacheHits(unittest.TestCase):
         """Test that hit counter is thread-safe."""
         # Set a value
         self.cache.set("thread_test_key", "thread_test_value")
-        
+
         # List to collect results from threads
         results: List[int] = []
-        
+
         def get_and_record_hits():
             """Get a value and record the hit count."""
             self.cache.get("thread_test_key")
             results.append(self.cache.get_hits())
-        
+
         # Create and start multiple threads
         threads = []
         num_threads = 10
@@ -192,15 +192,15 @@ class TestMemoryCacheHits(unittest.TestCase):
             thread = threading.Thread(target=get_and_record_hits)
             threads.append(thread)
             thread.start()
-        
+
         # Wait for all threads to complete
         for thread in threads:
             thread.join()
-        
+
         # Verify final hit count
         final_hits = self.cache.get_hits()
         self.assertEqual(final_hits, num_threads)
-        
+
         # Verify that all recorded hits are unique and sequential
         # (this tests that the locking works correctly)
         self.assertEqual(len(results), num_threads)
@@ -210,20 +210,20 @@ class TestMemoryCacheHits(unittest.TestCase):
     def test_concurrent_set_and_get_operations(self):
         """Test concurrent set and get operations with hit counter."""
         results: List[int] = []
-        
+
         def set_and_get_operations(thread_id: int):
             """Perform set and get operations."""
             key = f"thread_{thread_id}_key"
             value = f"thread_{thread_id}_value"
-            
+
             # Set a value (should not affect hits)
             self.cache.set(key, value)
-            
+
             # Get the value (should increment hits)
             retrieved_value = self.cache.get(key)
             if retrieved_value == value:
                 results.append(self.cache.get_hits())
-        
+
         # Create and start multiple threads
         threads = []
         num_threads = 5
@@ -231,11 +231,11 @@ class TestMemoryCacheHits(unittest.TestCase):
             thread = threading.Thread(target=set_and_get_operations, args=(i,))
             threads.append(thread)
             thread.start()
-        
+
         # Wait for all threads to complete
         for thread in threads:
             thread.join()
-        
+
         # Verify that we got the expected number of hits
         final_hits = self.cache.get_hits()
         self.assertEqual(final_hits, num_threads)

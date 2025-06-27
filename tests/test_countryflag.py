@@ -17,28 +17,32 @@ class ShellResult:
 
 def shell(command, exe=None):
     """Simple shell command runner to replace cli_test_helpers.shell.
-    
+
     Args:
         command: The command string to execute
         exe: Python executable to use (defaults to sys.executable)
     """
     if exe is None:
         exe = sys.executable
-    
+
     # Replace 'python' with the actual executable path
-    if command.startswith('python '):
+    if command.startswith("python "):
         command = exe + command[6:]  # Replace 'python' with exe
-    elif command.startswith('python3 '):
+    elif command.startswith("python3 "):
         command = exe + command[7:]  # Replace 'python3' with exe
-    
+
     try:
         if os.name == "nt":  # Windows
             # On Windows, explicitly use UTF-8 encoding to handle Unicode properly
             # and use cmd /c to avoid PowerShell splitting issues
             wrapped_command = f'cmd /c "chcp 65001 >nul & {command}"'
             result = subprocess.run(
-                wrapped_command, shell=True, capture_output=True, 
-                text=True, encoding='utf-8', timeout=30
+                wrapped_command,
+                shell=True,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                timeout=30,
             )
         else:  # Unix-like systems
             result = subprocess.run(
@@ -54,6 +58,7 @@ def shell(command, exe=None):
 def test_runas_module():
     """Can this package be run as a Python module?"""
     import sys
+
     # Use the same Python interpreter that's running the tests
     # On Windows, python3 command often doesn't exist
     if os.name == "nt":
@@ -89,14 +94,14 @@ def test_entrypoint():
     commands_to_try = ["countryflag"]
     if os.name == "nt":
         commands_to_try.append("countryflag.exe")
-    
+
     success = False
     for cmd in commands_to_try:
         result = shell(f"{cmd} --help")
         if result.exit_code == 0:
             success = True
             break
-    
+
     assert success, f"None of the commands {commands_to_try} worked successfully"
 
 
@@ -106,14 +111,14 @@ def test_example_command():
     commands_to_try = ["countryflag"]
     if os.name == "nt":
         commands_to_try.append("countryflag.exe")
-    
+
     success = False
     for cmd in commands_to_try:
         result = shell(f"{cmd} --countries france --help")
         if result.exit_code == 0:
             success = True
             break
-    
+
     assert success, f"None of the commands {commands_to_try} worked successfully"
 
 
@@ -124,14 +129,16 @@ def test_cli_singlecountry():
     commands_to_try = ["countryflag"]
     if os.name == "nt":
         commands_to_try.append("countryflag.exe")
-    
+
     success = False
     for cmd in commands_to_try:
         result = shell(f"{cmd} --countries France")
-        if result.exit_code == 0 and norm_newlines(result.stdout) == norm_newlines(expected):
+        if result.exit_code == 0 and norm_newlines(result.stdout) == norm_newlines(
+            expected
+        ):
             success = True
             break
-    
+
     assert success, f"None of the commands {commands_to_try} worked successfully"
 
 
@@ -142,16 +149,18 @@ def test_cli_multiplecountries():
     commands_to_try = ["countryflag"]
     if os.name == "nt":
         commands_to_try.append("countryflag.exe")
-    
+
     success = False
     for cmd in commands_to_try:
         result = shell(
             f'{cmd} --countries France Belgium JP "United States of America"'
         )
-        if result.exit_code == 0 and norm_newlines(result.stdout) == norm_newlines(expected):
+        if result.exit_code == 0 and norm_newlines(result.stdout) == norm_newlines(
+            expected
+        ):
             success = True
             break
-    
+
     assert success, f"None of the commands {commands_to_try} worked successfully"
 
 
@@ -162,12 +171,12 @@ def test_cli_notfound():
     commands_to_try = ["countryflag"]
     if os.name == "nt":
         commands_to_try.append("countryflag.exe")
-    
+
     success = False
     for cmd in commands_to_try:
         result = shell(f"{cmd} --countries nonexistentcountry")
         if norm_newlines(result.stdout) == norm_newlines(expected):
             success = True
             break
-    
+
     assert success, f"None of the commands {commands_to_try} worked successfully"

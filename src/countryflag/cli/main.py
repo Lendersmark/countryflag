@@ -58,13 +58,15 @@ def _merge_country_tokens(tokens: List[str], cf: CountryFlag) -> List[str]:
             if j > i + 1 and cf.validate_country_name(candidate):
                 # Additional check: make sure we're not accidentally merging separate countries
                 # by checking if individual tokens are also valid countries
-                individual_tokens_valid = all(cf.validate_country_name(token) for token in tokens[i:j])
+                individual_tokens_valid = all(
+                    cf.validate_country_name(token) for token in tokens[i:j]
+                )
                 if not individual_tokens_valid:
                     merged.append(candidate)
                     i = j
                     found_match = True
                     break
-        
+
         if not found_match:
             # nothing matched – keep original token as-is
             merged.append(tokens[i])
@@ -185,7 +187,11 @@ async def run_async_main(args: argparse.Namespace) -> None:
                 for flag, country in flag_country_pairs:
                     writer.writerow([flag, country])
                 output_str = output.getvalue()
-                print(norm_newlines(output_str) if isinstance(output_str, str) else output_str)
+                print(
+                    norm_newlines(output_str)
+                    if isinstance(output_str, str)
+                    else output_str
+                )
             else:
                 for flag, country in flag_country_pairs:
                     print(f"{flag} -> {country}")
@@ -397,7 +403,9 @@ def main() -> None:
                     ]
                 )
             output_str = output.getvalue()
-            print(norm_newlines(output_str) if isinstance(output_str, str) else output_str)
+            print(
+                norm_newlines(output_str) if isinstance(output_str, str) else output_str
+            )
         else:
             for country in countries:
                 region = (
@@ -418,7 +426,9 @@ def main() -> None:
             for region in regions:
                 writer.writerow([region])
             output_str = output.getvalue()
-            print(norm_newlines(output_str) if isinstance(output_str, str) else output_str)
+            print(
+                norm_newlines(output_str) if isinstance(output_str, str) else output_str
+            )
         else:
             print("Supported regions/continents:")
             for region in regions:
@@ -498,7 +508,11 @@ def main() -> None:
                 for flag, country in flag_country_pairs:
                     writer.writerow([flag, country])
                 output_str = output.getvalue()
-                print(norm_newlines(output_str) if isinstance(output_str, str) else output_str)
+                print(
+                    norm_newlines(output_str)
+                    if isinstance(output_str, str)
+                    else output_str
+                )
             else:
                 for flag, country in flag_country_pairs:
                     print(f"{flag} -> {country}")

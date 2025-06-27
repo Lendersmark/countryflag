@@ -73,16 +73,16 @@ class CountryFlag:
     def clear_global_cache(cls) -> None:
         """
         Clear the global cache. Useful for testing or resetting cache state.
-        
+
         This method clears the shared cache instance used by all CountryFlag
         instances that don't have a custom cache provided.
-        
+
         Example:
             >>> CountryFlag.clear_global_cache()
         """
         cls._global_cache.clear()
         cls._global_cache.reset_hits()
-    
+
     def set_language(self, language: str) -> None:
         """
         Set the language for country names.
@@ -95,20 +95,22 @@ class CountryFlag:
     def _make_key(self, country_names: List[str], separator: str) -> str:
         """
         Create a deterministic cache key by sorting country names.
-        
+
         This ensures that the same logical country list in different orders
         maps to the same cache entry. Only valid string entries are used for the key.
-        
+
         Args:
             country_names: List of country names.
             separator: The separator used between flags.
-            
+
         Returns:
             str: A deterministic cache key.
         """
         # Filter to only valid string entries for the cache key
-        valid_names = [name for name in country_names if isinstance(name, str) and name.strip()]
-        return ','.join(sorted(valid_names)) + f'_{separator}'
+        valid_names = [
+            name for name in country_names if isinstance(name, str) and name.strip()
+        ]
+        return ",".join(sorted(valid_names)) + f"_{separator}"
 
     def validate_country_name(self, country_name: str) -> bool:
         """
@@ -277,16 +279,20 @@ class CountryFlag:
                 cached_flags, cached_pairs = cached_result
                 # Create a mapping from country name to flag from cached result
                 country_to_flag = {country: flag for country, flag in cached_pairs}
-                
+
                 # Reconstruct result in current input order
                 reordered_pairs = []
                 reordered_flags = []
                 for country_name in country_names:
-                    if isinstance(country_name, str) and country_name.strip() and country_name in country_to_flag:
+                    if (
+                        isinstance(country_name, str)
+                        and country_name.strip()
+                        and country_name in country_to_flag
+                    ):
                         emoji_flag = country_to_flag[country_name]
                         reordered_pairs.append((country_name, emoji_flag))
                         reordered_flags.append(emoji_flag)
-                
+
                 return (separator.join(reordered_flags), reordered_pairs)
 
         # Use a list for better performance when concatenating strings
@@ -379,14 +385,14 @@ class CountryFlag:
                 # Cached result exists, but we need to reorder it to match current input order
                 # Create a mapping from flag to country from cached result
                 flag_to_country = {flag: country for flag, country in cached_result}
-                
+
                 # Reconstruct result in current input order
                 reordered_result = []
                 for emoji_flag in emoji_flags:
                     if isinstance(emoji_flag, str) and emoji_flag in flag_to_country:
                         country_name = flag_to_country[emoji_flag]
                         reordered_result.append((emoji_flag, country_name))
-                
+
                 return reordered_result
 
         flag_to_country = self._converter.get_flag_to_country_mapping()
