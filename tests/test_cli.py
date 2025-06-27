@@ -3,8 +3,10 @@
 import os
 import subprocess
 import sys
-from src.countryflag.utils.text import norm_newlines
+
 import pytest
+
+from src.countryflag.utils.text import norm_newlines
 
 
 class ShellResult:

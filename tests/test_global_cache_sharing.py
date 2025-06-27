@@ -7,6 +7,7 @@ while instances with explicit cache parameters use their own cache.
 """
 
 import unittest
+
 from countryflag.cache.memory import MemoryCache
 from countryflag.core.flag import CountryFlag
 

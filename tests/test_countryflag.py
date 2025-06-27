@@ -1,9 +1,9 @@
 import os
 import subprocess
 import sys
-from src.countryflag.utils.text import norm_newlines
 
 from src import countryflag
+from src.countryflag.utils.text import norm_newlines
 
 
 class ShellResult:
