@@ -36,7 +36,6 @@ import platform
 import sys
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-
 from countryflag.core.exceptions import (
     CacheError,
     CountryFlagError,
