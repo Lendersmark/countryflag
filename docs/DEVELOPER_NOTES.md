@@ -4,7 +4,7 @@
 - **Repository**: https://github.com/Lendersmark/countryflag
 - **Documentation**: https://countryflag.readthedocs.io/en/latest/
 - **Package**: Python library for converting country names to emoji flags
-- **Current Version**: 1.0.1
+- **Current Version**: 1.1.0
 
 ## Technical Stack
 - **Python**: 3.9, 3.10, 3.11, 3.12 support
@@ -98,7 +98,7 @@ countryflag/
 - All changes documented and tested on Windows
 
 ### Configuration Fixes
-- Fixed ReadTheDocs version mismatch (0.2.0 → 1.0.1)
+- Fixed ReadTheDocs version mismatch (0.2.0 → 1.1.0)
 - Updated mypy configuration syntax and Python target
 - Added py.typed marker for type checking
 - Configured Codecov XML report generation

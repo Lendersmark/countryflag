@@ -6,7 +6,7 @@ The caching system features automatic cache sharing, thread-safe operations, and
 
 Automatic Cache Sharing
 -----------------------
-Starting from version 1.0.1, CountryFlag automatically provides shared caching across instances when no explicit cache is provided.
+Starting from version 1.0.1, CountryFlag automatically provides shared caching across instances when no explicit cache is provided. Enhanced in version 1.1.0 with improved performance.
 
 .. code-block:: python
 
@@ -109,7 +109,7 @@ Backward Compatibility and Migration
 -------------------------------------
 
 .. important::
-   **Breaking Change in v1.0.1**: The caching behavior has changed for CountryFlag instances created without an explicit cache parameter.
+   **Breaking Change in v1.0.1**: The caching behavior has changed for CountryFlag instances created without an explicit cache parameter. Further optimized in v1.1.0.
 
 **Before v1.0.1:**
 
@@ -123,7 +123,7 @@ Backward Compatibility and Migration
    flags1, _ = cf1.get_flag(["Germany"])  # No caching
    flags2, _ = cf2.get_flag(["Germany"])  # No caching
 
-**From v1.0.1 onwards:**
+**From v1.0.1 onwards (enhanced in v1.1.0):**
 
 .. code-block:: python
 

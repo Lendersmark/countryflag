@@ -2,12 +2,12 @@ Migration Guide
 ===============
 This guide will help you migrate between different versions of countryflag.
 
-Migrating to v1.0.1 from v1.0.0
+Migrating to v1.1.0 from v1.0.1
 --------------------------------
 
 **Cache Singleton Behavior (Breaking Change)**
 
-Version 1.0.1 introduces automatic cache sharing across CountryFlag instances.
+Version 1.1.0 enhances the automatic cache sharing feature introduced in v1.0.1 across CountryFlag instances.
 
 **What Changed:**
 
@@ -17,7 +17,7 @@ Version 1.0.1 introduces automatic cache sharing across CountryFlag instances.
    cf1 = CountryFlag()  # No caching (cache=None)
    cf2 = CountryFlag()  # No caching (cache=None)
    
-   # From v1.0.1 onwards
+   # From v1.0.1 onwards (enhanced in v1.1.0)
    cf1 = CountryFlag()  # Automatic global cache sharing
    cf2 = CountryFlag()  # Same global cache as cf1
 

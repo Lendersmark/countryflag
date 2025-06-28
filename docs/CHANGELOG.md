@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - YYYY-MM-DD
+
+### Added
+- Enhanced version management and consistency across project files
+- Improved build system configuration
+- Updated documentation with version-specific references
+
+### Changed
+- Version bumped from 1.0.1 to 1.1.0 across all project files
+- Updated pyproject.toml, setup.py, setup.cfg, and __init__.py versions
+- Refreshed documentation and examples with current version
+
+### Fixed
+- Consistent version numbering across all project configuration files
+- Updated Docker and deployment configurations
+
 ## [1.0.1] - YYYY-MM-DD
 
 ### Added
@@ -84,6 +100,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Simple command-line interface
 - Python API with `getflag()` function
 
+[1.1.0]: https://github.com/Lendersmark/countryflag/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/Lendersmark/countryflag/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/Lendersmark/countryflag/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/Lendersmark/countryflag/compare/v0.1.2b4...v0.2.0

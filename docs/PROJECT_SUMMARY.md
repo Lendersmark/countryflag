@@ -12,7 +12,7 @@ Python library that converts country names to emoji flags (🇺🇸 🇩🇪 �
 ✅ **Fixed ReadTheDocs configuration** (version mismatch, modern config)  
 
 ## Current Status
-- **Version**: 1.0.1
+- **Version**: 1.1.0
 - **CI Status**: All tests passing across Windows/Linux/macOS
 - **Documentation**: Should be building at https://countryflag.readthedocs.io/
 - **Coverage**: ~23% baseline established
