@@ -154,6 +154,7 @@ async def run_async_main(args: argparse.Namespace) -> None:
             country_names = process_multiple_files(args.files, max_workers=args.workers)
         elif args.countries:
             country_names = _merge_country_tokens(args.countries, country_flag)
+        # Note: positional arguments are not used in async mode as they are handled in preprocessing
 
         # Handle region-based lookup
         if args.region:
@@ -239,15 +240,98 @@ async def run_async_main(args: argparse.Namespace) -> None:
         sys.exit(1)
 
 
+def preprocess_args(args: List[str]) -> Tuple[List[str], List[str]]:
+    """
+    Preprocess command line arguments to handle backwards compatibility.
+
+    When mutually exclusive flags are present along with positional arguments,
+    the positional arguments should be ignored (backwards compatibility).
+
+    Args:
+        args: List of command line arguments
+
+    Returns:
+        Tuple of (processed_args_for_parser, extracted_positional_args)
+    """
+    # Flags that are mutually exclusive with positional arguments
+    mutually_exclusive_flags = {
+        "--countries",
+        "--file",
+        "--files",
+        "--reverse",
+        "--region",
+        "--interactive",
+    }
+
+    # Check if any mutually exclusive flag is present
+    has_mutually_exclusive_flag = any(flag in args for flag in mutually_exclusive_flags)
+
+    processed_args = []
+    extracted_positional = []
+    i = 0
+
+    while i < len(args):
+        arg = args[i]
+        if arg.startswith("-"):
+            processed_args.append(arg)
+            # Handle flags that take values
+            if arg in [
+                "--file",
+                "--region",
+                "--threshold",
+                "--language",
+                "--validate",
+                "--workers",
+                "--cache-dir",
+                "--separator",
+                "--format",
+            ]:
+                # Single value flags
+                if i + 1 < len(args) and not args[i + 1].startswith("-"):
+                    i += 1
+                    processed_args.append(args[i])
+            elif arg in ["--countries", "--files", "--reverse"]:
+                # Multi-value flags - collect all non-flag arguments following this flag
+                while i + 1 < len(args) and not args[i + 1].startswith("-"):
+                    i += 1
+                    processed_args.append(args[i])
+        else:
+            # This is a positional argument
+            if has_mutually_exclusive_flag:
+                # Ignore positional args when mutually exclusive flags are present (backwards compatibility)
+                pass
+            else:
+                # Keep positional args when no mutually exclusive flags are present
+                extracted_positional.append(arg)
+        i += 1
+
+    return processed_args, extracted_positional
+
+
 def main() -> None:
     """
     Entry point to the script.
 
     Parses command line arguments and executes the main functionality.
     """
+    # Preprocess arguments for backwards compatibility
+    import sys
+
+    processed_args, extracted_positional = preprocess_args(sys.argv[1:])
+
     # Parse arguments
     parser = argparse.ArgumentParser(
-        description="Countryflag: a Python package for converting country names into emoji flags."
+        description="Countryflag: a Python package for converting country names into emoji flags.",
+        epilog="""Examples:
+  countryflag italy france spain                    # Positional arguments
+  countryflag --countries italy france spain       # Named arguments
+  countryflag --format json italy france           # JSON output
+  countryflag --region Europe                       # Regional flags
+  countryflag --reverse 🇮🇹 🇫🇷 🇪🇸              # Flag to country
+  countryflag --interactive                         # Interactive mode
+
+Both positional and named argument forms are equivalent.""",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
     # Input group
@@ -288,6 +372,8 @@ def main() -> None:
         action="store_true",
         help="Run in interactive mode with autocompletion",
     )
+
+    # Note: Positional arguments are handled via preprocessing to maintain backwards compatibility
 
     # Output options
     parser.add_argument(
@@ -366,7 +452,8 @@ def main() -> None:
         help="Directory to store cache files (if not specified, in-memory cache is used)",
     )
 
-    args = parser.parse_args()
+    # Parse the preprocessed arguments
+    args = parser.parse_args(processed_args)
 
     # Set logging level based on verbose flag
     if args.verbose:
@@ -478,6 +565,11 @@ def main() -> None:
             country_names = process_multiple_files(args.files, max_workers=args.workers)
         elif args.countries:
             country_names = _merge_country_tokens(args.countries, country_flag)
+        elif extracted_positional and not any(
+            [args.file, args.files, args.reverse, args.region, args.interactive]
+        ):
+            # Treat positional countries same as --countries when no other input source is specified
+            country_names = _merge_country_tokens(extracted_positional, country_flag)
 
         # Handle region-based lookup
         if args.region:

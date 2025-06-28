@@ -35,7 +35,9 @@ Using CountryFlag within Python:
 
 Command Line Interface
 ~~~~~~~~~~~~~~~~~~~~~~
-CountryFlag can also be used from the command line:
+CountryFlag can be used from the command line in two equivalent ways:
+
+**Positional Arguments (Short Form):**
 
 .. code-block:: bash
 
@@ -51,6 +53,27 @@ CountryFlag can also be used from the command line:
 
    # Using fuzzy matching
    countryflag Germny Belgim Span --fuzzy
+
+**Named Arguments (Explicit Form):**
+
+.. code-block:: bash
+
+   # Basic usage
+   countryflag --countries Germany BE Spain 'United States of America'
+
+   # Output in different formats
+   countryflag --countries Germany BE Spain --format json
+   countryflag --countries Germany BE Spain --format csv
+
+   # Using a custom separator
+   countryflag --countries Germany BE Spain --separator "|"
+
+   # Using fuzzy matching
+   countryflag --countries Germny Belgim Span --fuzzy
+
+**Other Commands (Both Forms Support These Options):**
+
+.. code-block:: bash
 
    # Reverse lookup
    countryflag --reverse 🇺🇸 🇨🇦 🇲🇽

@@ -59,8 +59,9 @@ To verify your installation:
    # Check the version
    countryflag --version
 
-   # Try a simple conversion
+   # Try a simple conversion (both forms work)
    countryflag "United States" Germany France
+   countryflag --countries "United States" Germany France
 
 Next Steps
 ----------

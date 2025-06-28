@@ -6,7 +6,9 @@ Basic Usage
 -----------
 Converting Country Names
 ~~~~~~~~~~~~~~~~~~~~~~~~
-Convert one or more country names to flags:
+CountryFlag supports two equivalent ways to specify country names:
+
+**Positional Arguments (Short Form):**
 
 .. code-block:: bash
 
@@ -18,6 +20,21 @@ Convert one or more country names to flags:
 
    # Mixed formats
    countryflag "United States" DE France
+
+**Named Arguments (Explicit Form):**
+
+.. code-block:: bash
+
+   # Basic usage
+   countryflag --countries Germany France Italy
+
+   # Using ISO codes
+   countryflag --countries DE FR IT
+
+   # Mixed formats
+   countryflag --countries "United States" DE France
+
+**Note:** Both forms are equivalent and produce the same output. The positional form is shorter, while the named form is more explicit and may be preferred in scripts.
 
 Options and Flags
 -----------------

@@ -98,7 +98,9 @@ Get flags for all countries in a specific region:
 
 Command Line Usage
 ------------------
-CountryFlag can also be used from the command line:
+CountryFlag can be used from the command line in two equivalent ways:
+
+**Positional Arguments (Short Form):**
 
 .. code-block:: bash
 
@@ -111,6 +113,23 @@ CountryFlag can also be used from the command line:
    # JSON output
    countryflag --format json Germany France Italy
 
+**Named Arguments (Explicit Form):**
+
+.. code-block:: bash
+
+   # Basic usage
+   countryflag --countries Germany France Italy
+
+   # Custom separator
+   countryflag --separator "|" --countries Germany France Italy
+
+   # JSON output
+   countryflag --format json --countries Germany France Italy
+
+**Other Commands (Both Forms Support These Options):**
+
+.. code-block:: bash
+
    # Reading from a file
    countryflag --file countries.txt
 
@@ -119,6 +138,9 @@ CountryFlag can also be used from the command line:
 
    # Interactive mode
    countryflag --interactive
+
+.. note::
+   Both positional and named argument forms are equivalent and produce the same output. The positional form is shorter, while the named form is more explicit and may be preferred in scripts.
 
 Common Use Cases
 ----------------
