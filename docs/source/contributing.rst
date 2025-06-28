@@ -183,7 +183,7 @@ Update version in:
 
 2. Documentation
 ~~~~~~~~~~~~~~~~
-- Update CHANGELOG.md
+- Update docs/CHANGELOG.md
 - Review all documentation
 - Update version references
 

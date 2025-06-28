@@ -1,0 +1,57 @@
+site_name: CountryFlag Documentation
+site_description: A Python package for converting country names into emoji flags
+site_url: https://countryflag.readthedocs.io/
+repo_url: https://github.com/lendersmark/countryflag
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotation
+    - content.code.copy
+
+nav:
+  - Home: ../README.md
+  - Documentation:
+    - index.md
+    - CONTRIBUTING.md
+    - CHANGELOG.md
+    - DEVELOPER_NOTES.md
+    - CACHE_SHARING_IMPLEMENTATION.md
+    - PEP517_MIGRATION.md
+    - PROJECT_SUMMARY.md
+    - README_TIMING_LOGIC.md
+    - audit.md
+    - windows_verification_results.md
+    - deployment_guide.md
+
+docs_dir: docs
+
+plugins:
+  - search
+  - autorefs
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/lendersmark/countryflag
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/countryflag/
