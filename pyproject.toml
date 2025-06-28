@@ -96,7 +96,7 @@ multi_line_output = 3
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "--cov=countryflag --cov-report=term-missing"
+addopts = "--cov=countryflag --cov-report=term-missing --cov-report=xml"
 testpaths = ["tests"]
 python_files = "test_*.py"
 python_classes = "Test*"
