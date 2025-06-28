@@ -51,19 +51,102 @@ print(flags)  # 🇺🇸 🇨🇦 🇲🇽
 
 ```bash
 # Basic usage
-countryflag Germany BE Spain 'United States of America'
+countryflag --countries Germany BE Spain 'United States of America'
 
 # Custom separator
-countryflag --separator "|" Germany France Italy
+countryflag --separator "|" --countries Germany France Italy
 
 # Fuzzy matching
-countryflag --fuzzy Germny Frnace Itly
+countryflag --fuzzy --countries Germny Frnace Itly
 
 # Get European flags
 countryflag --region Europe
 
 # Interactive mode
 countryflag --interactive
+
+# Output formats
+countryflag --format json --countries Germany France
+countryflag --format csv --countries Germany France
+
+# List all supported countries
+countryflag --list-countries
+
+# List all supported regions
+countryflag --list-regions
+
+# Validate a country name
+countryflag --validate "Germany"
+
+# Reverse lookup (flag to country)
+countryflag --reverse 🇩🇪 🇫🇷 🇺🇸
+
+# Process files
+countryflag --file countries.txt
+countryflag --files file1.txt file2.txt
+```
+
+## CLI Reference
+
+### Available Options
+
+| Option | Short | Description |
+|--------|-------|-------------|
+| `--countries` | | Country names to convert (space-separated) |
+| `--file` | `-i` | Process a file with country names (one per line) |
+| `--files` | | Process multiple files in parallel |
+| `--reverse` | `-r` | Convert flag emojis to country names |
+| `--region` | | Get flags for all countries in a region |
+| `--interactive` | `-I` | Run in interactive mode with autocompletion |
+| `--format` | `-f` | Output format: `text`, `json`, or `csv` |
+| `--separator` | `-s` | Character to separate flags (default: space) |
+| `--fuzzy` | `-z` | Enable fuzzy matching for country names |
+| `--threshold` | `-t` | Similarity threshold for fuzzy matching (0-1) |
+| `--language` | `-l` | Language for country names (ISO 639-1 code) |
+| `--verbose` | `-v` | Enable verbose logging |
+| `--list-countries` | | List all supported countries |
+| `--list-regions` | | List all supported regions |
+| `--validate` | | Validate a country name |
+| `--cache` | `-c` | Enable caching |
+| `--cache-dir` | | Directory for cache files |
+| `--async` | `-a` | Use asynchronous file processing |
+| `--workers` | `-w` | Number of worker threads for parallel processing |
+
+### Supported Regions
+
+- Africa
+- Americas  
+- Asia
+- Europe
+- Oceania
+
+## Troubleshooting
+
+### Common Issues
+
+**1. "More than one regular expression match" warnings**
+
+These warnings indicate that the country matching algorithm found multiple potential matches. The tool will still work correctly and output the correct flags, but you may see warning messages. This is a known issue that doesn't affect functionality.
+
+**2. Country not found**
+
+Try using the `--fuzzy` flag for fuzzy matching:
+```bash
+countryflag --fuzzy --countries "Untied States"  # Will match "United States"
+```
+
+**3. Multi-word country names**
+
+Always quote multi-word country names:
+```bash
+countryflag --countries "United States of America" "United Kingdom"
+```
+
+**4. Check available countries**
+
+To see all supported country names:
+```bash
+countryflag --list-countries
 ```
 
 ## Advanced Features
@@ -133,7 +216,7 @@ For complete documentation, visit [countryflag.readthedocs.io](https://countryfl
 
 ## Contributing
 
-Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details on how to submit pull requests, report issues, and contribute to the project.
+Contributions are welcome! Please read our [Contributing Guide](docs/CONTRIBUTING.md) for details on how to submit pull requests, report issues, and contribute to the project.
 
 ## License
 
