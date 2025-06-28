@@ -318,38 +318,38 @@ class TestCachePerformance:
         # Cache hit should be significantly faster
         # Platform-specific timing thresholds account for CI variability and OS I/O characteristics
         is_fast_machine = os.getenv("FAST_MACHINE", "").lower() in ("1", "true", "yes")
-        
+
         if sys.platform.startswith("win") and not is_fast_machine:
             # WINDOWS TIMING THRESHOLD: 1.5x (Very Lenient)
-            # 
+            #
             # Windows exhibits significant timing inconsistency in CI environments due to:
             # • NTFS file system overhead and fragmentation
             # • Windows Defender and antivirus real-time scanning impact
             # • Background Windows services consuming I/O bandwidth
             # • Windows CI runners often have limited and shared resources
             # • Process scheduling latency affecting small timing measurements
-            # 
+            #
             # The 1.5x threshold prevents false negatives while still validating
             # that caching provides measurable benefit over cache misses.
             timing_threshold = 1.5  # Very lenient for Windows CI
-            
+
         elif is_fast_machine:
             # FAST MACHINE THRESHOLD: 0.5x (Strict)
-            # 
+            #
             # Development machines with FAST_MACHINE=true should demonstrate
             # clear performance improvements with minimal variance:
             # • Fast NVMe SSD storage eliminates I/O bottlenecks
             # • Sufficient RAM prevents memory pressure
             # • Controlled environment with minimal background processes
             # • High-performance CPUs with consistent execution timing
-            # 
+            #
             # The strict 0.5x threshold ensures optimizations show significant
             # impact and catches performance regressions early in development.
             timing_threshold = 0.5  # Strict timing for fast machines
-            
+
         else:
             # LINUX/MACOS THRESHOLD: 0.8x (Moderate)
-            # 
+            #
             # Unix-like systems generally provide more consistent timing but
             # CI environments still introduce variability:
             # • ext4/APFS file systems with better I/O characteristics than NTFS
@@ -357,14 +357,16 @@ class TestCachePerformance:
             # • Docker container overhead in containerized CI environments
             # • Network-attached storage in cloud CI (AWS, GCP, Azure)
             # • Shared CPU resources among multiple CI jobs
-            # 
+            #
             # The 0.8x threshold balances meaningful performance validation
             # with tolerance for infrastructure-related timing variance.
             timing_threshold = 0.8  # Moderate timing for other platforms
 
         # Only check timing if both times are measurable
         if time_hit > 0.0001 and time_miss > 0.0001:
-            assert time_hit < time_miss * timing_threshold, (f"Cache hit was not significantly faster than miss (hit: {time_hit:.4f}s, miss: {time_miss:.4f}s, threshold: {timing_threshold}x)")
+            assert (
+                time_hit < time_miss * timing_threshold
+            ), f"Cache hit was not significantly faster than miss (hit: {time_hit:.4f}s, miss: {time_miss:.4f}s, threshold: {timing_threshold}x)"
         else:
             print("Note: timing too fast …")
         assert flags_hit == flags_miss, "Cache hit and miss produced different results"
