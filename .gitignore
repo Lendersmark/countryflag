@@ -130,3 +130,26 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .DS_Store
+
+# Virtual environments - Python virtual environment directories
+.venv/
+env/
+*/env/
+*/venv/
+test_env/
+
+# Backup / duplicate tests - Temporary backup directories for tests
+temp_tests_backup/
+
+# IDE & editor temp files - Temporary files created by IDEs and text editors
+.vscode/
+.idea/
+*.swp
+*.bak
+*~
+
+# Coverage & build artifacts - Test coverage reports and build output
+htmlcov/
+.coverage
+dist/
+build/
