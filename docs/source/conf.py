@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.abspath("../../src"))
 project = "CountryFlag"
 author = "Lendersmark"
 copyright = f"{datetime.now().year}, {author}"
-release = "0.2.0"
+release = "1.0.1"
 
 # -- General configuration ---------------------------------------------------
 extensions = [
