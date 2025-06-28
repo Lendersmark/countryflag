@@ -87,7 +87,7 @@ _setup_platform_optimizations()
 
 
 def getflag(
-    country_names: List[str], separator: str = " "
+    countries: Union[str, List[str]], separator: str = " "
 ) -> Union[str, Tuple[str, List[Tuple[str, str]]]]:
     """
     Convert country names to emoji flags.
@@ -97,7 +97,7 @@ def getflag(
     flags by default, but can optionally return the full tuple with pairs.
 
     Args:
-        country_names: A list of country names to convert to flags.
+        countries: A single country name or list of country names to convert to flags.
         separator: The separator to use between flags (default: space).
 
     Returns:
@@ -110,8 +110,12 @@ def getflag(
         >>> getflag(['Germany', 'BE', 'United States of America', 'Japan'])
         '🇩🇪 🇧🇪 🇺🇸 🇯🇵'
     """
+    # Convert single string to list for compatibility with core implementation
+    if isinstance(countries, str):
+        countries = [countries]
+    
     cf = CountryFlag()
-    flags, pairs = cf.get_flag(country_names, separator)
+    flags, pairs = cf.get_flag(countries, separator)
 
     # Check if we're being called from a module that imports from v0.2.0
     # If so, return the full result (flags, pairs)
