@@ -36,12 +36,6 @@ import platform
 import sys
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-# Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-
 from countryflag.core.exceptions import (
     CacheError,
     CountryFlagError,
