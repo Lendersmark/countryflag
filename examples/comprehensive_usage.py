@@ -18,6 +18,7 @@ from countryflag.core.exceptions import (
     ReverseConversionError,
 )
 from countryflag.core.flag import CountryFlag
+from countryflag.utils.text import norm_newlines
 
 # Set up logging
 logging.basicConfig(
@@ -87,7 +88,7 @@ def demo_output_formats():
     # Text format (default)
     text_output = cf.format_output(pairs, "text")
     print("Text format:")
-    print(text_output)
+    print(norm_newlines(text_output) if isinstance(text_output, str) else text_output)
 
     # JSON format
     json_output = cf.format_output(pairs, "json")
@@ -98,7 +99,7 @@ def demo_output_formats():
     # CSV format
     csv_output = cf.format_output(pairs, "csv")
     print("\nCSV format:")
-    print(csv_output)
+    print(norm_newlines(csv_output) if isinstance(csv_output, str) else csv_output)
 
     # Custom separator for text format
     custom_text = cf.format_output(pairs, "text", " 🌍 ")

@@ -14,7 +14,7 @@ Requirements
 ------------
 CountryFlag requires:
 
-* Python 3.6 or newer
+* Python 3.9 or newer
 * emoji-country-flag
 * country_converter
 * typeguard

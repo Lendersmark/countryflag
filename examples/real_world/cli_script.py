@@ -16,6 +16,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from countryflag.cache import DiskCache, MemoryCache
 from countryflag.core import CountryFlag
 from countryflag.core.exceptions import CountryFlagError, InvalidCountryError
+from countryflag.utils.text import norm_newlines
 
 
 def read_countries_from_file(file_path: str) -> List[str]:
@@ -319,7 +320,7 @@ def main():
         if args.output:
             write_output_to_file(output, args.output)
         else:
-            print(output)
+            print(norm_newlines(output) if isinstance(output, str) else output)
 
     except CountryFlagError as e:
         print(f"Error: {str(e)}")

@@ -29,7 +29,7 @@ The project already had proper PEP-517 configuration:
 
 ## How It Works
 
-### Standard Test Environments (py38, py39, etc.)
+### Standard Test Environments (py39, py310, etc.)
 1. tox creates an isolated build environment
 2. Uses PEP-517 to build the package from `pyproject.toml`
 3. Installs the package with `.[test]` extra dependencies
