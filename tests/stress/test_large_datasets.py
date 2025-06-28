@@ -411,10 +411,10 @@ class TestCachePerformance:
         # For disk cache, we mainly care that results are consistent and cache works
         # Performance may vary due to disk I/O, so we use a more lenient check
         assert flags_hit == flags_miss, "Cache hit and miss produced different results"
-        
+
         # Platform-specific timing thresholds account for CI variability and disk I/O characteristics
         is_fast_machine = os.getenv("FAST_MACHINE", "").lower() in ("1", "true", "yes")
-        
+
         if sys.platform.startswith("win") and not is_fast_machine:
             # WINDOWS DISK CACHE THRESHOLD: 3.0x (Very Lenient)
             #
@@ -429,7 +429,7 @@ class TestCachePerformance:
             # The 3.0x threshold prevents false negatives while still validating
             # that disk caching doesn't cause performance regressions.
             timing_threshold = 3.0  # Very lenient for Windows CI disk operations
-            
+
         elif is_fast_machine:
             # FAST MACHINE DISK THRESHOLD: 1.5x (Moderate)
             #
@@ -441,8 +441,10 @@ class TestCachePerformance:
             #
             # The 1.5x threshold accounts for disk I/O overhead while ensuring
             # cache doesn't introduce significant performance penalties.
-            timing_threshold = 1.5  # Moderate timing for fast machines with good storage
-            
+            timing_threshold = (
+                1.5  # Moderate timing for fast machines with good storage
+            )
+
         else:
             # LINUX/MACOS DISK THRESHOLD: 2.0x (Balanced)
             #
@@ -457,14 +459,16 @@ class TestCachePerformance:
             # The 2.0x threshold balances disk I/O overhead tolerance
             # with meaningful performance regression detection.
             timing_threshold = 2.0  # Balanced timing for other platforms
-        
+
         # Only check timing if both times are measurable (avoid division by zero and precision issues)
         if time_hit > 0.0001 and time_miss > 0.0001:
             assert (
                 time_hit < time_miss * timing_threshold
             ), f"Disk cache hit was much slower than miss (hit: {time_hit:.4f}s, miss: {time_miss:.4f}s, threshold: {timing_threshold}x) - possible cache issue"
         else:
-            print("Note: Disk cache timing too fast to measure accurately - cache functionality verified through result consistency")
+            print(
+                "Note: Disk cache timing too fast to measure accurately - cache functionality verified through result consistency"
+            )
 
     def test_cache_size(self, large_country_list, tmp_path):
         """Test the size of the cache with a large dataset."""
