@@ -113,7 +113,7 @@ def getflag(
     # Convert single string to list for compatibility with core implementation
     if isinstance(countries, str):
         countries = [countries]
-    
+
     cf = CountryFlag()
     flags, pairs = cf.get_flag(countries, separator)
 
