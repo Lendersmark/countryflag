@@ -948,18 +948,11 @@ def test_invalid_items_in_list(country_list_with_invalid_items):
         if isinstance(x, str) and x.strip() and x != ""
     ]
 
-    # Check if there are any explicit empty strings (which should raise errors)
-    has_empty_string = "" in country_list_with_invalid_items
-
-    if has_empty_string:
-        # If there's an empty string, expect an InvalidCountryError
-        with pytest.raises(InvalidCountryError, match="country names cannot be empty"):
-            cf.get_flag(country_list_with_invalid_items)
-    else:
-        # Convert the list - should handle invalid items gracefully
-        flags, pairs = cf.get_flag(country_list_with_invalid_items)
-        # Check that we got flags for valid items only
-        assert len(pairs) == len(valid_items)
+    # Convert the list - should handle invalid items gracefully
+    # Empty strings and other invalid items should be skipped
+    flags, pairs = cf.get_flag(country_list_with_invalid_items)
+    # Check that we got flags for valid items only
+    assert len(pairs) == len(valid_items)
 
 
 @given(valid_country_lists, st.text(min_size=0, max_size=0))

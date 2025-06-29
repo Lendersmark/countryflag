@@ -326,14 +326,10 @@ class CountryFlag:
                 )
                 continue
 
-            # Handle empty strings - raise error for explicit empty strings
-            # but skip empty strings that are results of whitespace stripping
-            if country_name == "":
-                logger.debug(f"Empty string detected at position {i}")
-                raise InvalidCountryError("country names cannot be empty", country="")
-            elif not country_name.strip():
+            # Skip empty strings and whitespace-only strings
+            if not country_name.strip():
                 logger.debug(
-                    f"Whitespace-only string detected at position {i}, skipping"
+                    f"Empty or whitespace-only string detected at position {i}, skipping"
                 )
                 continue
 

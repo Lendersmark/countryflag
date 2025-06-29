@@ -694,6 +694,16 @@ Both positional and named argument forms are equivalent.""",
                 else:
                     processed_names.append(name)
 
+            # Check for empty strings first
+            has_empty_string = any(name == "" for name in processed_names)
+            if has_empty_string:
+                print("Error: country names cannot be empty", file=sys.stderr)
+                print(
+                    "\nUse --list-countries to see all supported country names",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+
             # Handle mixed valid/invalid countries by processing individually
             successful_pairs = []
             had_errors = False
@@ -706,40 +716,29 @@ Both positional and named argument forms are equivalent.""",
                     successful_pairs.extend(pairs)
                 except InvalidCountryError as ice:
                     had_errors = True
-                    # Check if this is the empty string case
-                    if ice.country == "" and "country names cannot be empty" in str(
-                        ice
-                    ):
-                        print("Error: country names cannot be empty", file=sys.stderr)
+                    print(f"Error: {str(ice)}", file=sys.stderr)
+
+                    # If fuzzy matching is enabled, suggest alternatives
+                    if args.fuzzy:
+                        converter = CountryConverterSingleton()
+                        matches = converter.find_close_matches(
+                            ice.country, args.threshold
+                        )
+                        if matches:
+                            print(
+                                f"Did you mean one of these for '{ice.country}'?",
+                                file=sys.stderr,
+                            )
+                            for name, code in matches[:3]:  # Show top 3 matches
+                                print(f"  - {name} ({code})", file=sys.stderr)
+
+                    # For single invalid country, exit with error
+                    if len(processed_names) == 1:
                         print(
                             "\nUse --list-countries to see all supported country names",
                             file=sys.stderr,
                         )
                         sys.exit(1)
-                    else:
-                        print(f"Error: {str(ice)}", file=sys.stderr)
-
-                        # If fuzzy matching is enabled, suggest alternatives
-                        if args.fuzzy:
-                            converter = CountryConverterSingleton()
-                            matches = converter.find_close_matches(
-                                ice.country, args.threshold
-                            )
-                            if matches:
-                                print(
-                                    f"Did you mean one of these for '{ice.country}'?",
-                                    file=sys.stderr,
-                                )
-                                for name, code in matches[:3]:  # Show top 3 matches
-                                    print(f"  - {name} ({code})", file=sys.stderr)
-
-                        # For single invalid country, exit with error
-                        if len(processed_names) == 1:
-                            print(
-                                "\nUse --list-countries to see all supported country names",
-                                file=sys.stderr,
-                            )
-                            sys.exit(1)
 
             # Output successful results if any
             if successful_pairs:
