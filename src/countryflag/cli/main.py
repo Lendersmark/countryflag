@@ -227,7 +227,6 @@ async def run_async_main(args: argparse.Namespace) -> None:
             print(norm_newlines(output) if isinstance(output, str) else output)
 
     except InvalidCountryError as ice:
-        logger.error(str(ice))
         print(f"Error: {str(ice)}", file=sys.stderr)
 
         # If fuzzy matching is enabled, suggest alternatives
@@ -243,18 +242,15 @@ async def run_async_main(args: argparse.Namespace) -> None:
         sys.exit(1)
 
     except RegionError as re:
-        logger.error(str(re))
         print(f"Error: {str(re)}", file=sys.stderr)
         print(f"\nSupported regions: {', '.join(RegionDefinitions.REGIONS)}", file=sys.stderr)
         sys.exit(1)
 
     except ReverseConversionError as rce:
-        logger.error(str(rce))
         print(f"Error: {str(rce)}", file=sys.stderr)
         sys.exit(1)
 
     except Exception as e:
-        logger.error(f"Unexpected error: {str(e)}")
         print(f"Error: {str(e)}", file=sys.stderr)
         sys.exit(1)
 
@@ -639,7 +635,6 @@ Both positional and named argument forms are equivalent.""",
             print(norm_newlines(output) if isinstance(output, str) else output)
 
     except InvalidCountryError as ice:
-        logger.error(str(ice))
         print(f"Error: {str(ice)}", file=sys.stderr)
 
         # If fuzzy matching is enabled, suggest alternatives
@@ -655,13 +650,11 @@ Both positional and named argument forms are equivalent.""",
         sys.exit(1)
 
     except RegionError as re:
-        logger.error(str(re))
         print(f"Error: {str(re)}", file=sys.stderr)
         print(f"\nSupported regions: {', '.join(RegionDefinitions.REGIONS)}", file=sys.stderr)
         sys.exit(1)
 
     except ReverseConversionError as rce:
-        logger.error(str(rce))
         print(f"Error: {str(rce)}", file=sys.stderr)
         sys.exit(1)
 
@@ -670,7 +663,6 @@ Both positional and named argument forms are equivalent.""",
         sys.exit(1)
 
     except Exception as e:
-        logger.error(f"Unexpected error: {str(e)}")
         print(f"Error: {str(e)}", file=sys.stderr)
         sys.exit(1)
 
