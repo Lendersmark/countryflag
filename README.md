@@ -50,13 +50,16 @@ print(flags)  # 🇺🇸 🇨🇦 🇲🇽
 ### Command Line Interface
 
 ```bash
-# Basic usage
+# Basic usage - both forms are supported:
+countryflag Germany BE Spain 'United States of America'
 countryflag --countries Germany BE Spain 'United States of America'
 
 # Custom separator
+countryflag --separator "|" Germany France Italy
 countryflag --separator "|" --countries Germany France Italy
 
 # Fuzzy matching
+countryflag --fuzzy Germny Frnace Itly
 countryflag --fuzzy --countries Germny Frnace Itly
 
 # Get European flags
@@ -66,7 +69,9 @@ countryflag --region Europe
 countryflag --interactive
 
 # Output formats
+countryflag --format json Germany France
 countryflag --format json --countries Germany France
+countryflag --format csv Germany France
 countryflag --format csv --countries Germany France
 
 # List all supported countries

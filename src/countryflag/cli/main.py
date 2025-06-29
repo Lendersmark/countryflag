@@ -9,10 +9,11 @@ import asyncio
 import csv
 import json
 import logging
+import os
 import re
 import sys
 from io import StringIO
-from typing import Any, Dict, List, Optional, Tuple
+from typing import List, Tuple
 
 import prompt_toolkit
 from prompt_toolkit.completion import WordCompleter
@@ -33,6 +34,11 @@ from countryflag.utils.io import (
 )
 from countryflag.utils.text import norm_newlines
 
+# Configure UTF-8 output for Windows to prevent mojibake
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 # Configure logging
 logger = logging.getLogger("countryflag.cli")
 
@@ -43,34 +49,101 @@ def _merge_country_tokens(tokens: List[str], cf: CountryFlag) -> List[str]:
     (typical on Windows when quotes are not honoured).
 
     We scan greedily from left to right, always taking the longest sequence
-    of remaining tokens that forms a valid country name.
+    of remaining tokens that forms a valid country name. We avoid merging
+    tokens if it results in fuzzy matches that don't represent real countries.
     """
     merged: List[str] = []
     i = 0
     n = len(tokens)
 
+    # List of known multi-word countries to avoid false matches
+    known_multi_word_countries = {
+        "united states",
+        "united kingdom",
+        "south africa",
+        "new zealand",
+        "costa rica",
+        "puerto rico",
+        "sri lanka",
+        "saudi arabia",
+        "south korea",
+        "north korea",
+        "czech republic",
+        "dominican republic",
+        "el salvador",
+        "hong kong",
+        "san marino",
+        "burkina faso",
+        "cape verde",
+        "ivory coast",
+        "papua new guinea",
+        "sierra leone",
+        "south sudan",
+        "trinidad and tobago",
+        "united arab emirates",
+        "bosnia and herzegovina",
+        "antigua and barbuda",
+        "saint kitts and nevis",
+        "saint vincent and the grenadines",
+        "central african republic",
+        "united states of america",
+        "united states america",
+        "usa",
+    }
+
     while i < n:
-        # try longest slice first, but stop at reasonable boundaries
         found_match = False
-        for j in range(min(n, i + 5), i, -1):  # Limit to max 5 tokens per country
+        # Try longest slice first, but limit to reasonable boundaries
+        for j in range(
+            min(n, i + 6), i, -1
+        ):  # Max 6 tokens for very long country names
             candidate = " ".join(tokens[i:j])
-            # Only merge if it's a multi-token candidate and validates as a single country
-            if j > i + 1 and cf.validate_country_name(candidate):
-                # Additional check: make sure we're not accidentally merging separate countries
-                # by checking if individual tokens are also valid countries
-                individual_tokens_valid = all(
-                    cf.validate_country_name(token) for token in tokens[i:j]
-                )
-                if not individual_tokens_valid:
-                    merged.append(candidate)
-                    i = j
-                    found_match = True
-                    break
+            candidate_lower = candidate.lower()
+
+            # Check if it's a known multi-word country first,
+            # or try combinations for multi-word candidates
+            if candidate_lower in known_multi_word_countries:
+                # Validate it's actually recognized by the converter
+                try:
+                    code = cf._converter.convert(candidate)
+                    if code != "not found" and len(code) <= 3:
+                        merged.append(candidate)
+                        i = j
+                        found_match = True
+                        break
+                except Exception:
+                    pass
+            elif j > i + 1:  # Only try multi-word combinations for reasonable cases
+                # For non-known multi-word combinations, be more conservative
+                # Only merge if each individual token doesn't work on its own
+                individual_tokens_invalid = True
+                for k in range(i, j):
+                    try:
+                        individual_code = cf._converter.convert(tokens[k])
+                        if individual_code != "not found":
+                            individual_tokens_invalid = False
+                            break
+                    except Exception:
+                        pass
+
+                # Only merge if individual tokens are invalid
+                # AND the combined result is valid
+                if individual_tokens_invalid:
+                    try:
+                        code = cf._converter.convert(candidate)
+                        if code != "not found" and len(code) <= 3:
+                            merged.append(candidate)
+                            i = j
+                            found_match = True
+                            break
+                    except Exception:
+                        pass
 
         if not found_match:
-            # nothing matched – keep original token as-is
+            # No multi-word match found - keep original token as-is
             merged.append(tokens[i])
             i += 1
+
     return merged
 
 
@@ -154,6 +227,7 @@ async def run_async_main(args: argparse.Namespace) -> None:
             country_names = process_multiple_files(args.files, max_workers=args.workers)
         elif args.countries:
             country_names = _merge_country_tokens(args.countries, country_flag)
+        # Note: positional arguments are not used in async mode as they are handled in preprocessing
 
         # Handle region-based lookup
         if args.region:
@@ -207,36 +281,105 @@ async def run_async_main(args: argparse.Namespace) -> None:
             print(norm_newlines(output) if isinstance(output, str) else output)
 
     except InvalidCountryError as ice:
-        logger.error(str(ice))
-        print(f"Error: {str(ice)}")
+        print(f"Error: {str(ice)}", file=sys.stderr)
 
         # If fuzzy matching is enabled, suggest alternatives
         if args.fuzzy:
             converter = CountryConverterSingleton()
             matches = converter.find_close_matches(ice.country, args.threshold)
             if matches:
-                print("\nDid you mean one of these?")
+                print("\nDid you mean one of these?", file=sys.stderr)
                 for name, code in matches:
-                    print(f"  - {name} ({code})")
+                    print(f"  - {name} ({code})", file=sys.stderr)
 
-        print("\nUse --list-countries to see all supported country names")
+        print(
+            "\nUse --list-countries to see all supported country names", file=sys.stderr
+        )
         sys.exit(1)
 
     except RegionError as re:
-        logger.error(str(re))
-        print(f"Error: {str(re)}")
-        print(f"\nSupported regions: {', '.join(RegionDefinitions.REGIONS)}")
+        print(f"Error: {str(re)}", file=sys.stderr)
+        print(
+            f"\nSupported regions: {', '.join(RegionDefinitions.REGIONS)}",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     except ReverseConversionError as rce:
-        logger.error(str(rce))
-        print(f"Error: {str(rce)}")
+        print(f"Error: {str(rce)}", file=sys.stderr)
         sys.exit(1)
 
     except Exception as e:
-        logger.error(f"Unexpected error: {str(e)}")
-        print(f"Error: {str(e)}")
+        print(f"Error: {str(e)}", file=sys.stderr)
         sys.exit(1)
+
+
+def preprocess_args(args: List[str]) -> Tuple[List[str], List[str]]:
+    """
+    Preprocess command line arguments to handle backwards compatibility.
+
+    When mutually exclusive flags are present along with positional arguments,
+    the positional arguments should be ignored (backwards compatibility).
+
+    Args:
+        args: List of command line arguments
+
+    Returns:
+        Tuple of (processed_args_for_parser, extracted_positional_args)
+    """
+    # Flags that are mutually exclusive with positional arguments
+    mutually_exclusive_flags = {
+        "--countries",
+        "--file",
+        "--files",
+        "--reverse",
+        "--region",
+        "--interactive",
+    }
+
+    # Check if any mutually exclusive flag is present
+    has_mutually_exclusive_flag = any(flag in args for flag in mutually_exclusive_flags)
+
+    processed_args = []
+    extracted_positional = []
+    i = 0
+
+    while i < len(args):
+        arg = args[i]
+        if arg.startswith("-"):
+            processed_args.append(arg)
+            # Handle flags that take values
+            if arg in [
+                "--file",
+                "--region",
+                "--threshold",
+                "--language",
+                "--validate",
+                "--workers",
+                "--cache-dir",
+                "--separator",
+                "--format",
+            ]:
+                # Single value flags
+                if i + 1 < len(args) and not args[i + 1].startswith("-"):
+                    i += 1
+                    processed_args.append(args[i])
+            elif arg in ["--countries", "--files", "--reverse"]:
+                # Multi-value flags - collect all non-flag arguments following this flag
+                while i + 1 < len(args) and not args[i + 1].startswith("-"):
+                    i += 1
+                    processed_args.append(args[i])
+        else:
+            # This is a positional argument
+            if has_mutually_exclusive_flag:
+                # Ignore positional args when mutually exclusive flags are present (backwards compatibility)
+                pass
+            else:
+                # Keep positional args when no mutually exclusive flags are present
+                extracted_positional.append(arg)
+        i += 1
+
+    return processed_args, extracted_positional
 
 
 def main() -> None:
@@ -245,9 +388,24 @@ def main() -> None:
 
     Parses command line arguments and executes the main functionality.
     """
+    # Preprocess arguments for backwards compatibility
+    import sys
+
+    processed_args, extracted_positional = preprocess_args(sys.argv[1:])
+
     # Parse arguments
     parser = argparse.ArgumentParser(
-        description="Countryflag: a Python package for converting country names into emoji flags."
+        description="Countryflag: a Python package for converting country names into emoji flags.",
+        epilog="""Examples:
+  countryflag italy france spain                    # Positional arguments
+  countryflag --countries italy france spain       # Named arguments
+  countryflag --format json italy france           # JSON output
+  countryflag --region Europe                       # Regional flags
+  countryflag --reverse 🇮🇹 🇫🇷 🇪🇸              # Flag to country
+  countryflag --interactive                         # Interactive mode
+
+Both positional and named argument forms are equivalent.""",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
     # Input group
@@ -288,6 +446,8 @@ def main() -> None:
         action="store_true",
         help="Run in interactive mode with autocompletion",
     )
+
+    # Note: Positional arguments are handled via preprocessing to maintain backwards compatibility
 
     # Output options
     parser.add_argument(
@@ -366,7 +526,8 @@ def main() -> None:
         help="Directory to store cache files (if not specified, in-memory cache is used)",
     )
 
-    args = parser.parse_args()
+    # Parse the preprocessed arguments
+    args = parser.parse_args(processed_args)
 
     # Set logging level based on verbose flag
     if args.verbose:
@@ -478,6 +639,11 @@ def main() -> None:
             country_names = process_multiple_files(args.files, max_workers=args.workers)
         elif args.countries:
             country_names = _merge_country_tokens(args.countries, country_flag)
+        elif extracted_positional and not any(
+            [args.file, args.files, args.reverse, args.region, args.interactive]
+        ):
+            # Treat positional countries same as --countries when no other input source is specified
+            country_names = _merge_country_tokens(extracted_positional, country_flag)
 
         # Handle region-based lookup
         if args.region:
@@ -519,39 +685,127 @@ def main() -> None:
 
         # Handle country to flag conversion
         elif country_names:
-            flags, country_flag_pairs = country_flag.get_flag(
-                country_names, args.separator, args.fuzzy, args.threshold
+            # Pre-process country names to handle shell-escaped empty strings
+            processed_names = []
+            for name in country_names:
+                # Convert shell-escaped empty string to actual empty string
+                if name == "''" or name == '""':
+                    processed_names.append("")
+                else:
+                    processed_names.append(name)
+
+            # Check for empty strings first
+            has_empty_string = any(name == "" for name in processed_names)
+            if has_empty_string:
+                print("Error: country names cannot be empty", file=sys.stderr)
+                print(
+                    "\nUse --list-countries to see all supported country names",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+
+            # Handle mixed valid/invalid countries by processing individually
+            successful_pairs = []
+            had_errors = False
+
+            for country_name in processed_names:
+                try:
+                    flags, pairs = country_flag.get_flag(
+                        [country_name], args.separator, args.fuzzy, args.threshold
+                    )
+                    successful_pairs.extend(pairs)
+                except InvalidCountryError as ice:
+                    had_errors = True
+                    print(f"Error: {str(ice)}", file=sys.stderr)
+
+                    # If fuzzy matching is enabled, suggest alternatives
+                    if args.fuzzy:
+                        converter = CountryConverterSingleton()
+                        matches = converter.find_close_matches(
+                            ice.country, args.threshold
+                        )
+                        if matches:
+                            print(
+                                f"Did you mean one of these for '{ice.country}'?",
+                                file=sys.stderr,
+                            )
+                            for name, code in matches[:3]:  # Show top 3 matches
+                                print(f"  - {name} ({code})", file=sys.stderr)
+
+                    # For single invalid country, exit with error
+                    if len(processed_names) == 1:
+                        print(
+                            "\nUse --list-countries to see all supported country names",
+                            file=sys.stderr,
+                        )
+                        sys.exit(1)
+
+            # Output successful results if any
+            if successful_pairs:
+                output = country_flag.format_output(
+                    successful_pairs, args.format, args.separator
+                )
+                print(norm_newlines(output) if isinstance(output, str) else output)
+
+            # If we had errors but also successful conversions, don't exit with error
+            # Only exit with error if ALL countries failed
+            if had_errors and not successful_pairs:
+                print(
+                    "\nUse --list-countries to see all supported country names",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+        else:
+            # No input provided - show helpful message and examples
+            print("CountryFlag: Convert country names to emoji flags\n")
+            print("Usage examples:")
+            print(
+                "  countryflag italy france spain                    # Convert countries to flags"
             )
-            output = country_flag.format_output(
-                country_flag_pairs, args.format, args.separator
+            print("  countryflag --countries italy france spain       # Same as above")
+            print(
+                "  countryflag --reverse 🇮🇹 🇫🇷 🇪🇸              # Convert flags to countries"
             )
-            print(norm_newlines(output) if isinstance(output, str) else output)
+            print(
+                "  countryflag --region Europe                       # Get all European flags"
+            )
+            print(
+                "  countryflag --interactive                         # Interactive mode"
+            )
+            print(
+                "  countryflag --list-countries                      # List all supported countries"
+            )
+            print("  countryflag --help                               # Show full help")
+            print("\nFor more options, use: countryflag --help")
+            sys.exit(0)
 
     except InvalidCountryError as ice:
-        logger.error(str(ice))
-        print(f"Error: {str(ice)}")
+        print(f"Error: {str(ice)}", file=sys.stderr)
 
         # If fuzzy matching is enabled, suggest alternatives
         if args.fuzzy:
             converter = CountryConverterSingleton()
             matches = converter.find_close_matches(ice.country, args.threshold)
             if matches:
-                print("\nDid you mean one of these?")
+                print("\nDid you mean one of these?", file=sys.stderr)
                 for name, code in matches:
-                    print(f"  - {name} ({code})")
+                    print(f"  - {name} ({code})", file=sys.stderr)
 
-        print("\nUse --list-countries to see all supported country names")
+        print(
+            "\nUse --list-countries to see all supported country names", file=sys.stderr
+        )
         sys.exit(1)
 
     except RegionError as re:
-        logger.error(str(re))
-        print(f"Error: {str(re)}")
-        print(f"\nSupported regions: {', '.join(RegionDefinitions.REGIONS)}")
+        print(f"Error: {str(re)}", file=sys.stderr)
+        print(
+            f"\nSupported regions: {', '.join(RegionDefinitions.REGIONS)}",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     except ReverseConversionError as rce:
-        logger.error(str(rce))
-        print(f"Error: {str(rce)}")
+        print(f"Error: {str(rce)}", file=sys.stderr)
         sys.exit(1)
 
     except KeyboardInterrupt:
@@ -559,8 +813,7 @@ def main() -> None:
         sys.exit(1)
 
     except Exception as e:
-        logger.error(f"Unexpected error: {str(e)}")
-        print(f"Error: {str(e)}")
+        print(f"Error: {str(e)}", file=sys.stderr)
         sys.exit(1)
 
 

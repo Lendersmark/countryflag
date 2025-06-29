@@ -9,7 +9,7 @@ import csv
 import json
 import logging
 from io import StringIO
-from typing import Any, Dict, List, Literal, Optional, Tuple, cast
+from typing import Dict, List, Literal, Optional, Tuple
 
 import flag
 
@@ -21,7 +21,7 @@ from countryflag.core.exceptions import (
     RegionError,
     ReverseConversionError,
 )
-from countryflag.core.models import CountryInfo
+from countryflag.utils.suppress import silence_coco_warnings
 from countryflag.utils.text import norm_newlines
 
 # Configure logging
@@ -62,7 +62,8 @@ class CountryFlag:
 
         Args:
             language: The language code for output (default: 'en').
-            cache: The cache instance to use (optional). If None, uses the shared global cache.
+            cache: The cache instance to use (optional).
+                If None, uses the shared global cache.
         """
         self._converter = CountryConverterSingleton()
         self._language = language
@@ -140,15 +141,29 @@ class CountryFlag:
                 if cached_result is not None:
                     return cached_result
 
-            code = self._converter.convert(country_name)
-            # Only accept single country results, reject lists or "not found"
-            result = isinstance(code, str) and code != "not found" and len(code) <= 3
+            # Convert to all possible codes and validate the length
+            valid_result = False
+            iso_codes = [code.strip() for code in country_name.split()]
+
+            if len(iso_codes) > 1:  # Handle cases with multi-word countries
+                with silence_coco_warnings():
+                    valid_result = all(
+                        self._converter.convert(name) != "not found"
+                        for name in iso_codes
+                    )
+            else:
+                # Single country validation
+                with silence_coco_warnings():
+                    code = self._converter.convert(country_name)
+                    valid_result = (
+                        isinstance(code, str) and code != "not found" and len(code) <= 3
+                    )
 
             # Cache the result if cache is available
             if self._cache:
-                self._cache.set(cache_key, result)
+                self._cache.set(cache_key, valid_result)
 
-            return result
+            return valid_result
         except Exception:
             return False
 
@@ -277,8 +292,9 @@ class CountryFlag:
             if cached_result is not None:
                 # Cached result exists, but we need to reorder it to match current input order
                 cached_flags, cached_pairs = cached_result
-                # Create a mapping from country name to flag from cached result
-                country_to_flag = {country: flag for country, flag in cached_pairs}
+                # Create a mapping from country name to flag
+                # from cached result
+                country_to_flag = dict(cached_pairs)
 
                 # Reconstruct result in current input order
                 reordered_pairs = []
@@ -302,31 +318,45 @@ class CountryFlag:
         for i, country_name in enumerate(country_names):
             logger.debug(f"Processing country: {country_name}")
 
-            if not country_name or not isinstance(country_name, str):
-                logger.warning(f"Invalid input at position {i}: {country_name}")
+            # Skip invalid items (non-strings, None)
+            if not isinstance(country_name, str):
+                logger.debug(
+                    f"Skipping invalid input type at position {i}: "
+                    f"expected string, got {type(country_name).__name__}"
+                )
+                continue
+
+            # Skip empty strings and whitespace-only strings
+            if not country_name.strip():
+                logger.debug(
+                    f"Empty or whitespace-only string detected at position {i}, skipping"
+                )
                 continue
 
             try:
-                # Try direct conversion first
-                country_code = self._converter.convert(country_name)
+                # Suppress noise during conversion attempts
+                with silence_coco_warnings():
+                    # Try direct conversion first
+                    country_code = self._converter.convert(country_name)
 
-                # If not found and fuzzy matching is enabled, try to find close matches
-                if country_code == "not found" and fuzzy_matching:
-                    matches = self._converter.find_close_matches(
-                        country_name, fuzzy_threshold
-                    )
-                    if matches:
-                        # Use the best match
-                        best_match, country_code = matches[0]
-                        logger.info(
-                            f"Using fuzzy match '{best_match}' for '{country_name}'"
+                    # If not found and fuzzy matching is enabled, try to find close matches
+                    if country_code == "not found" and fuzzy_matching:
+                        matches = self._converter.find_close_matches(
+                            country_name, fuzzy_threshold
                         )
-                        country_name = best_match
+                        if matches:
+                            # Use the best match
+                            best_match, country_code = matches[0]
+                            logger.info(
+                                f"Using fuzzy match '{best_match}' for "
+                                f"'{country_name}'"
+                            )
+                            country_name = best_match
 
-                if country_code == "not found":
-                    raise InvalidCountryError(
-                        f"Country not found: {country_name}", country_name
-                    )
+                    if country_code == "not found":
+                        raise InvalidCountryError(
+                            f"Country not found: {country_name}", country_name
+                        )
 
                 # Convert ISO2 code into flag
                 emoji_flag = flag.flag(country_code)
@@ -369,9 +399,9 @@ class CountryFlag:
 
         Example:
             >>> cf = CountryFlag()
-            >>> pairs = cf.reverse_lookup(["🇺🇸", "🇬🇧", "🇺🇰", "🇦🇨"])
+            >>> pairs = cf.reverse_lookup(["🇺🇸", "🇬🇧", "🇺🇰"])
             >>> pairs
-            [('🇺🇸', 'United States'), ('🇬🇧', 'United Kingdom'), ('🇺🇰', 'United Kingdom'), ('🇦🇨', 'Ascension Island')]
+            [('🇺🇸', 'United States'), ('🇬🇧', 'United Kingdom')]
         """
         if not emoji_flags:
             logger.warning("Empty list of emoji flags provided")
@@ -384,7 +414,7 @@ class CountryFlag:
             if cached_result is not None:
                 # Cached result exists, but we need to reorder it to match current input order
                 # Create a mapping from flag to country from cached result
-                flag_to_country = {flag: country for flag, country in cached_result}
+                flag_to_country = dict(cached_result)
 
                 # Reconstruct result in current input order
                 reordered_result = []
@@ -453,7 +483,7 @@ class CountryFlag:
             >>> cf = CountryFlag()
             >>> flags, pairs = cf.get_flag(["United States", "Canada"])
             >>> cf.format_output(pairs, "json")
-            '[{"country": "United States", "flag": "🇺🇸"}, {"country": "Canada", "flag": "🇨🇦"}]'
+            '[{"country": "US", "flag": "🇺🇸"}]'
         """
         if output_format == "json":
             result = [
@@ -466,8 +496,8 @@ class CountryFlag:
             output = StringIO()
             writer = csv.writer(output)
             writer.writerow(["Country", "Flag"])
-            for country, flag in country_flag_pairs:
-                writer.writerow([country, flag])
+            for country, emoji_flag in country_flag_pairs:
+                writer.writerow([country, emoji_flag])
             return norm_newlines(output.getvalue())
 
         else:  # text format

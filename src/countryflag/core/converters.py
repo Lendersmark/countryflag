@@ -8,7 +8,7 @@ caching and conversion of country names to various formats.
 import logging
 from difflib import get_close_matches
 from functools import lru_cache
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, Dict, List, Optional, Tuple
 
 import country_converter as coco
 import flag
@@ -16,7 +16,11 @@ import pandas as pd
 
 from countryflag.core.exceptions import RegionError
 from countryflag.core.models import CountryInfo, RegionDefinitions
-from countryflag.lookup import create_enhanced_flag_mapping, reverse_lookup_flag
+from countryflag.lookup import (
+    create_enhanced_flag_mapping,
+    extract_iso_codes_from_regex,
+)
+from countryflag.utils.suppress import silence_coco_warnings
 
 # Configure logging
 logger = logging.getLogger("countryflag.converters")
@@ -54,7 +58,7 @@ class CountryConverterSingleton:
             cls.__instance._reverse_cache: Dict[str, str] = {}
             cls.__instance._region_cache: Dict[str, List[CountryInfo]] = {}
 
-            # Add UN region data if available
+            # Add region data using available columns from country_converter
             try:
                 cls.__instance._region_data = cls.__instance._converter.data[
                     [
@@ -62,17 +66,27 @@ class CountryConverterSingleton:
                         "ISO3",
                         "name_short",
                         "name_official",
-                        "region",
-                        "sub_region",
+                        "continent",
+                        "UNregion",
                     ]
                 ]
             except KeyError:
-                # If region data is not available, create empty columns
+                # If some columns are not available, use what we have
+                available_cols = ["ISO2", "ISO3", "name_short", "name_official"]
+                if "continent" in cls.__instance._converter.data.columns:
+                    available_cols.append("continent")
+                if "UNregion" in cls.__instance._converter.data.columns:
+                    available_cols.append("UNregion")
+
                 cls.__instance._region_data = cls.__instance._converter.data[
-                    ["ISO2", "ISO3", "name_short", "name_official"]
+                    available_cols
                 ].copy()
-                cls.__instance._region_data["region"] = ""
-                cls.__instance._region_data["sub_region"] = ""
+
+                # Add missing columns with empty values if needed
+                if "continent" not in cls.__instance._region_data.columns:
+                    cls.__instance._region_data["continent"] = ""
+                if "UNregion" not in cls.__instance._region_data.columns:
+                    cls.__instance._region_data["UNregion"] = ""
 
         return cls.__instance
 
@@ -116,7 +130,8 @@ class CountryConverterSingleton:
             'USA'
         """
         try:
-            result = coco.convert(names=name, to=to)
+            with silence_coco_warnings():
+                result = coco.convert(names=name, to=to)
             return result
         except Exception as e:
             logger.debug(f"Error converting {name} to {to}: {e}")
@@ -142,7 +157,6 @@ class CountryConverterSingleton:
             'United Kingdom'
         """
         if "iso2_mapping" not in self._cache:
-            from countryflag.lookup import extract_iso_codes_from_regex
 
             result = {}
             for _, row in self.data.iterrows():
@@ -199,20 +213,33 @@ class CountryConverterSingleton:
         if region not in self._region_cache:
             countries = []
 
-            # Filter countries by region
+            # Map our region names to country_converter continent names
+            region_mapping = {
+                "Africa": "Africa",
+                "Americas": "America",  # country_converter uses "America" for Americas
+                "Asia": "Asia",
+                "Europe": "Europe",
+                "Oceania": "Oceania",
+            }
+
+            cc_continent = region_mapping.get(region)
+            if not cc_continent:
+                raise RegionError(f"Unsupported region: {region}", region)
+
+            # Filter countries by continent (region)
             for _, row in self.region_data.iterrows():
                 if (
                     row["ISO2"] != "not found"
-                    and isinstance(row["region"], str)
-                    and row["region"].lower() == region.lower()
+                    and isinstance(row["continent"], str)
+                    and row["continent"] == cc_continent
                 ):
                     country_info = CountryInfo(
                         name=row["name_short"],
                         iso2=row["ISO2"],
                         iso3=row["ISO3"],
                         official_name=row["name_official"],
-                        region=row["region"],
-                        subregion=row["sub_region"] if "sub_region" in row else "",
+                        region=region,  # Use our standardized region name
+                        subregion=row["UNregion"] if "UNregion" in row else "",
                         flag=flag.flag(row["ISO2"]),
                     )
                     countries.append(country_info)

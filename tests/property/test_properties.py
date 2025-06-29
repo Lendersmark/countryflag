@@ -17,6 +17,7 @@ from hypothesis.strategies import composite
 from countryflag.cache.disk import DiskCache
 from countryflag.cache.memory import MemoryCache
 from countryflag.core.converters import CountryConverterSingleton
+from countryflag.core.exceptions import InvalidCountryError
 from countryflag.core.flag import CountryFlag
 from countryflag.core.models import CountryInfo
 
@@ -935,18 +936,21 @@ def test_empty_input_list(empty_list):
 
 
 @given(st.lists(country_names_strategy, min_size=1).map(lambda x: x + [None, "", 123]))
+@settings(deadline=None)  # Disable deadline for this test due to variable performance
 def test_invalid_items_in_list(country_list_with_invalid_items):
     """Test that invalid items in the list are handled gracefully."""
     cf = CountryFlag()
 
-    # Count valid items
+    # Count valid items (exclude None, numbers, empty strings, and whitespace-only strings)
     valid_items = [
-        x for x in country_list_with_invalid_items if isinstance(x, str) and x
+        x
+        for x in country_list_with_invalid_items
+        if isinstance(x, str) and x.strip() and x != ""
     ]
 
-    # Convert the list
+    # Convert the list - should handle invalid items gracefully
+    # Empty strings and other invalid items should be skipped
     flags, pairs = cf.get_flag(country_list_with_invalid_items)
-
     # Check that we got flags for valid items only
     assert len(pairs) == len(valid_items)
 

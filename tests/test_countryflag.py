@@ -48,7 +48,7 @@ def shell(command, exe=None):
             result = subprocess.run(
                 command, shell=True, capture_output=True, text=True, timeout=30
             )
-        return ShellResult(result.returncode, result.stdout, result.stderr)
+        return ShellResult(result.returncode, result.stdout or "", result.stderr or "")
     except subprocess.TimeoutExpired:
         return ShellResult(1, "", "Command timed out")
     except Exception as e:
@@ -175,7 +175,10 @@ def test_cli_notfound():
     success = False
     for cmd in commands_to_try:
         result = shell(f"{cmd} --countries nonexistentcountry")
-        if norm_newlines(result.stdout) == norm_newlines(expected):
+        # Error messages now go to stderr, and command exits with non-zero code
+        if result.exit_code != 0 and norm_newlines(result.stderr) == norm_newlines(
+            expected
+        ):
             success = True
             break
 
