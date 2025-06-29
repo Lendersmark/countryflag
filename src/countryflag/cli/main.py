@@ -685,11 +685,20 @@ Both positional and named argument forms are equivalent.""",
 
         # Handle country to flag conversion
         elif country_names:
+            # Pre-process country names to handle shell-escaped empty strings
+            processed_names = []
+            for name in country_names:
+                # Convert shell-escaped empty string to actual empty string
+                if name == "''" or name == '""':
+                    processed_names.append("")
+                else:
+                    processed_names.append(name)
+
             # Handle mixed valid/invalid countries by processing individually
             successful_pairs = []
             had_errors = False
 
-            for country_name in country_names:
+            for country_name in processed_names:
                 try:
                     flags, pairs = country_flag.get_flag(
                         [country_name], args.separator, args.fuzzy, args.threshold
@@ -697,12 +706,15 @@ Both positional and named argument forms are equivalent.""",
                     successful_pairs.extend(pairs)
                 except InvalidCountryError as ice:
                     had_errors = True
-                    # Check if this is the empty string case (either real empty string or shell-escaped '')
-                    if (
-                        ice.country == ""
-                        and "country names cannot be empty" in str(ice)
-                    ) or ice.country == "''":
+                    # Check if this is the empty string case
+                    if ice.country == "" and "country names cannot be empty" in str(
+                        ice
+                    ):
                         print("Error: country names cannot be empty", file=sys.stderr)
+                        print(
+                            "\nUse --list-countries to see all supported country names",
+                            file=sys.stderr,
+                        )
                         sys.exit(1)
                     else:
                         print(f"Error: {str(ice)}", file=sys.stderr)
@@ -720,7 +732,14 @@ Both positional and named argument forms are equivalent.""",
                                 )
                                 for name, code in matches[:3]:  # Show top 3 matches
                                     print(f"  - {name} ({code})", file=sys.stderr)
-                            continue
+
+                        # For single invalid country, exit with error
+                        if len(processed_names) == 1:
+                            print(
+                                "\nUse --list-countries to see all supported country names",
+                                file=sys.stderr,
+                            )
+                            sys.exit(1)
 
             # Output successful results if any
             if successful_pairs:

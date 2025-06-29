@@ -318,7 +318,7 @@ class CountryFlag:
         for i, country_name in enumerate(country_names):
             logger.debug(f"Processing country: {country_name}")
 
-            # Skip invalid items (non-strings, None, empty strings)
+            # Skip invalid items (non-strings, None)
             if not isinstance(country_name, str):
                 logger.debug(
                     f"Skipping invalid input type at position {i}: "
@@ -326,8 +326,15 @@ class CountryFlag:
                 )
                 continue
 
-            if not country_name.strip():
-                logger.debug(f"Empty string detected at position {i}, skipping")
+            # Handle empty strings - raise error for explicit empty strings
+            # but skip empty strings that are results of whitespace stripping
+            if country_name == "":
+                logger.debug(f"Empty string detected at position {i}")
+                raise InvalidCountryError("country names cannot be empty", country="")
+            elif not country_name.strip():
+                logger.debug(
+                    f"Whitespace-only string detected at position {i}, skipping"
+                )
                 continue
 
             try:
