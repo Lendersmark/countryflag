@@ -176,7 +176,9 @@ def test_cli_notfound():
     for cmd in commands_to_try:
         result = shell(f"{cmd} --countries nonexistentcountry")
         # Error messages now go to stderr, and command exits with non-zero code
-        if result.exit_code != 0 and norm_newlines(result.stderr) == norm_newlines(expected):
+        if result.exit_code != 0 and norm_newlines(result.stderr) == norm_newlines(
+            expected
+        ):
             success = True
             break
 

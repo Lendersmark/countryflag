@@ -8,7 +8,7 @@ caching and conversion of country names to various formats.
 import logging
 from difflib import get_close_matches
 from functools import lru_cache
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, Dict, List, Optional, Tuple
 
 import country_converter as coco
 import flag
@@ -16,7 +16,10 @@ import pandas as pd
 
 from countryflag.core.exceptions import RegionError
 from countryflag.core.models import CountryInfo, RegionDefinitions
-from countryflag.lookup import create_enhanced_flag_mapping, reverse_lookup_flag
+from countryflag.lookup import (
+    create_enhanced_flag_mapping,
+    extract_iso_codes_from_regex,
+)
 from countryflag.utils.suppress import silence_coco_warnings
 
 # Configure logging
@@ -74,9 +77,11 @@ class CountryConverterSingleton:
                     available_cols.append("continent")
                 if "UNregion" in cls.__instance._converter.data.columns:
                     available_cols.append("UNregion")
-                    
-                cls.__instance._region_data = cls.__instance._converter.data[available_cols].copy()
-                
+
+                cls.__instance._region_data = cls.__instance._converter.data[
+                    available_cols
+                ].copy()
+
                 # Add missing columns with empty values if needed
                 if "continent" not in cls.__instance._region_data.columns:
                     cls.__instance._region_data["continent"] = ""
@@ -152,7 +157,6 @@ class CountryConverterSingleton:
             'United Kingdom'
         """
         if "iso2_mapping" not in self._cache:
-            from countryflag.lookup import extract_iso_codes_from_regex
 
             result = {}
             for _, row in self.data.iterrows():
@@ -215,9 +219,9 @@ class CountryConverterSingleton:
                 "Americas": "America",  # country_converter uses "America" for Americas
                 "Asia": "Asia",
                 "Europe": "Europe",
-                "Oceania": "Oceania"
+                "Oceania": "Oceania",
             }
-            
+
             cc_continent = region_mapping.get(region)
             if not cc_continent:
                 raise RegionError(f"Unsupported region: {region}", region)

@@ -195,7 +195,7 @@ def test_no_arguments_provided():
     result = shell("python -m countryflag")
     # CLI exits cleanly and shows helpful usage message when no args provided
     assert result.exit_code == 0
-    
+
     # Check that the help message is displayed
     expected_content = [
         "CountryFlag: Convert country names to emoji flags",
@@ -207,12 +207,14 @@ def test_no_arguments_provided():
         "countryflag --interactive",
         "countryflag --list-countries",
         "countryflag --help",
-        "For more options, use: countryflag --help"
+        "For more options, use: countryflag --help",
     ]
-    
+
     # Verify all expected content is present
     for content in expected_content:
-        assert content in result.stdout, f"Expected '{content}' in output: {result.stdout}"
+        assert (
+            content in result.stdout
+        ), f"Expected '{content}' in output: {result.stdout}"
 
 
 def test_interactive_mode():
@@ -550,21 +552,23 @@ def test_no_arguments_help_message_content():
     """Test that the no-arguments help message contains all expected examples."""
     result = shell("python -m countryflag")
     assert result.exit_code == 0
-    
+
     # Check specific examples are included
     expected_examples = [
         "countryflag italy france spain",
-        "countryflag --countries italy france spain", 
+        "countryflag --countries italy france spain",
         "countryflag --reverse",
         "countryflag --region Europe",
         "countryflag --interactive",
         "countryflag --list-countries",
-        "countryflag --help"
+        "countryflag --help",
     ]
-    
+
     for example in expected_examples:
-        assert example in result.stdout, f"Expected example '{example}' not found in help message"
-        
+        assert (
+            example in result.stdout
+        ), f"Expected example '{example}' not found in help message"
+
     # Ensure the help message ends with the "For more options" line
     assert "For more options, use: countryflag --help" in result.stdout
 
@@ -574,20 +578,26 @@ def test_no_arguments_vs_help_flag():
     # Get output from no arguments
     no_args_result = shell("python -m countryflag")
     assert no_args_result.exit_code == 0
-    
+
     # Get output from --help flag
     help_result = shell("python -m countryflag --help")
     assert help_result.exit_code == 0
-    
+
     # The outputs should be different - help should be more comprehensive
     assert no_args_result.stdout != help_result.stdout
-    
+
     # No-args should be shorter and more focused
     assert len(no_args_result.stdout) < len(help_result.stdout)
-    
+
     # Help should contain argparse-generated content that no-args doesn't
-    assert "optional arguments:" in help_result.stdout.lower() or "options:" in help_result.stdout.lower()
-    assert "optional arguments:" not in no_args_result.stdout.lower() and "options:" not in no_args_result.stdout.lower()
+    assert (
+        "optional arguments:" in help_result.stdout.lower()
+        or "options:" in help_result.stdout.lower()
+    )
+    assert (
+        "optional arguments:" not in no_args_result.stdout.lower()
+        and "options:" not in no_args_result.stdout.lower()
+    )
 
 
 def test_no_arguments_entrypoint():
@@ -596,15 +606,20 @@ def test_no_arguments_entrypoint():
     commands_to_try = ["countryflag"]
     if os.name == "nt":
         commands_to_try.append("countryflag.exe")
-    
+
     success = False
     for cmd in commands_to_try:
         result = shell(cmd)
-        if result.exit_code == 0 and "CountryFlag: Convert country names to emoji flags" in result.stdout:
+        if (
+            result.exit_code == 0
+            and "CountryFlag: Convert country names to emoji flags" in result.stdout
+        ):
             success = True
             # Verify it contains usage examples
             assert "Usage examples:" in result.stdout
             assert "countryflag italy france spain" in result.stdout
             break
-    
-    assert success, f"None of the commands {commands_to_try} showed the expected help message"
+
+    assert (
+        success
+    ), f"None of the commands {commands_to_try} showed the expected help message"

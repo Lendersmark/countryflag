@@ -9,12 +9,10 @@ import asyncio
 import csv
 import json
 import logging
-import os
 import re
 import sys
-import warnings
 from io import StringIO
-from typing import Any, Dict, List, Optional, Tuple
+from typing import List, Tuple
 
 import prompt_toolkit
 from prompt_toolkit.completion import WordCompleter
@@ -54,25 +52,50 @@ def _merge_country_tokens(tokens: List[str], cf: CountryFlag) -> List[str]:
 
     # List of known multi-word countries to avoid false matches
     known_multi_word_countries = {
-        "united states", "united kingdom", "south africa", "new zealand",
-        "costa rica", "puerto rico", "sri lanka", "saudi arabia", 
-        "south korea", "north korea", "czech republic", "dominican republic",
-        "el salvador", "hong kong", "san marino", "burkina faso",
-        "cape verde", "ivory coast", "papua new guinea", "sierra leone",
-        "south sudan", "trinidad and tobago", "united arab emirates",
-        "bosnia and herzegovina", "antigua and barbuda", "saint kitts and nevis",
-        "saint vincent and the grenadines", "central african republic",
-        "united states of america", "united states america", "usa", "united states"
+        "united states",
+        "united kingdom",
+        "south africa",
+        "new zealand",
+        "costa rica",
+        "puerto rico",
+        "sri lanka",
+        "saudi arabia",
+        "south korea",
+        "north korea",
+        "czech republic",
+        "dominican republic",
+        "el salvador",
+        "hong kong",
+        "san marino",
+        "burkina faso",
+        "cape verde",
+        "ivory coast",
+        "papua new guinea",
+        "sierra leone",
+        "south sudan",
+        "trinidad and tobago",
+        "united arab emirates",
+        "bosnia and herzegovina",
+        "antigua and barbuda",
+        "saint kitts and nevis",
+        "saint vincent and the grenadines",
+        "central african republic",
+        "united states of america",
+        "united states america",
+        "usa",
     }
 
     while i < n:
         found_match = False
         # Try longest slice first, but limit to reasonable boundaries
-        for j in range(min(n, i + 6), i, -1):  # Max 6 tokens for very long country names
+        for j in range(
+            min(n, i + 6), i, -1
+        ):  # Max 6 tokens for very long country names
             candidate = " ".join(tokens[i:j])
             candidate_lower = candidate.lower()
-            
-            # Check if it's a known multi-word country first, or try combinations for multi-word candidates
+
+            # Check if it's a known multi-word country first,
+            # or try combinations for multi-word candidates
             if candidate_lower in known_multi_word_countries:
                 # Validate it's actually recognized by the converter
                 try:
@@ -82,7 +105,7 @@ def _merge_country_tokens(tokens: List[str], cf: CountryFlag) -> List[str]:
                         i = j
                         found_match = True
                         break
-                except:
+                except Exception:
                     pass
             elif j > i + 1:  # Only try multi-word combinations for reasonable cases
                 # For non-known multi-word combinations, be more conservative
@@ -94,10 +117,11 @@ def _merge_country_tokens(tokens: List[str], cf: CountryFlag) -> List[str]:
                         if individual_code != "not found":
                             individual_tokens_invalid = False
                             break
-                    except:
+                    except Exception:
                         pass
-                
-                # Only merge if individual tokens are invalid AND the combined result is valid
+
+                # Only merge if individual tokens are invalid
+                # AND the combined result is valid
                 if individual_tokens_invalid:
                     try:
                         code = cf._converter.convert(candidate)
@@ -106,14 +130,14 @@ def _merge_country_tokens(tokens: List[str], cf: CountryFlag) -> List[str]:
                             i = j
                             found_match = True
                             break
-                    except:
+                    except Exception:
                         pass
 
         if not found_match:
             # No multi-word match found - keep original token as-is
             merged.append(tokens[i])
             i += 1
-            
+
     return merged
 
 
@@ -262,12 +286,17 @@ async def run_async_main(args: argparse.Namespace) -> None:
                 for name, code in matches:
                     print(f"  - {name} ({code})", file=sys.stderr)
 
-        print("\nUse --list-countries to see all supported country names", file=sys.stderr)
+        print(
+            "\nUse --list-countries to see all supported country names", file=sys.stderr
+        )
         sys.exit(1)
 
     except RegionError as re:
         print(f"Error: {str(re)}", file=sys.stderr)
-        print(f"\nSupported regions: {', '.join(RegionDefinitions.REGIONS)}", file=sys.stderr)
+        print(
+            f"\nSupported regions: {', '.join(RegionDefinitions.REGIONS)}",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     except ReverseConversionError as rce:
@@ -653,9 +682,12 @@ Both positional and named argument forms are equivalent.""",
             # Handle mixed valid/invalid countries by processing individually
             successful_pairs = []
             had_errors = False
-            
+
             for country_name in country_names:
                 try:
+                    if not country_name or country_name.strip() == "":
+                        raise ValueError("Empty country name provided")
+
                     flags, pairs = country_flag.get_flag(
                         [country_name], args.separator, args.fuzzy, args.threshold
                     )
@@ -663,39 +695,62 @@ Both positional and named argument forms are equivalent.""",
                 except InvalidCountryError as ice:
                     had_errors = True
                     print(f"Error: {str(ice)}", file=sys.stderr)
-                    
+
                     # If fuzzy matching is enabled, suggest alternatives
                     if args.fuzzy:
                         converter = CountryConverterSingleton()
-                        matches = converter.find_close_matches(ice.country, args.threshold)
+                        matches = converter.find_close_matches(
+                            ice.country, args.threshold
+                        )
                         if matches:
-                            print(f"Did you mean one of these for '{ice.country}'?", file=sys.stderr)
+                            print(
+                                f"Did you mean one of these for '{ice.country}'?",
+                                file=sys.stderr,
+                            )
                             for name, code in matches[:3]:  # Show top 3 matches
                                 print(f"  - {name} ({code})", file=sys.stderr)
-                    continue
-            
+                        continue
+                except ValueError:
+                    # Handle empty or whitespace-only string
+                    had_errors = True
+                    print("Error: country names cannot be empty", file=sys.stderr)
+                    sys.exit(1)
+
             # Output successful results if any
             if successful_pairs:
                 output = country_flag.format_output(
                     successful_pairs, args.format, args.separator
                 )
                 print(norm_newlines(output) if isinstance(output, str) else output)
-            
+
             # If we had errors but also successful conversions, don't exit with error
             # Only exit with error if ALL countries failed
             if had_errors and not successful_pairs:
-                print("\nUse --list-countries to see all supported country names", file=sys.stderr)
+                print(
+                    "\nUse --list-countries to see all supported country names",
+                    file=sys.stderr,
+                )
                 sys.exit(1)
         else:
             # No input provided - show helpful message and examples
             print("CountryFlag: Convert country names to emoji flags\n")
             print("Usage examples:")
-            print("  countryflag italy france spain                    # Convert countries to flags")
+            print(
+                "  countryflag italy france spain                    # Convert countries to flags"
+            )
             print("  countryflag --countries italy france spain       # Same as above")
-            print("  countryflag --reverse 🇮🇹 🇫🇷 🇪🇸              # Convert flags to countries")
-            print("  countryflag --region Europe                       # Get all European flags")
-            print("  countryflag --interactive                         # Interactive mode")
-            print("  countryflag --list-countries                      # List all supported countries")
+            print(
+                "  countryflag --reverse 🇮🇹 🇫🇷 🇪🇸              # Convert flags to countries"
+            )
+            print(
+                "  countryflag --region Europe                       # Get all European flags"
+            )
+            print(
+                "  countryflag --interactive                         # Interactive mode"
+            )
+            print(
+                "  countryflag --list-countries                      # List all supported countries"
+            )
             print("  countryflag --help                               # Show full help")
             print("\nFor more options, use: countryflag --help")
             sys.exit(0)
@@ -712,12 +767,17 @@ Both positional and named argument forms are equivalent.""",
                 for name, code in matches:
                     print(f"  - {name} ({code})", file=sys.stderr)
 
-        print("\nUse --list-countries to see all supported country names", file=sys.stderr)
+        print(
+            "\nUse --list-countries to see all supported country names", file=sys.stderr
+        )
         sys.exit(1)
 
     except RegionError as re:
         print(f"Error: {str(re)}", file=sys.stderr)
-        print(f"\nSupported regions: {', '.join(RegionDefinitions.REGIONS)}", file=sys.stderr)
+        print(
+            f"\nSupported regions: {', '.join(RegionDefinitions.REGIONS)}",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     except ReverseConversionError as rce:
