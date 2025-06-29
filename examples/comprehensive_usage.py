@@ -52,7 +52,7 @@ def demo_basic_usage():
 
     # Using custom separator
     flags = countryflag.getflag(countries, separator=" | ")
-    print(f"\nFlags with custom separator:")
+    print("\nFlags with custom separator:")
     print(flags)
 
 
@@ -229,7 +229,7 @@ def demo_supported_countries():
     print(f"Total supported countries: {len(supported)}")
     print("\nSample of supported countries:")
     # Print just the first 10 countries to keep output manageable
-    for country in sorted(list(supported))[:10]:
+    for country in sorted(supported)[:10]:
         print(f"- {country}")
     print("...")
 

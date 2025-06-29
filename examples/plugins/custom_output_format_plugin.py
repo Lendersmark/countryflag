@@ -56,10 +56,10 @@ class OutputFormatPlugin:
         ]
 
         for country, flag in pairs:
-            html.append(f"        <tr>")
+            html.append("        <tr>")
             html.append(f"            <td>{country}</td>")
             html.append(f"            <td>{flag}</td>")
-            html.append(f"        </tr>")
+            html.append("        </tr>")
 
         html.extend(["    </table>", "</body>", "</html>"])
 

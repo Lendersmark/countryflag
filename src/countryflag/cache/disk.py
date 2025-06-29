@@ -159,7 +159,7 @@ class DiskCache(Cache):
             if cache_path.exists():
                 try:
                     os.remove(cache_path)
-                except:
+                except OSError:
                     pass  # Best effort cleanup
             raise  # Re-raise the CacheError from _save_index
 
