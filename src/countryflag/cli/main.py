@@ -390,7 +390,6 @@ def main() -> None:
     """
     # Preprocess arguments for backwards compatibility
     import sys
-    
 
     processed_args, extracted_positional = preprocess_args(sys.argv[1:])
 
@@ -699,7 +698,10 @@ Both positional and named argument forms are equivalent.""",
                 except InvalidCountryError as ice:
                     had_errors = True
                     # Check if this is the empty string case (either real empty string or shell-escaped '')
-                    if (ice.country == "" and "country names cannot be empty" in str(ice)) or ice.country == "''":
+                    if (
+                        ice.country == ""
+                        and "country names cannot be empty" in str(ice)
+                    ) or ice.country == "''":
                         print("Error: country names cannot be empty", file=sys.stderr)
                         sys.exit(1)
                     else:

@@ -68,6 +68,7 @@ def shell(command, exe=None):
     except Exception as e:
         return ShellResult(1, "", str(e))
 
+
 def test_help_displays_correctly():
     """Test that --help displays without error."""
     result = shell("python -m countryflag --help")

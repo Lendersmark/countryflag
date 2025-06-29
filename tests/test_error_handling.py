@@ -24,7 +24,7 @@ def run_cli_command(command, capture_stderr=True):
         if os.name == "nt":  # Windows
             # On Windows, prepend chcp 65001 to ensure UTF-8 console and use UTF-8 environment
             # Redirect chcp output to NUL to avoid polluting stdout
-            wrapped_command = f'chcp 65001 > NUL & {command}'
+            wrapped_command = f"chcp 65001 > NUL & {command}"
             result = subprocess.run(
                 wrapped_command,
                 shell=True,

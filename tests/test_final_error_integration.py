@@ -14,9 +14,10 @@ import sys
 def run_command(cmd):
     """Run a command and return stdout, stderr, and exit code."""
     import os
+
     if os.name == "nt":  # Windows
         # Redirect chcp output to NUL to avoid polluting stdout
-        cmd = f'chcp 65001 > NUL & {cmd}'
+        cmd = f"chcp 65001 > NUL & {cmd}"
         result = subprocess.run(
             cmd,
             shell=True,
