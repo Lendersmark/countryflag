@@ -45,49 +45,51 @@ def _merge_country_tokens(tokens: List[str], cf: CountryFlag) -> List[str]:
     (typical on Windows when quotes are not honoured).
 
     We scan greedily from left to right, always taking the longest sequence
-    of remaining tokens that forms a valid country name.
+    of remaining tokens that forms a valid country name. We avoid merging
+    tokens if it results in fuzzy matches that don't represent real countries.
     """
     merged: List[str] = []
     i = 0
     n = len(tokens)
 
+    # List of known multi-word countries to avoid false matches
+    known_multi_word_countries = {
+        "united states", "united kingdom", "south africa", "new zealand",
+        "costa rica", "puerto rico", "sri lanka", "saudi arabia", 
+        "south korea", "north korea", "czech republic", "dominican republic",
+        "el salvador", "hong kong", "san marino", "burkina faso",
+        "cape verde", "ivory coast", "papua new guinea", "sierra leone",
+        "south sudan", "trinidad and tobago", "united arab emirates",
+        "bosnia and herzegovina", "antigua and barbuda", "saint kitts and nevis",
+        "saint vincent and the grenadines", "central african republic"
+    }
+
     while i < n:
-        # try longest slice first, but stop at reasonable boundaries
         found_match = False
-        for j in range(min(n, i + 5), i, -1):  # Limit to max 5 tokens per country
-            candidate = " ".join(tokens[i:j])
-            # Only merge if the candidate does not produce warnings
-            # Suppress stderr output from country_converter during validation
-            try:
-                # Redirect stderr to suppress country_converter noise
-                old_stderr = sys.stderr
-                sys.stderr = open(os.devnull, 'w')
+        # Try longest slice first, but limit to reasonable boundaries
+        for j in range(min(n, i + 6), i, -1):  # Max 6 tokens for very long country names
+            if j > i + 1:  # Only try merging for multi-token candidates
+                candidate = " ".join(tokens[i:j])
+                candidate_lower = candidate.lower()
                 
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore")
-                    if j > i + 1 and cf.validate_country_name(candidate):
-                        # Additional check: make sure we're not accidentally merging separate countries
-                        # by checking if individual tokens are also valid countries
-                        individual_tokens_valid = all(
-                            cf.validate_country_name(token) for token in tokens[i:j]
-                        )
-                        if not individual_tokens_valid:
+                # Check if it's a known multi-word country first
+                if candidate_lower in known_multi_word_countries:
+                    # Validate it's actually recognized by the converter
+                    try:
+                        code = cf._converter.convert(candidate)
+                        if code != "not found" and len(code) <= 3:
                             merged.append(candidate)
                             i = j
                             found_match = True
                             break
-            except:
-                pass
-            finally:
-                # Restore stderr
-                if 'old_stderr' in locals():
-                    sys.stderr.close()
-                    sys.stderr = old_stderr
+                    except:
+                        pass
 
         if not found_match:
-            # nothing matched – keep original token as-is
+            # No multi-word match found - keep original token as-is
             merged.append(tokens[i])
             i += 1
+            
     return merged
 
 

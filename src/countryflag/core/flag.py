@@ -140,15 +140,24 @@ class CountryFlag:
                 if cached_result is not None:
                     return cached_result
 
-            code = self._converter.convert(country_name)
-            # Only accept single country results, reject lists or "not found"
-            result = isinstance(code, str) and code != "not found" and len(code) <= 3
+            # Convert to all possible codes and validate the length
+            valid_result = False
+            iso_codes = [code.strip() for code in country_name.split()]
+            
+            if len(iso_codes) > 1:  # Handle cases with multi-word countries
+                valid_result = all(
+                    self._converter.convert(name) != "not found" for name in iso_codes
+                )
+            else:
+                # Single country validation
+                code = self._converter.convert(country_name)
+                valid_result = isinstance(code, str) and code != "not found" and len(code) <= 3
 
             # Cache the result if cache is available
             if self._cache:
-                self._cache.set(cache_key, result)
+                self._cache.set(cache_key, valid_result)
 
-            return result
+            return valid_result
         except Exception:
             return False
 
