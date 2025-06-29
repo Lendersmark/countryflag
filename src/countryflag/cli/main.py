@@ -9,6 +9,7 @@ import asyncio
 import csv
 import json
 import logging
+import os
 import re
 import sys
 from io import StringIO
@@ -32,6 +33,11 @@ from countryflag.utils.io import (
     process_multiple_files,
 )
 from countryflag.utils.text import norm_newlines
+
+# Configure UTF-8 output for Windows to prevent mojibake
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 # Configure logging
 logger = logging.getLogger("countryflag.cli")
@@ -384,6 +390,7 @@ def main() -> None:
     """
     # Preprocess arguments for backwards compatibility
     import sys
+    
 
     processed_args, extracted_positional = preprocess_args(sys.argv[1:])
 
@@ -685,36 +692,33 @@ Both positional and named argument forms are equivalent.""",
 
             for country_name in country_names:
                 try:
-                    if not country_name or country_name.strip() == "":
-                        raise ValueError("Empty country name provided")
-
                     flags, pairs = country_flag.get_flag(
                         [country_name], args.separator, args.fuzzy, args.threshold
                     )
                     successful_pairs.extend(pairs)
                 except InvalidCountryError as ice:
                     had_errors = True
-                    print(f"Error: {str(ice)}", file=sys.stderr)
+                    # Check if this is the empty string case (either real empty string or shell-escaped '')
+                    if (ice.country == "" and "country names cannot be empty" in str(ice)) or ice.country == "''":
+                        print("Error: country names cannot be empty", file=sys.stderr)
+                        sys.exit(1)
+                    else:
+                        print(f"Error: {str(ice)}", file=sys.stderr)
 
-                    # If fuzzy matching is enabled, suggest alternatives
-                    if args.fuzzy:
-                        converter = CountryConverterSingleton()
-                        matches = converter.find_close_matches(
-                            ice.country, args.threshold
-                        )
-                        if matches:
-                            print(
-                                f"Did you mean one of these for '{ice.country}'?",
-                                file=sys.stderr,
+                        # If fuzzy matching is enabled, suggest alternatives
+                        if args.fuzzy:
+                            converter = CountryConverterSingleton()
+                            matches = converter.find_close_matches(
+                                ice.country, args.threshold
                             )
-                            for name, code in matches[:3]:  # Show top 3 matches
-                                print(f"  - {name} ({code})", file=sys.stderr)
-                        continue
-                except ValueError:
-                    # Handle empty or whitespace-only string
-                    had_errors = True
-                    print("Error: country names cannot be empty", file=sys.stderr)
-                    sys.exit(1)
+                            if matches:
+                                print(
+                                    f"Did you mean one of these for '{ice.country}'?",
+                                    file=sys.stderr,
+                                )
+                                for name, code in matches[:3]:  # Show top 3 matches
+                                    print(f"  - {name} ({code})", file=sys.stderr)
+                            continue
 
             # Output successful results if any
             if successful_pairs:

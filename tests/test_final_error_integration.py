@@ -13,10 +13,34 @@ import sys
 
 def run_command(cmd):
     """Run a command and return stdout, stderr, and exit code."""
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=30)
+    import os
+    if os.name == "nt":  # Windows
+        # Redirect chcp output to NUL to avoid polluting stdout
+        cmd = f'chcp 65001 > NUL & {cmd}'
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            env={**os.environ, "PYTHONIOENCODING": "utf-8"},
+            timeout=30,
+        )
+    else:
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            env={**os.environ, "PYTHONIOENCODING": "utf-8"},
+            timeout=30,
+        )
     return {
-        "stdout": result.stdout,
-        "stderr": result.stderr,
+        "stdout": result.stdout or "",
+        "stderr": result.stderr or "",
         "exit_code": result.returncode,
     }
 

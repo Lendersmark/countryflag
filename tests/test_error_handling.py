@@ -21,17 +21,35 @@ from countryflag.core.flag import CountryFlag
 def run_cli_command(command, capture_stderr=True):
     """Helper function to run CLI commands and capture stdout/stderr separately."""
     try:
-        result = subprocess.run(
-            command,
-            shell=True,
-            capture_output=True,
-            text=True,
-            timeout=30,
-        )
+        if os.name == "nt":  # Windows
+            # On Windows, prepend chcp 65001 to ensure UTF-8 console and use UTF-8 environment
+            # Redirect chcp output to NUL to avoid polluting stdout
+            wrapped_command = f'chcp 65001 > NUL & {command}'
+            result = subprocess.run(
+                wrapped_command,
+                shell=True,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                env={**os.environ, "PYTHONIOENCODING": "utf-8"},
+                timeout=30,
+            )
+        else:  # Unix-like systems
+            result = subprocess.run(
+                command,
+                shell=True,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                env={**os.environ, "PYTHONIOENCODING": "utf-8"},
+                timeout=30,
+            )
         return {
             "exit_code": result.returncode,
-            "stdout": result.stdout,
-            "stderr": result.stderr,
+            "stdout": result.stdout or "",  # Coerce None to empty string
+            "stderr": result.stderr or "",  # Coerce None to empty string
         }
     except subprocess.TimeoutExpired:
         return {"exit_code": 1, "stdout": "", "stderr": "Command timed out"}

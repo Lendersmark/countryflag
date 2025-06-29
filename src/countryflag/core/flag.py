@@ -326,8 +326,8 @@ class CountryFlag:
                 )
                 continue
 
-            if not country_name or country_name.strip() == "":
-                logger.debug(f"Skipping empty string at position {i}")
+            if not country_name.strip():
+                logger.debug(f"Empty string detected at position {i}, skipping")
                 continue
 
             try:

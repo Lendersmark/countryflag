@@ -48,7 +48,7 @@ def shell(command, exe=None):
             result = subprocess.run(
                 command, shell=True, capture_output=True, text=True, timeout=30
             )
-        return ShellResult(result.returncode, result.stdout, result.stderr)
+        return ShellResult(result.returncode, result.stdout or "", result.stderr or "")
     except subprocess.TimeoutExpired:
         return ShellResult(1, "", "Command timed out")
     except Exception as e:

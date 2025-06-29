@@ -16,6 +16,22 @@ from countryflag.core.models import CountryInfo
 
 
 @pytest.fixture
+def windows_utf8_subprocess_env(monkeypatch) -> None:
+    """Set UTF-8 encoding environment variables for subprocess calls on Windows.
+    
+    This fixture sets PYTHONIOENCODING=utf-8 and LC_ALL=C.UTF-8 environment
+    variables when running on Windows (os.name=="nt") to ensure consistent
+    UTF-8 handling in subprocess calls across tests.
+    
+    The fixture automatically applies to all tests when used, reducing
+    duplication of subprocess environment setup.
+    """
+    if os.name == "nt":
+        monkeypatch.setenv("PYTHONIOENCODING", "utf-8")
+        monkeypatch.setenv("LC_ALL", "C.UTF-8")
+
+
+@pytest.fixture
 def sample_country_names() -> List[str]:
     """Return a list of sample country names for testing."""
     return ["United States", "Canada", "Germany", "Japan", "Brazil"]

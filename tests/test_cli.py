@@ -46,18 +46,27 @@ def shell(command, exe=None):
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
+                errors="replace",
+                env={**os.environ, "PYTHONIOENCODING": "utf-8"},
                 timeout=30,
             )
         else:  # Unix-like systems
             result = subprocess.run(
-                command, shell=True, capture_output=True, text=True, timeout=30
+                command,
+                shell=True,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                env={**os.environ, "PYTHONIOENCODING": "utf-8"},
+                timeout=30,
             )
-        return ShellResult(result.returncode, result.stdout, result.stderr)
+        # Coerce stdout/stderr to empty string if None
+        return ShellResult(result.returncode, result.stdout or "", result.stderr or "")
     except subprocess.TimeoutExpired:
         return ShellResult(1, "", "Command timed out")
     except Exception as e:
         return ShellResult(1, "", str(e))
-
 
 def test_help_displays_correctly():
     """Test that --help displays without error."""
