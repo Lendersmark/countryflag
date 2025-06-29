@@ -146,13 +146,22 @@ class DiskCache(Cache):
         try:
             with open(cache_path, "w", encoding="utf-8") as f:
                 json.dump(value, f)
+        except Exception as e:
+            logger.error(f"Error writing cache file for key '{key}': {e}")
+            raise CacheError(f"Error writing cache file for key '{key}': {e}", key)
 
+        try:
             # Update the index
             self._index[key] = cache_path.name
             self._save_index()
         except Exception as e:
-            logger.error(f"Error writing cache file for key '{key}': {e}")
-            raise CacheError(f"Error writing cache file for key '{key}': {e}", key)
+            # If index save fails, remove the cache file we just created
+            if cache_path.exists():
+                try:
+                    os.remove(cache_path)
+                except:
+                    pass  # Best effort cleanup
+            raise  # Re-raise the CacheError from _save_index
 
     def delete(self, key: str) -> None:
         """
