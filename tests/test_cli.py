@@ -89,7 +89,7 @@ def test_countries_flag_multiple_countries():
 def test_countries_flag_nonexistent_country():
     """Test CLI behavior with nonexistent country."""
     result = shell("python -m countryflag --countries nonexistentcountry")
-    assert "Country not found" in result.stdout
+    assert "Country not found" in result.stderr
 
 
 def test_countries_flag_windows_split():

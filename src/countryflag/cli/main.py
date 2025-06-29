@@ -9,8 +9,10 @@ import asyncio
 import csv
 import json
 import logging
+import os
 import re
 import sys
+import warnings
 from io import StringIO
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -54,18 +56,33 @@ def _merge_country_tokens(tokens: List[str], cf: CountryFlag) -> List[str]:
         found_match = False
         for j in range(min(n, i + 5), i, -1):  # Limit to max 5 tokens per country
             candidate = " ".join(tokens[i:j])
-            # Only merge if it's a multi-token candidate and validates as a single country
-            if j > i + 1 and cf.validate_country_name(candidate):
-                # Additional check: make sure we're not accidentally merging separate countries
-                # by checking if individual tokens are also valid countries
-                individual_tokens_valid = all(
-                    cf.validate_country_name(token) for token in tokens[i:j]
-                )
-                if not individual_tokens_valid:
-                    merged.append(candidate)
-                    i = j
-                    found_match = True
-                    break
+            # Only merge if the candidate does not produce warnings
+            # Suppress stderr output from country_converter during validation
+            try:
+                # Redirect stderr to suppress country_converter noise
+                old_stderr = sys.stderr
+                sys.stderr = open(os.devnull, 'w')
+                
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    if j > i + 1 and cf.validate_country_name(candidate):
+                        # Additional check: make sure we're not accidentally merging separate countries
+                        # by checking if individual tokens are also valid countries
+                        individual_tokens_valid = all(
+                            cf.validate_country_name(token) for token in tokens[i:j]
+                        )
+                        if not individual_tokens_valid:
+                            merged.append(candidate)
+                            i = j
+                            found_match = True
+                            break
+            except:
+                pass
+            finally:
+                # Restore stderr
+                if 'old_stderr' in locals():
+                    sys.stderr.close()
+                    sys.stderr = old_stderr
 
         if not found_match:
             # nothing matched – keep original token as-is
@@ -209,34 +226,34 @@ async def run_async_main(args: argparse.Namespace) -> None:
 
     except InvalidCountryError as ice:
         logger.error(str(ice))
-        print(f"Error: {str(ice)}")
+        print(f"Error: {str(ice)}", file=sys.stderr)
 
         # If fuzzy matching is enabled, suggest alternatives
         if args.fuzzy:
             converter = CountryConverterSingleton()
             matches = converter.find_close_matches(ice.country, args.threshold)
             if matches:
-                print("\nDid you mean one of these?")
+                print("\nDid you mean one of these?", file=sys.stderr)
                 for name, code in matches:
-                    print(f"  - {name} ({code})")
+                    print(f"  - {name} ({code})", file=sys.stderr)
 
-        print("\nUse --list-countries to see all supported country names")
+        print("\nUse --list-countries to see all supported country names", file=sys.stderr)
         sys.exit(1)
 
     except RegionError as re:
         logger.error(str(re))
-        print(f"Error: {str(re)}")
-        print(f"\nSupported regions: {', '.join(RegionDefinitions.REGIONS)}")
+        print(f"Error: {str(re)}", file=sys.stderr)
+        print(f"\nSupported regions: {', '.join(RegionDefinitions.REGIONS)}", file=sys.stderr)
         sys.exit(1)
 
     except ReverseConversionError as rce:
         logger.error(str(rce))
-        print(f"Error: {str(rce)}")
+        print(f"Error: {str(rce)}", file=sys.stderr)
         sys.exit(1)
 
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
-        print(f"Error: {str(e)}")
+        print(f"Error: {str(e)}", file=sys.stderr)
         sys.exit(1)
 
 
@@ -621,29 +638,29 @@ Both positional and named argument forms are equivalent.""",
 
     except InvalidCountryError as ice:
         logger.error(str(ice))
-        print(f"Error: {str(ice)}")
+        print(f"Error: {str(ice)}", file=sys.stderr)
 
         # If fuzzy matching is enabled, suggest alternatives
         if args.fuzzy:
             converter = CountryConverterSingleton()
             matches = converter.find_close_matches(ice.country, args.threshold)
             if matches:
-                print("\nDid you mean one of these?")
+                print("\nDid you mean one of these?", file=sys.stderr)
                 for name, code in matches:
-                    print(f"  - {name} ({code})")
+                    print(f"  - {name} ({code})", file=sys.stderr)
 
-        print("\nUse --list-countries to see all supported country names")
+        print("\nUse --list-countries to see all supported country names", file=sys.stderr)
         sys.exit(1)
 
     except RegionError as re:
         logger.error(str(re))
-        print(f"Error: {str(re)}")
-        print(f"\nSupported regions: {', '.join(RegionDefinitions.REGIONS)}")
+        print(f"Error: {str(re)}", file=sys.stderr)
+        print(f"\nSupported regions: {', '.join(RegionDefinitions.REGIONS)}", file=sys.stderr)
         sys.exit(1)
 
     except ReverseConversionError as rce:
         logger.error(str(rce))
-        print(f"Error: {str(rce)}")
+        print(f"Error: {str(rce)}", file=sys.stderr)
         sys.exit(1)
 
     except KeyboardInterrupt:
@@ -652,7 +669,7 @@ Both positional and named argument forms are equivalent.""",
 
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
-        print(f"Error: {str(e)}")
+        print(f"Error: {str(e)}", file=sys.stderr)
         sys.exit(1)
 
 

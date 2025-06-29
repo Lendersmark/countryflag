@@ -17,6 +17,7 @@ import pandas as pd
 from countryflag.core.exceptions import RegionError
 from countryflag.core.models import CountryInfo, RegionDefinitions
 from countryflag.lookup import create_enhanced_flag_mapping, reverse_lookup_flag
+from countryflag.utils.suppress import silence_coco_warnings
 
 # Configure logging
 logger = logging.getLogger("countryflag.converters")
@@ -116,7 +117,8 @@ class CountryConverterSingleton:
             'USA'
         """
         try:
-            result = coco.convert(names=name, to=to)
+            with silence_coco_warnings():
+                result = coco.convert(names=name, to=to)
             return result
         except Exception as e:
             logger.debug(f"Error converting {name} to {to}: {e}")
