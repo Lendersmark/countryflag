@@ -22,6 +22,7 @@ from countryflag.core.exceptions import (
     ReverseConversionError,
 )
 from countryflag.core.models import CountryInfo
+from countryflag.utils.suppress import silence_coco_warnings
 from countryflag.utils.text import norm_newlines
 
 # Configure logging
@@ -145,13 +146,15 @@ class CountryFlag:
             iso_codes = [code.strip() for code in country_name.split()]
             
             if len(iso_codes) > 1:  # Handle cases with multi-word countries
-                valid_result = all(
-                    self._converter.convert(name) != "not found" for name in iso_codes
-                )
+                with silence_coco_warnings():
+                    valid_result = all(
+                        self._converter.convert(name) != "not found" for name in iso_codes
+                    )
             else:
                 # Single country validation
-                code = self._converter.convert(country_name)
-                valid_result = isinstance(code, str) and code != "not found" and len(code) <= 3
+                with silence_coco_warnings():
+                    code = self._converter.convert(country_name)
+                    valid_result = isinstance(code, str) and code != "not found" and len(code) <= 3
 
             # Cache the result if cache is available
             if self._cache:
@@ -316,26 +319,28 @@ class CountryFlag:
                 continue
 
             try:
-                # Try direct conversion first
-                country_code = self._converter.convert(country_name)
+                # Suppress noise during conversion attempts
+                with silence_coco_warnings():
+                    # Try direct conversion first
+                    country_code = self._converter.convert(country_name)
 
-                # If not found and fuzzy matching is enabled, try to find close matches
-                if country_code == "not found" and fuzzy_matching:
-                    matches = self._converter.find_close_matches(
-                        country_name, fuzzy_threshold
-                    )
-                    if matches:
-                        # Use the best match
-                        best_match, country_code = matches[0]
-                        logger.info(
-                            f"Using fuzzy match '{best_match}' for '{country_name}'"
+                    # If not found and fuzzy matching is enabled, try to find close matches
+                    if country_code == "not found" and fuzzy_matching:
+                        matches = self._converter.find_close_matches(
+                            country_name, fuzzy_threshold
                         )
-                        country_name = best_match
+                        if matches:
+                            # Use the best match
+                            best_match, country_code = matches[0]
+                            logger.info(
+                                f"Using fuzzy match '{best_match}' for '{country_name}'"
+                            )
+                            country_name = best_match
 
-                if country_code == "not found":
-                    raise InvalidCountryError(
-                        f"Country not found: {country_name}", country_name
-                    )
+                    if country_code == "not found":
+                        raise InvalidCountryError(
+                            f"Country not found: {country_name}", country_name
+                        )
 
                 # Convert ISO2 code into flag
                 emoji_flag = flag.flag(country_code)
