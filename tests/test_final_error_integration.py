@@ -135,12 +135,17 @@ def test_error_messages_are_clean_and_helpful():
     # Multiple error patterns should be clean
     test_cases = [
         ("invalidcountry", "Country not found"),
-        ("", "Invalid input"),  # Empty string
+        ("", "country names cannot be empty"),  # Empty string
     ]
     
     for test_input, expected_error in test_cases:
         result = run_command(f"python -m countryflag --countries '{test_input}'")
-        assert expected_error in result["stderr"] or expected_error in result["stdout"]
+        # For empty string, it should now be an error with exit code 1
+        if test_input == "":
+            assert result["exit_code"] == 1
+            assert expected_error in result["stderr"]
+        else:
+            assert expected_error in result["stderr"] or expected_error in result["stdout"]
 
 
 def test_help_and_info_commands_use_stdout():

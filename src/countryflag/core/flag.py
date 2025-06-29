@@ -314,9 +314,17 @@ class CountryFlag:
         for i, country_name in enumerate(country_names):
             logger.debug(f"Processing country: {country_name}")
 
-            if not country_name or not isinstance(country_name, str):
-                logger.warning(f"Invalid input at position {i}: {country_name}")
-                continue
+            if not isinstance(country_name, str):
+                raise InvalidCountryError(
+                    f"Invalid input type at position {i}: expected string, got {type(country_name).__name__}",
+                    str(country_name)
+                )
+            
+            if not country_name or country_name.strip() == "":
+                raise InvalidCountryError(
+                    f"Empty string provided at position {i}: country names cannot be empty",
+                    country_name
+                )
 
             try:
                 # Suppress noise during conversion attempts

@@ -143,12 +143,13 @@ def test_precedence_rules_positional_ignored_when_flags_provided():
 
     # Test with --region flag and positional args - positional should be ignored
     # Note: Testing that positional args are ignored, not the region functionality itself
+    # Use Japan (not in Europe) to avoid false positive matches
     result = shell(
-        'python -c "from src.countryflag.cli.main import main; main()" Germany --region Europe'
+        'python -c "from src.countryflag.cli.main import main; main()" Japan --region Europe'
     )
     assert result.exit_code == 0
-    # The key test is that Germany (positional) is ignored, not what region outputs
-    assert "🇩🇪" not in result.stdout  # Germany (positional) should be ignored
+    # The key test is that Japan (positional) is ignored, not what region outputs
+    assert "🇯🇵" not in result.stdout  # Japan (positional) should be ignored
 
     # Test with --file flag and positional args - positional should be ignored
     # Note: We'll create a temporary file for this test
@@ -192,9 +193,26 @@ def test_precedence_rules_positional_used_when_no_flags():
 def test_no_arguments_provided():
     """Test CLI behavior when no arguments are provided."""
     result = shell("python -m countryflag")
-    # CLI exits cleanly with no output when no args provided
+    # CLI exits cleanly and shows helpful usage message when no args provided
     assert result.exit_code == 0
-    assert norm_newlines(result.stdout) == norm_newlines("")
+    
+    # Check that the help message is displayed
+    expected_content = [
+        "CountryFlag: Convert country names to emoji flags",
+        "Usage examples:",
+        "countryflag italy france spain",
+        "countryflag --countries italy france spain",
+        "countryflag --reverse",
+        "countryflag --region Europe",
+        "countryflag --interactive",
+        "countryflag --list-countries",
+        "countryflag --help",
+        "For more options, use: countryflag --help"
+    ]
+    
+    # Verify all expected content is present
+    for content in expected_content:
+        assert content in result.stdout, f"Expected '{content}' in output: {result.stdout}"
 
 
 def test_interactive_mode():
@@ -333,13 +351,13 @@ def test_positional_args_success_cases(invocation_style, countries, expected_fla
         ("positional", ["fakecountry"], "Country not found", True),
         ("named", ["fakecountry"], "Country not found", True),
         # Mixed valid and invalid countries - these continue processing and exit with 0
-        ("positional", ["Germany", "nonexistentcountry"], "not found in regex", False),
-        ("named", ["Germany", "nonexistentcountry"], "not found in regex", False),
-        ("positional", ["invalidcountry", "France"], "not found in regex", False),
-        ("named", ["invalidcountry", "France"], "not found in regex", False),
-        # Empty string - handled gracefully with message
-        ("positional", ["''"], "Invalid input", False),
-        ("named", ["''"], "Invalid input", False),
+        ("positional", ["Germany", "nonexistentcountry"], "Country not found", False),
+        ("named", ["Germany", "nonexistentcountry"], "Country not found", False),
+        ("positional", ["invalidcountry", "France"], "Country not found", False),
+        ("named", ["invalidcountry", "France"], "Country not found", False),
+        # Empty string - should now raise an error
+        ("positional", ["''"], "country names cannot be empty", True),
+        ("named", ["''"], "country names cannot be empty", True),
         # Invalid characters/symbols
         ("positional", ["@#$%"], "Country not found", True),
         ("named", ["@#$%"], "Country not found", True),
@@ -515,13 +533,78 @@ def test_positional_args_precedence_with_flags(
 
 def test_empty_positional_args():
     """Test behavior with empty positional arguments."""
-    # Test with no arguments at all
+    # Test with no arguments at all - should show help message
     result = shell("python -m countryflag")
     assert result.exit_code == 0
-    assert norm_newlines(result.stdout) == norm_newlines("")
+    assert "CountryFlag: Convert country names to emoji flags" in result.stdout
+    assert "Usage examples:" in result.stdout
 
     # Test with only whitespace (empty string)
     result = shell("python -m countryflag ''")
-    # Empty string produces a message but exits with 0
+    # Empty string should now produce an error and exit with 1
+    assert result.exit_code == 1
+    assert "country names cannot be empty" in result.stderr
+
+
+def test_no_arguments_help_message_content():
+    """Test that the no-arguments help message contains all expected examples."""
+    result = shell("python -m countryflag")
     assert result.exit_code == 0
-    assert "Invalid input" in (result.stdout + result.stderr)
+    
+    # Check specific examples are included
+    expected_examples = [
+        "countryflag italy france spain",
+        "countryflag --countries italy france spain", 
+        "countryflag --reverse",
+        "countryflag --region Europe",
+        "countryflag --interactive",
+        "countryflag --list-countries",
+        "countryflag --help"
+    ]
+    
+    for example in expected_examples:
+        assert example in result.stdout, f"Expected example '{example}' not found in help message"
+        
+    # Ensure the help message ends with the "For more options" line
+    assert "For more options, use: countryflag --help" in result.stdout
+
+
+def test_no_arguments_vs_help_flag():
+    """Test that no-arguments help is different from --help flag."""
+    # Get output from no arguments
+    no_args_result = shell("python -m countryflag")
+    assert no_args_result.exit_code == 0
+    
+    # Get output from --help flag
+    help_result = shell("python -m countryflag --help")
+    assert help_result.exit_code == 0
+    
+    # The outputs should be different - help should be more comprehensive
+    assert no_args_result.stdout != help_result.stdout
+    
+    # No-args should be shorter and more focused
+    assert len(no_args_result.stdout) < len(help_result.stdout)
+    
+    # Help should contain argparse-generated content that no-args doesn't
+    assert "optional arguments:" in help_result.stdout.lower() or "options:" in help_result.stdout.lower()
+    assert "optional arguments:" not in no_args_result.stdout.lower() and "options:" not in no_args_result.stdout.lower()
+
+
+def test_no_arguments_entrypoint():
+    """Test that the installed entrypoint also shows help message with no arguments."""
+    # Test both possible command names on different platforms
+    commands_to_try = ["countryflag"]
+    if os.name == "nt":
+        commands_to_try.append("countryflag.exe")
+    
+    success = False
+    for cmd in commands_to_try:
+        result = shell(cmd)
+        if result.exit_code == 0 and "CountryFlag: Convert country names to emoji flags" in result.stdout:
+            success = True
+            # Verify it contains usage examples
+            assert "Usage examples:" in result.stdout
+            assert "countryflag italy france spain" in result.stdout
+            break
+    
+    assert success, f"None of the commands {commands_to_try} showed the expected help message"

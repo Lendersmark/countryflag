@@ -61,20 +61,44 @@ def _merge_country_tokens(tokens: List[str], cf: CountryFlag) -> List[str]:
         "cape verde", "ivory coast", "papua new guinea", "sierra leone",
         "south sudan", "trinidad and tobago", "united arab emirates",
         "bosnia and herzegovina", "antigua and barbuda", "saint kitts and nevis",
-        "saint vincent and the grenadines", "central african republic"
+        "saint vincent and the grenadines", "central african republic",
+        "united states of america", "united states america", "usa", "united states"
     }
 
     while i < n:
         found_match = False
         # Try longest slice first, but limit to reasonable boundaries
         for j in range(min(n, i + 6), i, -1):  # Max 6 tokens for very long country names
-            if j > i + 1:  # Only try merging for multi-token candidates
-                candidate = " ".join(tokens[i:j])
-                candidate_lower = candidate.lower()
+            candidate = " ".join(tokens[i:j])
+            candidate_lower = candidate.lower()
+            
+            # Check if it's a known multi-word country first, or try combinations for multi-word candidates
+            if candidate_lower in known_multi_word_countries:
+                # Validate it's actually recognized by the converter
+                try:
+                    code = cf._converter.convert(candidate)
+                    if code != "not found" and len(code) <= 3:
+                        merged.append(candidate)
+                        i = j
+                        found_match = True
+                        break
+                except:
+                    pass
+            elif j > i + 1:  # Only try multi-word combinations for reasonable cases
+                # For non-known multi-word combinations, be more conservative
+                # Only merge if each individual token doesn't work on its own
+                individual_tokens_invalid = True
+                for k in range(i, j):
+                    try:
+                        individual_code = cf._converter.convert(tokens[k])
+                        if individual_code != "not found":
+                            individual_tokens_invalid = False
+                            break
+                    except:
+                        pass
                 
-                # Check if it's a known multi-word country first
-                if candidate_lower in known_multi_word_countries:
-                    # Validate it's actually recognized by the converter
+                # Only merge if individual tokens are invalid AND the combined result is valid
+                if individual_tokens_invalid:
                     try:
                         code = cf._converter.convert(candidate)
                         if code != "not found" and len(code) <= 3:
@@ -626,13 +650,55 @@ Both positional and named argument forms are equivalent.""",
 
         # Handle country to flag conversion
         elif country_names:
-            flags, country_flag_pairs = country_flag.get_flag(
-                country_names, args.separator, args.fuzzy, args.threshold
-            )
-            output = country_flag.format_output(
-                country_flag_pairs, args.format, args.separator
-            )
-            print(norm_newlines(output) if isinstance(output, str) else output)
+            # Handle mixed valid/invalid countries by processing individually
+            successful_pairs = []
+            had_errors = False
+            
+            for country_name in country_names:
+                try:
+                    flags, pairs = country_flag.get_flag(
+                        [country_name], args.separator, args.fuzzy, args.threshold
+                    )
+                    successful_pairs.extend(pairs)
+                except InvalidCountryError as ice:
+                    had_errors = True
+                    print(f"Error: {str(ice)}", file=sys.stderr)
+                    
+                    # If fuzzy matching is enabled, suggest alternatives
+                    if args.fuzzy:
+                        converter = CountryConverterSingleton()
+                        matches = converter.find_close_matches(ice.country, args.threshold)
+                        if matches:
+                            print(f"Did you mean one of these for '{ice.country}'?", file=sys.stderr)
+                            for name, code in matches[:3]:  # Show top 3 matches
+                                print(f"  - {name} ({code})", file=sys.stderr)
+                    continue
+            
+            # Output successful results if any
+            if successful_pairs:
+                output = country_flag.format_output(
+                    successful_pairs, args.format, args.separator
+                )
+                print(norm_newlines(output) if isinstance(output, str) else output)
+            
+            # If we had errors but also successful conversions, don't exit with error
+            # Only exit with error if ALL countries failed
+            if had_errors and not successful_pairs:
+                print("\nUse --list-countries to see all supported country names", file=sys.stderr)
+                sys.exit(1)
+        else:
+            # No input provided - show helpful message and examples
+            print("CountryFlag: Convert country names to emoji flags\n")
+            print("Usage examples:")
+            print("  countryflag italy france spain                    # Convert countries to flags")
+            print("  countryflag --countries italy france spain       # Same as above")
+            print("  countryflag --reverse 🇮🇹 🇫🇷 🇪🇸              # Convert flags to countries")
+            print("  countryflag --region Europe                       # Get all European flags")
+            print("  countryflag --interactive                         # Interactive mode")
+            print("  countryflag --list-countries                      # List all supported countries")
+            print("  countryflag --help                               # Show full help")
+            print("\nFor more options, use: countryflag --help")
+            sys.exit(0)
 
     except InvalidCountryError as ice:
         print(f"Error: {str(ice)}", file=sys.stderr)
