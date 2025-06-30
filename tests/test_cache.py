@@ -1,10 +1,10 @@
 """
-Force CI refresh - no RuleBasedStateMachine import needed.
-"""
 Comprehensive tests for cache implementations.
 
 This module contains tests for both DiskCache and MemoryCache implementations,
 including basic operations, TTL expiry, error handling, and concurrency scenarios.
+
+Force CI refresh - no RuleBasedStateMachine import needed.
 """
 
 import json
@@ -133,7 +133,7 @@ class TestCacheBasicOperations:
         assert cache_instance.get("key5") is None
 
     def test_get_nonexistent_key(self, cache_instance):
-        """Test getting a key that doesn't exist."""
+        """Test getting a key that doesn\'t exist."""
         assert cache_instance.get("nonexistent") is None
 
     def test_delete(self, cache_instance):
