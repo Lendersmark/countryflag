@@ -104,12 +104,24 @@ def getflag(
         str: A string containing emoji flags separated by the specified separator.
 
     Raises:
+        TypeError: If countries argument is not a string or list of strings.
         InvalidCountryError: If a country name cannot be converted to a flag.
 
     Example:
         >>> getflag(['Germany', 'BE', 'United States of America', 'Japan'])
         '🇩🇪 🇧🇪 🇺🇸 🇯🇵'
     """
+    # Type checking for defensive programming
+    if countries is None:
+        raise TypeError(
+            "countries argument cannot be None. Expected a string or list of strings."
+        )
+
+    if not isinstance(countries, (str, list)):
+        raise TypeError(
+            f"countries argument must be a string or list of strings, got {type(countries).__name__}"
+        )
+
     # Convert single string to list for compatibility with core implementation
     if isinstance(countries, str):
         countries = [countries]
@@ -133,8 +145,45 @@ def getflag(
     return flags
 
 
+def get_ascii_flag(country_name: str) -> str:
+    """
+    Get ASCII art flag for a country, with fallback to Unicode emoji.
+
+    This is a convenience function that creates a CountryFlag instance and calls
+    get_ascii_flag() on it. It attempts to load ASCII art from embedded resources,
+    falling back to Unicode emoji flags when resources are missing.
+
+    Args:
+        country_name: The country name or ISO code.
+
+    Returns:
+        str: ASCII art flag if available, otherwise Unicode emoji flag.
+
+    Raises:
+        TypeError: If country_name is not a string.
+        InvalidCountryError: If the country name cannot be converted.
+
+    Example:
+        >>> result = get_ascii_flag("DE")
+        >>> isinstance(result, str)
+        True
+    """
+    # Type checking for defensive programming
+    if country_name is None:
+        raise TypeError("country_name argument cannot be None. Expected a string.")
+
+    if not isinstance(country_name, str):
+        raise TypeError(
+            f"country_name argument must be a string, got {type(country_name).__name__}"
+        )
+
+    cf = CountryFlag()
+    return cf.get_ascii_flag(country_name)
+
+
 __all__ = [
     "getflag",
+    "get_ascii_flag",
     "CountryFlag",
     "CountryFlagError",
     "InvalidCountryError",

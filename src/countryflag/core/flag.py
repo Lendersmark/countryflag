@@ -13,6 +13,17 @@ from typing import Dict, List, Literal, Optional, Tuple
 
 import flag
 
+# Import resource loading modules
+try:
+    import importlib.resources as importlib_resources
+except ImportError:
+    importlib_resources = None
+
+try:
+    import pkg_resources
+except ImportError:
+    pkg_resources = None
+
 from countryflag.cache.base import Cache
 from countryflag.cache.memory import MemoryCache
 from countryflag.core.converters import CountryConverterSingleton
@@ -502,3 +513,91 @@ class CountryFlag:
 
         else:  # text format
             return norm_newlines(separator.join(flag for _, flag in country_flag_pairs))
+
+    def get_ascii_flag(self, country_name: str) -> str:
+        """
+        Get ASCII art flag for a country, with fallback to Unicode emoji.
+
+        This method attempts to load ASCII art from embedded resources.
+        If the resource is missing or cannot be loaded, it falls back to
+        returning the Unicode emoji flag instead of raising an error.
+
+        Args:
+            country_name: The country name or ISO code.
+
+        Returns:
+            str: ASCII art flag if available, otherwise Unicode emoji flag.
+
+        Example:
+            >>> cf = CountryFlag()
+            >>> result = cf.get_ascii_flag("DE")
+            >>> isinstance(result, str)
+            True
+        """
+        # First convert country name to ISO code
+        try:
+            with silence_coco_warnings():
+                iso_code = self._converter.convert(country_name)
+
+            if iso_code == "not found":
+                raise InvalidCountryError(
+                    f"Country not found: {country_name}", country_name
+                )
+
+        except Exception:
+            raise InvalidCountryError(
+                f"Invalid country name: {country_name}", country_name
+            )
+
+        # Try to load ASCII art from embedded resources
+        try:
+            # Try different resource loading approaches
+            ascii_art = None
+
+            # Method 1: importlib.resources (Python 3.9+)
+            if importlib_resources and hasattr(importlib_resources, "open_binary"):
+                try:
+                    # This will raise FileNotFoundError if resource is missing
+                    with importlib_resources.open_binary(
+                        "countryflag.assets", f"{iso_code.lower()}.txt"
+                    ) as f:
+                        ascii_art = f.read().decode("utf-8")
+                except FileNotFoundError:
+                    logger.debug(
+                        f"ASCII art resource not found for {iso_code} (importlib.resources)"
+                    )
+                    ascii_art = None
+
+            # Method 2: pkg_resources (legacy)
+            elif pkg_resources and hasattr(pkg_resources, "resource_stream"):
+                try:
+                    # This will raise FileNotFoundError if resource is missing
+                    with pkg_resources.resource_stream(
+                        "countryflag.assets", f"{iso_code.lower()}.txt"
+                    ) as f:
+                        ascii_art = f.read().decode("utf-8")
+                except FileNotFoundError:
+                    logger.debug(
+                        f"ASCII art resource not found for {iso_code} (pkg_resources)"
+                    )
+                    ascii_art = None
+
+            # If ASCII art was successfully loaded, return it
+            if ascii_art:
+                logger.debug(f"Loaded ASCII art for {iso_code}")
+                return ascii_art
+
+        except Exception as e:
+            # Log the error but don't crash
+            logger.debug(f"Error loading ASCII art for {iso_code}: {e}")
+
+        # Fallback: return Unicode emoji flag
+        logger.debug(f"Falling back to Unicode emoji for {iso_code}")
+        try:
+            emoji_flag = flag.flag(iso_code)
+            return emoji_flag
+        except Exception as e:
+            logger.error(f"Error generating emoji flag for {iso_code}: {e}")
+            raise InvalidCountryError(
+                f"Could not generate flag for country: {country_name}", country_name
+            ) from e

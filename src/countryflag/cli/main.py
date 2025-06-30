@@ -18,6 +18,7 @@ from typing import List, Tuple
 import prompt_toolkit
 from prompt_toolkit.completion import WordCompleter
 
+from countryflag import __version__
 from countryflag.cache import DiskCache, MemoryCache
 from countryflag.core.converters import CountryConverterSingleton
 from countryflag.core.exceptions import (
@@ -525,6 +526,12 @@ Both positional and named argument forms are equivalent.""",
         metavar="DIR",
         help="Directory to store cache files (if not specified, in-memory cache is used)",
     )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"countryflag {__version__}",
+        help="Show program's version number and exit",
+    )
 
     # Parse the preprocessed arguments
     args = parser.parse_args(processed_args)
@@ -757,27 +764,40 @@ Both positional and named argument forms are equivalent.""",
                 sys.exit(1)
         else:
             # No input provided - show helpful message and examples
-            print("CountryFlag: Convert country names to emoji flags\n")
-            print("Usage examples:")
             print(
-                "  countryflag italy france spain                    # Convert countries to flags"
+                "CountryFlag: Convert country names to emoji flags\n", file=sys.stderr
             )
-            print("  countryflag --countries italy france spain       # Same as above")
+            print("Usage examples:", file=sys.stderr)
             print(
-                "  countryflag --reverse 🇮🇹 🇫🇷 🇪🇸              # Convert flags to countries"
-            )
-            print(
-                "  countryflag --region Europe                       # Get all European flags"
+                "  countryflag italy france spain                    # Convert countries to flags",
+                file=sys.stderr,
             )
             print(
-                "  countryflag --interactive                         # Interactive mode"
+                "  countryflag --countries italy france spain       # Same as above",
+                file=sys.stderr,
             )
             print(
-                "  countryflag --list-countries                      # List all supported countries"
+                "  countryflag --reverse 🇮🇹 🇫🇷 🇪🇸              # Convert flags to countries",
+                file=sys.stderr,
             )
-            print("  countryflag --help                               # Show full help")
-            print("\nFor more options, use: countryflag --help")
-            sys.exit(0)
+            print(
+                "  countryflag --region Europe                       # Get all European flags",
+                file=sys.stderr,
+            )
+            print(
+                "  countryflag --interactive                         # Interactive mode",
+                file=sys.stderr,
+            )
+            print(
+                "  countryflag --list-countries                      # List all supported countries",
+                file=sys.stderr,
+            )
+            print(
+                "  countryflag --help                               # Show full help",
+                file=sys.stderr,
+            )
+            print("\nFor more options, use: countryflag --help", file=sys.stderr)
+            sys.exit(1)
 
     except InvalidCountryError as ice:
         print(f"Error: {str(ice)}", file=sys.stderr)
