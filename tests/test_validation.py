@@ -1,6 +1,8 @@
-import pytest
-from src.countryflag.utils.validation import require, ensure, runtime_typechecked
 from functools import wraps
+
+import pytest
+
+from src.countryflag.utils.validation import ensure, require, runtime_typechecked
 
 
 # Sample functions with decorators

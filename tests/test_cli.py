@@ -1085,8 +1085,8 @@ def test_cli_cache_options():
     assert "🇺🇸" in result.stdout, "Should work with cache enabled"
 
     # Test with cache directory (create temp directory for test)
-    import tempfile
     import os
+    import tempfile
 
     with tempfile.TemporaryDirectory() as temp_dir:
         result = shell(f"python -m countryflag --cache --cache-dir '{temp_dir}' US")

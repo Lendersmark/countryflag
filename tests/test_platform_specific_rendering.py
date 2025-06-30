@@ -41,6 +41,7 @@ class TestPlatformSpecificRendering:
         # Import the CLI module to trigger platform-specific initialization
         # We need to reload the module to trigger the platform check again
         import importlib
+
         from src.countryflag.cli import main as cli_module
 
         importlib.reload(cli_module)
@@ -70,6 +71,7 @@ class TestPlatformSpecificRendering:
         # Import the CLI module to trigger platform-specific initialization
         # We need to reload the module to trigger the platform check again
         import importlib
+
         from src.countryflag.cli import main as cli_module
 
         importlib.reload(cli_module)
@@ -365,6 +367,7 @@ class TestPlatformSpecificRendering:
 
         # Import the module - this should trigger the Windows branch
         import importlib
+
         import src.countryflag.cli.main as cli_main_module
 
         # Force reload to ensure the platform check runs with our mocked values

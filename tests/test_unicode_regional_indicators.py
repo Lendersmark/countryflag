@@ -6,9 +6,10 @@ construction when feeding two-letter codes containing non-ASCII letters
 or unusual cases like "ÅL" for Åland.
 """
 
-import pytest
-import flag
 import unicodedata
+
+import flag
+import pytest
 
 from src.countryflag.core.flag import CountryFlag
 

@@ -7,11 +7,11 @@ re-invoke the underlying loader.
 """
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from countryflag import getflag
-from countryflag.core.flag import CountryFlag
 from countryflag.cache.memory import MemoryCache
+from countryflag.core.flag import CountryFlag
 
 
 class TestGetFlagCacheMemoisation(unittest.TestCase):

@@ -6,17 +6,18 @@ and error handling, including edge cases and type correctness.
 """
 
 from typing import List, Optional
+
 import pytest
 
-from countryflag.plugins import (
-    register_plugin,
-    get_plugin,
-    get_registered_plugins,
-    unregister_plugin,
-    BasePlugin,
-)
 from countryflag.core.exceptions import PluginError
 from countryflag.core.models import CountryInfo
+from countryflag.plugins import (
+    BasePlugin,
+    get_plugin,
+    get_registered_plugins,
+    register_plugin,
+    unregister_plugin,
+)
 
 
 class DummyPlugin(BasePlugin):

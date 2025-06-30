@@ -6,7 +6,8 @@ Covers defensive type-checking lines.
 """
 
 import pytest
-from src.countryflag import getflag, get_ascii_flag
+
+from src.countryflag import get_ascii_flag, getflag
 from src.countryflag.core.flag import CountryFlag
 
 

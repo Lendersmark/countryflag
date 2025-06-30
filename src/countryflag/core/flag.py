@@ -15,14 +15,14 @@ import flag
 
 # Import resource loading modules
 try:
-    import importlib.resources as importlib_resources
+    import importlib.resources as importlib_resources  # type: ignore
 except ImportError:
-    importlib_resources = None
+    importlib_resources = None  # type: ignore
 
 try:
-    import pkg_resources
+    import pkg_resources  # type: ignore
 except ImportError:
-    pkg_resources = None
+    pkg_resources = None  # type: ignore
 
 from countryflag.cache.base import Cache
 from countryflag.cache.memory import MemoryCache
