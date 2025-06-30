@@ -1,4 +1,6 @@
 """
+Force CI refresh - no RuleBasedStateMachine import needed.
+"""
 Comprehensive tests for cache implementations.
 
 This module contains tests for both DiskCache and MemoryCache implementations,
