@@ -95,7 +95,9 @@ def _merge_country_tokens(tokens: List[str], cf: CountryFlag) -> List[str]:
     while i < n:
         found_match = False
         # Try longest slice first, but limit to reasonable boundaries
-        for j in range(min(n, i + 6), i, -1):  # Max 6 tokens for very long country names
+        for j in range(
+            min(n, i + 6), i, -1
+        ):  # Max 6 tokens for very long country names
             candidate = " ".join(tokens[i:j])
             candidate_lower = candidate.lower()
 
@@ -220,18 +222,12 @@ async def run_async_main(args: argparse.Namespace) -> None:
         country_names = []
         if args.file:
             # Use async file processing for larger files
-            country_names = await process_file_input_async(
-                args.file
-            )
+            country_names = await process_file_input_async(args.file)
         elif args.files:
             # Use parallel processing for multiple files
-            country_names = process_multiple_files(
-                args.files, max_workers=args.workers
-            )
+            country_names = process_multiple_files(args.files, max_workers=args.workers)
         elif args.countries:
-            country_names = _merge_country_tokens(
-                args.countries, country_flag
-            )
+            country_names = _merge_country_tokens(args.countries, country_flag)
         # Note: positional arguments are not used in async mode as they are
         # handled in preprocessing
 
@@ -656,18 +652,18 @@ Both positional and named argument forms are equivalent.""",
             country_names = process_multiple_files(args.files, max_workers=args.workers)
         elif args.countries:
             country_names = _merge_country_tokens(args.countries, country_flag)
-        elif extracted_positional and not any([
-            args.file,
-            args.files,
-            args.reverse,
-            args.region,
-            args.interactive,
-        ]):
+        elif extracted_positional and not any(
+            [
+                args.file,
+                args.files,
+                args.reverse,
+                args.region,
+                args.interactive,
+            ]
+        ):
             # Treat positional countries same as --countries when no other
             # input source is specified
-            country_names = _merge_country_tokens(
-                extracted_positional, country_flag
-            )
+            country_names = _merge_country_tokens(extracted_positional, country_flag)
 
         # Handle region-based lookup
         if args.region:
@@ -788,8 +784,7 @@ Both positional and named argument forms are equivalent.""",
                 "# Convert countries to flags"
             )
             print(
-                "  countryflag --countries italy france spain       "
-                "# Same as above"
+                "  countryflag --countries italy france spain       " "# Same as above"
             )
             print(
                 "  countryflag --reverse 🇮🇹 🇫🇷 🇪🇸              "
