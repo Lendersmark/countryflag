@@ -13,6 +13,7 @@ import os
 import re
 import sys
 from io import StringIO
+from pathlib import Path
 from typing import List, Tuple
 
 import prompt_toolkit
@@ -541,6 +542,30 @@ Both positional and named argument forms are equivalent.""",
 
     # Parse the preprocessed arguments
     args = parser.parse_args(processed_args)
+
+    # Normalize quoted arguments (Windows compatibility)
+    # Handle separator argument
+    if (
+        args.separator
+        and len(args.separator) >= 2
+        and args.separator[0] == args.separator[-1] in {'"', "'"}
+    ):
+        args.separator = args.separator[1:-1]
+
+    # Handle cache_dir argument - strip quotes and normalize path
+    if args.cache_dir:
+        # Strip surrounding quotes if present
+        if len(args.cache_dir) >= 2 and args.cache_dir[0] == args.cache_dir[-1] in {
+            '"',
+            "'",
+        }:
+            args.cache_dir = args.cache_dir[1:-1]
+        # Normalize path with user expansion and resolution
+        args.cache_dir = str(Path(os.path.expanduser(args.cache_dir)).resolve())
+
+    # Handle other single-char options that might be wrapped in quotes
+    # No other single-char options currently need this treatment, but this
+    # provides a pattern for future options
 
     # Set logging level based on verbose flag
     if args.verbose:

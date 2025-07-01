@@ -62,8 +62,8 @@ class CountryFlag:
         '🇺🇸 🇨🇦 🇲🇽'
     """
 
-    # Class-level shared cache instance
-    _global_cache: MemoryCache = MemoryCache()
+    # Class-level shared cache instance (lazy-initialized)
+    _global_cache: Optional[MemoryCache] = None
 
     __slots__ = ("_converter", "_language", "_cache")
 
@@ -79,8 +79,23 @@ class CountryFlag:
         self._converter = CountryConverterSingleton()
         self._language = language
         # Use the global cache if no cache is provided
-        self._cache = cache if cache is not None else self._global_cache
+        self._cache = cache if cache is not None else self._get_global_cache()
 
+    @classmethod
+    def _get_global_cache(cls) -> MemoryCache:
+        """
+        Get or create the global cache instance (lazy initialization).
+        
+        This method ensures thread-safe lazy initialization of the global cache
+        to prevent deadlocks in multiprocessing scenarios.
+        
+        Returns:
+            MemoryCache: The global cache instance.
+        """
+        if cls._global_cache is None:
+            cls._global_cache = MemoryCache()
+        return cls._global_cache
+    
     @classmethod
     def clear_global_cache(cls) -> None:
         """
@@ -92,8 +107,9 @@ class CountryFlag:
         Example:
             >>> CountryFlag.clear_global_cache()
         """
-        cls._global_cache.clear()
-        cls._global_cache.reset_hits()
+        if cls._global_cache is not None:
+            cls._global_cache.clear()
+            cls._global_cache.reset_hits()
 
     def set_language(self, language: str) -> None:
         """

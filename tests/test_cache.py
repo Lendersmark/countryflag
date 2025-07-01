@@ -616,6 +616,100 @@ class TestConcurrency:
         assert set_count > 0, "Should have some set operations"
         assert contains_count > 0, "Should have some contains operations"
 
+    def test_diskcache_thread_safety_clear(self, tmp_path):
+        """Test thread safety ensuring no RuntimeError when clear() and set() occur in parallel."""
+        cache = DiskCache(str(tmp_path / "thread_safety_clear_cache"))
+
+        # Pre-populate some keys
+        for i in range(10):
+            cache.set(f"initial_key_{i}", f"initial_value_{i}")
+
+        errors = []
+        operations_completed = []
+
+        def clear_worker():
+            """Worker that repeatedly calls clear()."""
+            try:
+                for _ in range(20):  # Multiple clear operations
+                    cache.clear()
+                    operations_completed.append("clear")
+                    time.sleep(
+                        0.001
+                    )  # Small delay to increase chance of race condition
+            except Exception as e:
+                errors.append(f"clear_worker: {e}")
+
+        def set_worker(worker_id):
+            """Worker that repeatedly calls set()."""
+            try:
+                for i in range(30):  # Multiple set operations
+                    key = f"worker_{worker_id}_key_{i}"
+                    value = f"worker_{worker_id}_value_{i}"
+                    cache.set(key, value)
+                    operations_completed.append("set")
+                    time.sleep(
+                        0.001
+                    )  # Small delay to increase chance of race condition
+            except Exception as e:
+                errors.append(f"set_worker_{worker_id}: {e}")
+
+        def get_worker():
+            """Worker that repeatedly calls get() on existing keys."""
+            try:
+                for i in range(25):
+                    # Try to get both initial and new keys
+                    cache.get(f"initial_key_{i % 10}")
+                    cache.get(f"worker_0_key_{i % 10}")
+                    operations_completed.append("get")
+                    time.sleep(0.001)
+            except Exception as e:
+                errors.append(f"get_worker: {e}")
+
+        # Run workers concurrently
+        with ThreadPoolExecutor(max_workers=6) as executor:
+            futures = [
+                executor.submit(clear_worker),
+                executor.submit(set_worker, 0),
+                executor.submit(set_worker, 1),
+                executor.submit(set_worker, 2),
+                executor.submit(get_worker),
+            ]
+
+            # Wait for all workers to complete
+            for future in futures:
+                future.result(timeout=30)  # 30 second timeout
+
+        # Check that no RuntimeError or other errors occurred
+        runtime_errors = [
+            error
+            for error in errors
+            if "RuntimeError" in error or "dictionary changed size" in error
+        ]
+        assert (
+            len(runtime_errors) == 0
+        ), f"RuntimeError(s) occurred during concurrent operations: {runtime_errors}"
+
+        # Check that no other errors occurred
+        assert (
+            len(errors) == 0
+        ), f"Errors occurred during concurrent operations: {errors}"
+
+        # Verify that operations completed (some may have been cleared)
+        clear_count = sum(1 for op in operations_completed if op == "clear")
+        set_count = sum(1 for op in operations_completed if op == "set")
+        get_count = sum(1 for op in operations_completed if op == "get")
+
+        assert clear_count > 0, "Clear operations should have completed"
+        assert set_count > 0, "Set operations should have completed"
+        assert get_count > 0, "Get operations should have completed"
+
+        # Final verification that cache is in a consistent state
+        # (We can't predict exact contents due to race conditions, but it should not crash)
+        try:
+            cache.clear()  # Final clear should work without error
+        except Exception as e:
+            assert False, f"Final clear operation failed: {e}"
+
 
 class TestCacheIntegration:
     """Integration tests for cache functionality."""

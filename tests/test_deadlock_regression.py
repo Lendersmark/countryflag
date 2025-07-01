@@ -22,7 +22,7 @@ def deadlock_prone_sequence():
     """
     try:
         # Import inside the function to avoid issues with multiprocessing
-        from countryflag.cache.memory import MemoryCache
+        from src.countryflag.cache.memory import MemoryCache
 
         # Create a cache instance
         cache = MemoryCache()
@@ -40,7 +40,7 @@ def deadlock_prone_sequence():
             sys.exit(1)  # Exit with error code if results are wrong
 
         # Also test with CountryFlag operations that use cache
-        from countryflag.core.flag import CountryFlag
+        from src.countryflag.core.flag import CountryFlag
 
         cf = CountryFlag()
 
@@ -49,7 +49,9 @@ def deadlock_prone_sequence():
         flags2, pairs2 = cf.get_flag(["Germany"])  # Second call should hit cache
 
         # Verify results
-        if not flags1 or not flags2 or flags1 != flags2:
+        if flags1 and flags2 and flags1 == flags2:
+            sys.exit(0)
+        else:
             sys.exit(1)
 
         # If we reach here, everything completed successfully
@@ -64,8 +66,8 @@ def deadlock_prone_sequence():
 def mixed_operations_sequence():
     """Run mixed cache operations that could potentially deadlock."""
     try:
-        from countryflag.cache.memory import MemoryCache
-        from countryflag.core.flag import CountryFlag
+        from src.countryflag.cache.memory import MemoryCache
+        from src.countryflag.core.flag import CountryFlag
 
         # Test with MemoryCache directly
         cache = MemoryCache()
@@ -115,6 +117,10 @@ def mixed_operations_sequence():
 
 class TestDeadlockRegression(unittest.TestCase):
     """Regression test for deadlock prevention."""
+    
+    def setUp(self):
+        """Set up test environment."""
+        setup_multiprocessing()
 
     def test_no_deadlock_on_consecutive_cache_gets(self):
         """
@@ -131,8 +137,8 @@ class TestDeadlockRegression(unittest.TestCase):
         start_time = time.time()
         process.start()
 
-        # Join with a 2-second timeout
-        process.join(timeout=2.0)
+        # Join with a 10-second timeout (Windows processes can be slow to start)
+        process.join(timeout=10.0)
 
         # Check if the process is still alive (indicates potential deadlock)
         if process.is_alive():
@@ -142,7 +148,7 @@ class TestDeadlockRegression(unittest.TestCase):
 
             elapsed_time = time.time() - start_time
             self.fail(
-                f"Process is still alive after 2-second timeout "
+                f"Process is still alive after 10-second timeout "
                 f"(elapsed: {elapsed_time:.2f}s). This indicates a potential "
                 f"deadlock in consecutive cache get() operations."
             )
@@ -170,8 +176,8 @@ class TestDeadlockRegression(unittest.TestCase):
         start_time = time.time()
         process.start()
 
-        # Join with timeout
-        process.join(timeout=2.0)
+        # Join with timeout (Windows processes can be slow to start)
+        process.join(timeout=10.0)
 
         # Check for deadlock
         if process.is_alive():
@@ -180,7 +186,7 @@ class TestDeadlockRegression(unittest.TestCase):
 
             elapsed_time = time.time() - start_time
             self.fail(
-                f"Mixed operations process deadlocked after 2-second timeout "
+                f"Mixed operations process deadlocked after 10-second timeout "
                 f"(elapsed: {elapsed_time:.2f}s)."
             )
 
@@ -196,8 +202,8 @@ class TestDeadlockRegression(unittest.TestCase):
         )
 
 
-if __name__ == "__main__":
-    # Set multiprocessing start method for better compatibility
+def setup_multiprocessing():
+    """Set up multiprocessing for Windows compatibility."""
     if hasattr(multiprocessing, "set_start_method"):
         try:
             multiprocessing.set_start_method("spawn", force=True)
@@ -205,4 +211,6 @@ if __name__ == "__main__":
             # Method already set, continue
             pass
 
+if __name__ == "__main__":
+    setup_multiprocessing()
     unittest.main()

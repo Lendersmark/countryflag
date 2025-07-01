@@ -723,7 +723,7 @@ def test_cli_help_and_version_options(option, expected_content):
     "options,country",
     [
         ("--format json", "US"),
-        ("--separator '|'", "US"),
+        ("--separator ,", "US"),
         ("--format csv --separator ';'", "US"),
         ("--fuzzy --threshold 0.8", "USA"),  # Test fuzzy matching
         ("--verbose --format json", "GB"),
@@ -803,6 +803,73 @@ def test_cli_windows_platform_specific():
 
     # Should handle Unicode properly
     assert "🇺🇸" in result.stdout, f"Expected US flag in Windows output: {result.stdout}"
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows-specific test")
+def test_cli_windows_cache_dir_with_spaces_and_quotes():
+    """Test Windows path handling with spaces and quotes in cache-dir.
+
+    This test verifies the robustness requirement for cache-dir paths.
+    """
+    import tempfile
+    import shutil
+
+    # Create a temporary directory with spaces in the name
+    with tempfile.TemporaryDirectory() as base_temp_dir:
+        # Create a subdirectory with spaces
+        cache_dir_with_spaces = os.path.join(base_temp_dir, "my cache dir")
+        os.makedirs(cache_dir_with_spaces, exist_ok=True)
+
+        # Test 1: Without quotes (should work due to our preprocessing)
+        result = shell(
+            f"python -m countryflag --cache --cache-dir {cache_dir_with_spaces} US"
+        )
+        assert (
+            result.exit_code == 0
+        ), f"Cache dir without quotes failed: {result.stderr}"
+        assert "🇺🇸" in result.stdout, "Should work with cache dir containing spaces"
+
+        # Test 2: With double quotes
+        result = shell(
+            f'python -m countryflag --cache --cache-dir "{cache_dir_with_spaces}" US'
+        )
+        assert (
+            result.exit_code == 0
+        ), f"Cache dir with double quotes failed: {result.stderr}"
+        assert "🇺🇸" in result.stdout, "Should work with quoted cache dir"
+
+        # Test 3: With single quotes (use proper Windows cmd escaping)
+        # On Windows cmd, single quotes don't work the same as double quotes
+        # So we'll test with double quotes in cmd /c context
+        escaped_path = cache_dir_with_spaces.replace("\\", "\\\\")
+        result = shell(f'python -m countryflag --cache --cache-dir "{escaped_path}" US')
+        assert (
+            result.exit_code == 0
+        ), f"Cache dir with escaped quotes failed: {result.stderr}"
+        assert "🇺🇸" in result.stdout, "Should work with properly escaped cache dir"
+
+        # Test 4: Test that tilde expansion works
+        # Create a test directory in the user's home directory
+        user_home = os.path.expanduser("~")
+        home_cache_dir = os.path.join(user_home, "temp_countryflag_test")
+
+        try:
+            # Use tilde notation
+            result = shell(
+                "python -m countryflag --cache --cache-dir '~/temp_countryflag_test' US"
+            )
+            assert result.exit_code == 0, f"Tilde expansion failed: {result.stderr}"
+            assert "🇺🇸" in result.stdout, "Should work with tilde expansion"
+
+            # Verify the directory was actually created
+            assert os.path.exists(
+                home_cache_dir
+            ), "Cache directory should be created with tilde expansion"
+
+        finally:
+            # Clean up the test directory
+            if os.path.exists(home_cache_dir):
+                shutil.rmtree(home_cache_dir, ignore_errors=True)
 
 
 @pytest.mark.skipif(os.name == "nt", reason="POSIX-specific test")
@@ -986,9 +1053,9 @@ def test_cli_flag_size_scaling_tests():
     ), "CSV should have appropriate headers"
 
     # Test with custom separator
-    result = shell('python -m countryflag --separator "|" US FR DE')
+    result = shell('python -m countryflag --separator "; " US FR DE')
     assert result.exit_code == 0, f"Custom separator failed: {result.stderr}"
-    assert "|" in result.stdout, "Custom separator should appear in output"
+    assert "; " in result.stdout, "Custom separator should appear in output"
 
 
 def test_cli_list_countries_functionality():
@@ -1047,12 +1114,12 @@ def test_cli_validate_functionality():
     Test --validate with valid and invalid country names.
     """
     # Test valid country name (use ISO code which is more reliable)
-    result = shell("python -m countryflag --validate 'US'")
+    result = shell('python -m countryflag --validate "US"')
     assert result.exit_code == 0, f"Valid country validation failed: {result.stderr}"
     assert "is a valid country name" in result.stdout, "Should confirm valid country"
 
     # Test another valid country name
-    result = shell("python -m countryflag --validate 'Germany'")
+    result = shell('python -m countryflag --validate "Germany"')
     assert result.exit_code == 0, f"Valid country validation failed: {result.stderr}"
     assert "is a valid country name" in result.stdout, "Should confirm valid country"
 
@@ -1089,7 +1156,7 @@ def test_cli_cache_options():
     import tempfile
 
     with tempfile.TemporaryDirectory() as temp_dir:
-        result = shell(f"python -m countryflag --cache --cache-dir '{temp_dir}' US")
+        result = shell(f'python -m countryflag --cache --cache-dir "{temp_dir}" US')
         assert result.exit_code == 0, f"Cache directory option failed: {result.stderr}"
         assert "🇺🇸" in result.stdout, "Should work with cache directory"
 

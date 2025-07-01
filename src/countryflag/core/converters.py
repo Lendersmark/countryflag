@@ -52,15 +52,29 @@ class CountryConverterSingleton:
         """
         if cls.__instance is None:
             cls.__instance = super().__new__(cls)
-            cls.__instance._converter = coco.CountryConverter()
+            # Initialize attributes but don't load data yet (lazy initialization)
+            cls.__instance._converter = None
             cls.__instance._cache: Dict[str, Any] = {}
             cls.__instance._fuzzy_cache: Dict[str, List[Tuple[str, str]]] = {}
             cls.__instance._reverse_cache: Dict[str, str] = {}
             cls.__instance._region_cache: Dict[str, List[CountryInfo]] = {}
+            cls.__instance._region_data = None
 
-            # Add region data using available columns from country_converter
+        return cls.__instance
+
+    def _ensure_initialized(self) -> None:
+        """
+        Ensure the converter and region data are initialized (lazy initialization).
+        
+        This method prevents deadlocks in multiprocessing scenarios by only
+        initializing the converter when actually needed.
+        """
+        if self._converter is None:
+            self._converter = coco.CountryConverter()
+            
+            # Initialize region data
             try:
-                cls.__instance._region_data = cls.__instance._converter.data[
+                self._region_data = self._converter.data[
                     [
                         "ISO2",
                         "ISO3",
@@ -73,22 +87,20 @@ class CountryConverterSingleton:
             except KeyError:
                 # If some columns are not available, use what we have
                 available_cols = ["ISO2", "ISO3", "name_short", "name_official"]
-                if "continent" in cls.__instance._converter.data.columns:
+                if "continent" in self._converter.data.columns:
                     available_cols.append("continent")
-                if "UNregion" in cls.__instance._converter.data.columns:
+                if "UNregion" in self._converter.data.columns:
                     available_cols.append("UNregion")
 
-                cls.__instance._region_data = cls.__instance._converter.data[
+                self._region_data = self._converter.data[
                     available_cols
                 ].copy()
 
                 # Add missing columns with empty values if needed
-                if "continent" not in cls.__instance._region_data.columns:
-                    cls.__instance._region_data["continent"] = ""
-                if "UNregion" not in cls.__instance._region_data.columns:
-                    cls.__instance._region_data["UNregion"] = ""
-
-        return cls.__instance
+                if "continent" not in self._region_data.columns:
+                    self._region_data["continent"] = ""
+                if "UNregion" not in self._region_data.columns:
+                    self._region_data["UNregion"] = ""
 
     @property
     def data(self) -> pd.DataFrame:
@@ -98,6 +110,7 @@ class CountryConverterSingleton:
         Returns:
             pandas.DataFrame: The data frame containing country information.
         """
+        self._ensure_initialized()
         return self._converter.data
 
     @property
@@ -108,6 +121,7 @@ class CountryConverterSingleton:
         Returns:
             pandas.DataFrame: The data frame containing country region information.
         """
+        self._ensure_initialized()
         return self._region_data
 
     @lru_cache(maxsize=1024)
@@ -157,7 +171,7 @@ class CountryConverterSingleton:
             'United Kingdom'
         """
         if "iso2_mapping" not in self._cache:
-
+            self._ensure_initialized()
             result = {}
             for _, row in self.data.iterrows():
                 country_name = row["name_short"]
@@ -227,6 +241,7 @@ class CountryConverterSingleton:
                 raise RegionError(f"Unsupported region: {region}", region)
 
             # Filter countries by continent (region)
+            self._ensure_initialized()
             for _, row in self.region_data.iterrows():
                 if (
                     row["ISO2"] != "not found"
@@ -271,6 +286,7 @@ class CountryConverterSingleton:
             'United Kingdom'
         """
         if not self._reverse_cache:
+            self._ensure_initialized()
             # Use the enhanced mapping that handles regex patterns and edge cases
             self._reverse_cache = create_enhanced_flag_mapping(self.data)
             logger.debug(
@@ -302,6 +318,7 @@ class CountryConverterSingleton:
             return self._fuzzy_cache[cache_key]
 
         # Get all country names
+        self._ensure_initialized()
         country_names = []
         for _, row in self.data.iterrows():
             if row["ISO2"] != "not found":
