@@ -95,9 +95,7 @@ def _merge_country_tokens(tokens: List[str], cf: CountryFlag) -> List[str]:
     while i < n:
         found_match = False
         # Try longest slice first, but limit to reasonable boundaries
-        for j in range(
-            min(n, i + 6), i, -1
-        ):  # Max 6 tokens for very long country names
+        for j in range(min(n, i + 6), i, -1):  # Max 6 tokens for very long country names
             candidate = " ".join(tokens[i:j])
             candidate_lower = candidate.lower()
 
@@ -222,13 +220,20 @@ async def run_async_main(args: argparse.Namespace) -> None:
         country_names = []
         if args.file:
             # Use async file processing for larger files
-            country_names = await process_file_input_async(args.file)
+            country_names = await process_file_input_async(
+                args.file
+            )
         elif args.files:
             # Use parallel processing for multiple files
-            country_names = process_multiple_files(args.files, max_workers=args.workers)
+            country_names = process_multiple_files(
+                args.files, max_workers=args.workers
+            )
         elif args.countries:
-            country_names = _merge_country_tokens(args.countries, country_flag)
-        # Note: positional arguments are not used in async mode as they are handled in preprocessing
+            country_names = _merge_country_tokens(
+                args.countries, country_flag
+            )
+        # Note: positional arguments are not used in async mode as they are
+        # handled in preprocessing
 
         # Handle region-based lookup
         if args.region:
@@ -373,7 +378,8 @@ def preprocess_args(args: List[str]) -> Tuple[List[str], List[str]]:
         else:
             # This is a positional argument
             if has_mutually_exclusive_flag:
-                # Ignore positional args when mutually exclusive flags are present (backwards compatibility)
+                # Ignore positional args when mutually exclusive flags are
+                # present (backwards compatibility)
                 pass
             else:
                 # Keep positional args when no mutually exclusive flags are present
@@ -396,7 +402,10 @@ def main() -> None:
 
     # Parse arguments
     parser = argparse.ArgumentParser(
-        description="Countryflag: a Python package for converting country names into emoji flags.",
+        description=(
+            "Countryflag: a Python package for converting country names into "
+            "emoji flags."
+        ),
         epilog="""Examples:
   countryflag italy france spain                    # Positional arguments
   countryflag --countries italy france spain       # Named arguments
@@ -448,7 +457,8 @@ Both positional and named argument forms are equivalent.""",
         help="Run in interactive mode with autocompletion",
     )
 
-    # Note: Positional arguments are handled via preprocessing to maintain backwards compatibility
+    # Note: Positional arguments are handled via preprocessing to maintain
+    # backwards compatibility
 
     # Output options
     parser.add_argument(
@@ -646,11 +656,18 @@ Both positional and named argument forms are equivalent.""",
             country_names = process_multiple_files(args.files, max_workers=args.workers)
         elif args.countries:
             country_names = _merge_country_tokens(args.countries, country_flag)
-        elif extracted_positional and not any(
-            [args.file, args.files, args.reverse, args.region, args.interactive]
-        ):
-            # Treat positional countries same as --countries when no other input source is specified
-            country_names = _merge_country_tokens(extracted_positional, country_flag)
+        elif extracted_positional and not any([
+            args.file,
+            args.files,
+            args.reverse,
+            args.region,
+            args.interactive,
+        ]):
+            # Treat positional countries same as --countries when no other
+            # input source is specified
+            country_names = _merge_country_tokens(
+                extracted_positional, country_flag
+            )
 
         # Handle region-based lookup
         if args.region:
@@ -764,40 +781,34 @@ Both positional and named argument forms are equivalent.""",
                 sys.exit(1)
         else:
             # No input provided - show helpful message and examples
+            print("CountryFlag: Convert country names to emoji flags\n")
+            print("Usage examples:")
             print(
-                "CountryFlag: Convert country names to emoji flags\n", file=sys.stderr
-            )
-            print("Usage examples:", file=sys.stderr)
-            print(
-                "  countryflag italy france spain                    # Convert countries to flags",
-                file=sys.stderr,
+                "  countryflag italy france spain                    "
+                "# Convert countries to flags"
             )
             print(
-                "  countryflag --countries italy france spain       # Same as above",
-                file=sys.stderr,
+                "  countryflag --countries italy france spain       "
+                "# Same as above"
             )
             print(
-                "  countryflag --reverse 🇮🇹 🇫🇷 🇪🇸              # Convert flags to countries",
-                file=sys.stderr,
+                "  countryflag --reverse 🇮🇹 🇫🇷 🇪🇸              "
+                "# Convert flags to countries"
             )
             print(
-                "  countryflag --region Europe                       # Get all European flags",
-                file=sys.stderr,
+                "  countryflag --region Europe                       "
+                "# Get all European flags"
             )
             print(
-                "  countryflag --interactive                         # Interactive mode",
-                file=sys.stderr,
+                "  countryflag --interactive                         # Interactive mode"
             )
             print(
-                "  countryflag --list-countries                      # List all supported countries",
-                file=sys.stderr,
+                "  countryflag --list-countries                      "
+                "# List all supported countries"
             )
-            print(
-                "  countryflag --help                               # Show full help",
-                file=sys.stderr,
-            )
-            print("\nFor more options, use: countryflag --help", file=sys.stderr)
-            sys.exit(1)
+            print("  countryflag --help                               # Show full help")
+            print("\nFor more options, use: countryflag --help")
+            sys.exit(0)
 
     except InvalidCountryError as ice:
         print(f"Error: {str(ice)}", file=sys.stderr)

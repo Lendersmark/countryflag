@@ -31,7 +31,8 @@ class TestUnicodeRegionalIndicators:
         print(f"Input code: {code}")
         print(f"Code characters: {[c for c in code]}")
         print(
-            f"ASCII chars in code: {[c for c in code.lower() if c in 'abcdefghijklmnopqrstuvwxyz0123456789']}"
+            f"ASCII chars in code: "
+            f"{[c for c in code.lower() if c in 'abcdefghijklmnopqrstuvwxyz0123456789']}"
         )
 
         # The flag library filters non-ASCII characters
@@ -47,7 +48,8 @@ class TestUnicodeRegionalIndicators:
             # Analyze the Unicode structure
             for i, char in enumerate(result):
                 print(
-                    f"Character {i}: {char} (U+{ord(char):04X}) - {unicodedata.name(char, 'UNKNOWN')}"
+                    f"Character {i}: {char} (U+{ord(char):04X}) - "
+                    f"{unicodedata.name(char, 'UNKNOWN')}"
                 )
 
             # This should not happen with current behavior
@@ -55,7 +57,7 @@ class TestUnicodeRegionalIndicators:
                 False
             ), "Expected UnknownCountryCode exception for filtered input 'ÅL' -> 'L'"
 
-        except flag.UnknownCountryCode as e:
+        except ValueError as e:
             print(f"Expected exception caught: {e}")
             # This is the expected behavior - non-ASCII chars are filtered
             # leaving only "L" which is not a valid country code
@@ -64,8 +66,8 @@ class TestUnicodeRegionalIndicators:
             ), "Exception should mention the filtered character"
             print("✓ Correctly handled non-ASCII character filtering edge case")
 
-        # Now test a case that should work: "ÅLand" -> "land" -> tag sequence (but too short)
-        # Or better: "ÅUS" -> "US" -> valid regional indicator
+        # Now test a case that should work: "ÅLand" -> "land" -> tag sequence
+        # (but too short) Or better: "ÅUS" -> "US" -> valid regional indicator
         code2 = "ÅUS"
         print(f"\nTesting another case: {code2}")
 
@@ -151,7 +153,8 @@ class TestUnicodeRegionalIndicators:
                     for i, char in enumerate(flags):
                         if char != " ":  # Skip separators
                             print(
-                                f"Flag char {i}: {char} (U+{ord(char):04X}) - {unicodedata.name(char, 'UNKNOWN')}"
+                                f"Flag char {i}: {char} (U+{ord(char):04X}) - "
+                                f"{unicodedata.name(char, 'UNKNOWN')}"
                             )
 
             except Exception as e:
@@ -216,7 +219,7 @@ class TestUnicodeRegionalIndicators:
             (
                 "Ü$",
                 "U",
-            ),  # Ü and $ should be removed, leaving U (but this is invalid as single char)
+            ),  # Ü and $ should be removed, leaving U (invalid as single char)
             ("FÖ", "FO"),  # Ö should be removed, leaving FO (Faroe Islands might work)
             ("A#B", "AB"),  # # should be removed, leaving AB
             ("123", "123"),  # Numbers should be preserved
