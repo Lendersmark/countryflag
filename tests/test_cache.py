@@ -708,7 +708,7 @@ class TestConcurrency:
         try:
             cache.clear()  # Final clear should work without error
         except Exception as e:
-            assert False, f"Final clear operation failed: {e}"
+            raise AssertionError(f"Final clear operation failed: {e}")
 
 
 class TestCacheIntegration:
