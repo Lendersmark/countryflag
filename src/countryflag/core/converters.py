@@ -65,13 +65,13 @@ class CountryConverterSingleton:
     def _ensure_initialized(self) -> None:
         """
         Ensure the converter and region data are initialized (lazy initialization).
-        
+
         This method prevents deadlocks in multiprocessing scenarios by only
         initializing the converter when actually needed.
         """
         if self._converter is None:
             self._converter = coco.CountryConverter()
-            
+
             # Initialize region data
             try:
                 self._region_data = self._converter.data[
@@ -92,9 +92,7 @@ class CountryConverterSingleton:
                 if "UNregion" in self._converter.data.columns:
                     available_cols.append("UNregion")
 
-                self._region_data = self._converter.data[
-                    available_cols
-                ].copy()
+                self._region_data = self._converter.data[available_cols].copy()
 
                 # Add missing columns with empty values if needed
                 if "continent" not in self._region_data.columns:

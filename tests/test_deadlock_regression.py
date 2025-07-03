@@ -117,7 +117,7 @@ def mixed_operations_sequence():
 
 class TestDeadlockRegression(unittest.TestCase):
     """Regression test for deadlock prevention."""
-    
+
     def setUp(self):
         """Set up test environment."""
         setup_multiprocessing()
@@ -210,6 +210,7 @@ def setup_multiprocessing():
         except RuntimeError:
             # Method already set, continue
             pass
+
 
 if __name__ == "__main__":
     setup_multiprocessing()

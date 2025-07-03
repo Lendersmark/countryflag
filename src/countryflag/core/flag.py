@@ -85,17 +85,17 @@ class CountryFlag:
     def _get_global_cache(cls) -> MemoryCache:
         """
         Get or create the global cache instance (lazy initialization).
-        
+
         This method ensures thread-safe lazy initialization of the global cache
         to prevent deadlocks in multiprocessing scenarios.
-        
+
         Returns:
             MemoryCache: The global cache instance.
         """
         if cls._global_cache is None:
             cls._global_cache = MemoryCache()
         return cls._global_cache
-    
+
     @classmethod
     def clear_global_cache(cls) -> None:
         """

@@ -53,16 +53,18 @@ class TestUnicodeRegionalIndicators:
                 )
 
             # This should not happen with current behavior
-            assert (
-                False
-            ), "Expected UnknownCountryCode exception for filtered input 'ÅL' -> 'L'"
+            raise AssertionError(
+                "Expected UnknownCountryCode exception for filtered input 'ÅL' -> 'L'"
+            )
 
         except ValueError as e:
             print(f"Expected exception caught: {e}")
             # This is the expected behavior - non-ASCII chars are filtered
             # leaving only "L" which is not a valid country code
             msg = str(e)
-            assert "in 'ÅL'" in msg and "l" in msg, "Exception should mention the filtered character"
+            assert (
+                "in 'ÅL'" in msg and "l" in msg
+            ), "Exception should mention the filtered character"
             print("✓ Correctly handled non-ASCII character filtering edge case")
 
         # Now test a case that should work: "ÅLand" -> "land" -> tag sequence

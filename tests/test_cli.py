@@ -811,8 +811,8 @@ def test_cli_windows_cache_dir_with_spaces_and_quotes():
 
     This test verifies the robustness requirement for cache-dir paths.
     """
-    import tempfile
     import shutil
+    import tempfile
 
     # Create a temporary directory with spaces in the name
     with tempfile.TemporaryDirectory() as base_temp_dir:

@@ -5,14 +5,15 @@ This demonstrates how to integrate the timing logic into performance tests,
 following the same pattern as test_memory_cache_with_large_dataset.
 """
 
-import time
-import sys
 import os
+import sys
+import time
+
 from platform_timing_logic import (
-    get_timing_threshold,
-    should_skip_timing_assertion,
     evaluate_timing_performance,
     get_platform_info,
+    get_timing_threshold,
+    should_skip_timing_assertion,
 )
 
 

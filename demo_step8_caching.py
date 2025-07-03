@@ -9,9 +9,10 @@ This script demonstrates that:
 4. Cache hit counter increments to verify memoisation
 """
 
+from unittest.mock import patch
+
 from countryflag import getflag
 from countryflag.core.flag import CountryFlag
-from unittest.mock import patch
 
 
 def main():

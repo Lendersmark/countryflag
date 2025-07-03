@@ -7,14 +7,14 @@ global cache when no explicit cache is provided, while instances with
 explicit cache parameters use their own cache.
 """
 
-import sys
 import os
+import sys
 
 # Add the src directory to Python path for local testing
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
 
-from countryflag.core.flag import CountryFlag
 from countryflag.cache.memory import MemoryCache
+from countryflag.core.flag import CountryFlag
 
 
 def main():
