@@ -45,7 +45,7 @@ countryflag/
 ### Key Files
 - `platform_timing_logic.py` - Core timing logic implementation
 - `tests/stress/test_large_datasets.py` - Uses conditional timing assertions
-- `example_timing_test.py` - Demonstrates timing logic usage
+|- `examples/example_timing_test.py` - Demonstrates timing logic usage
 - `README_TIMING_LOGIC.md` - Comprehensive documentation
 
 ## CI/CD Configuration
@@ -138,7 +138,7 @@ FAST_MACHINE=1 pytest tests/stress/
 
 # Test platform timing logic
 python platform_timing_logic.py
-python example_timing_test.py
+python examples/example_timing_test.py
 ```
 
 ## Environment Variables
@@ -149,6 +149,14 @@ python example_timing_test.py
 - **Runtime**: emoji-country-flag, country_converter, typeguard, prompt_toolkit, aioconsole
 - **Development**: black, isort, mypy, pytest, pytest-cov, tox, sphinx, flake8 + extensions
 - **Testing**: pytest-benchmark, hypothesis, psutil, cli_test_helpers
+
+## Demo File Cleanup (June 2025)
+
+### Retention/Deletion Decisions
+- **KEEP**: `demo_cache_sharing.py` - Useful cache-sharing demonstration
+- **KEEP**: `example_timing_test.py` - Timing-logic demonstration and reference
+
+*Rationale: Keep educational demos that demonstrate specific features, remove development scaffolding that has been superseded by proper test coverage.*
 
 ## Notes for Future Development
 - All tests must pass on Windows, Linux, and macOS
