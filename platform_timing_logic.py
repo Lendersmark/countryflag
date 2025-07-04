@@ -5,9 +5,9 @@ This module provides utilities for setting timing thresholds based on the operat
 system and machine capabilities, mimicking the logic used in test_memory_cache_with_large_dataset.
 """
 
-import sys
 import os
-from typing import Tuple, Optional
+import sys
+from typing import Optional, Tuple
 
 
 def get_timing_threshold() -> float:

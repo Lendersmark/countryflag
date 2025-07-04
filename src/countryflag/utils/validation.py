@@ -121,6 +121,10 @@ def runtime_typechecked(func: Callable[..., T]) -> Callable[..., T]:
 
     @functools.wraps(func)
     def wrapper(*args: Any, **kwargs: Any) -> T:
-        return typeguard.typechecked(func)(*args, **kwargs)
+        try:
+            return typeguard.typechecked(func)(*args, **kwargs)
+        except typeguard.TypeCheckError as e:
+            # Convert TypeCheckError to TypeError for consistency
+            raise TypeError(str(e)) from e
 
     return wrapper

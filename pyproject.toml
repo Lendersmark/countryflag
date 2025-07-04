@@ -57,6 +57,7 @@ test = [
     "hypothesis",
     "psutil",
     "cli_test_helpers",
+    "freezegun",
 ]
 docs = [
     "sphinx",

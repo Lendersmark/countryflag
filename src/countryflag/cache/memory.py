@@ -26,7 +26,7 @@ class MemoryCache(Cache):
         """
         self._cache: Dict[str, Any] = {}
         self._hits = 0  # Initialize hit counter
-        self._lock = threading.Lock()  # Add a lock
+        self._lock = threading.RLock()  # Add a lock
 
     def get(self, key: str) -> Optional[Any]:
         """
