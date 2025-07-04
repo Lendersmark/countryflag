@@ -28,7 +28,9 @@ def main():
 
     print(f"   cf1._cache is cf2._cache: {cf1._cache is cf2._cache}")
     print(f"   Both use global cache: {cf1._cache is CountryFlag._global_cache}")
-    print(f"   Initial global cache hits: {cast(MemoryCache, CountryFlag._global_cache).get_hits()}")
+    print(
+        f"   Initial global cache hits: {cast(MemoryCache, CountryFlag._global_cache).get_hits()}"
+    )
     print()
 
     print("2. Using cf1 to get flag for Germany:")
@@ -63,7 +65,9 @@ def main():
     flags3, pairs3 = cf3.get_flag(["Germany"])
     print(f"   Result: {flags3}")
     print(f"   Custom cache hits after cf3 call: {custom_cache.get_hits()}")
-    print(f"   Global cache hits (unchanged): {cast(MemoryCache, CountryFlag._global_cache).get_hits()}")
+    print(
+        f"   Global cache hits (unchanged): {cast(MemoryCache, CountryFlag._global_cache).get_hits()}"
+    )
     print()
 
     print("6. Testing cache persistence across instance creation:")
@@ -90,14 +94,20 @@ def main():
     print()
 
     print("7. Demonstrating clear_global_cache method:")
-    print(f"   Global cache hits before clear: {cast(MemoryCache, CountryFlag._global_cache).get_hits()}")
+    print(
+        f"   Global cache hits before clear: {cast(MemoryCache, CountryFlag._global_cache).get_hits()}"
+    )
     CountryFlag.clear_global_cache()
-    print(f"   Global cache hits after clear: {cast(MemoryCache, CountryFlag._global_cache).get_hits()}")
+    print(
+        f"   Global cache hits after clear: {cast(MemoryCache, CountryFlag._global_cache).get_hits()}"
+    )
 
     # Request again - should rebuild cache
     flags5, pairs5 = cf4.get_flag(["Germany"])
     print(f"   cf4 result after cache clear: {flags5}")
-    print(f"   Global cache hits after rebuild: {cast(MemoryCache, CountryFlag._global_cache).get_hits()}")
+    print(
+        f"   Global cache hits after rebuild: {cast(MemoryCache, CountryFlag._global_cache).get_hits()}"
+    )
     print()
 
     print("=== Demo Complete ===")

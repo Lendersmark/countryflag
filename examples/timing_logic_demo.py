@@ -51,7 +51,9 @@ def main():
     # Verify results
     print("\nVerification:")
     print(f"- Results identical: {flags1 == flags2 and pairs1 == pairs2}")
-    print(f"- Second call was served from cache: {cast(MemoryCache, cf._cache).get_hits() > 0}")
+    print(
+        f"- Second call was served from cache: {cast(MemoryCache, cf._cache).get_hits() > 0}"
+    )
 
     print("\n" + "=" * 80)
     print("2. Testing with getflag() convenience function:")
@@ -60,13 +62,17 @@ def main():
     # Clear cache again
     CountryFlag.clear_global_cache()
 
-    print(f"Initial global cache hits: {cast(MemoryCache, CountryFlag._global_cache).get_hits()}")
+    print(
+        f"Initial global cache hits: {cast(MemoryCache, CountryFlag._global_cache).get_hits()}"
+    )
 
     # FIRST CALL using convenience function
     print("\nFIRST CALL: getflag('FR')")
     result1 = getflag("FR")
     print(f"Result: '{result1}'")
-    print(f"Global cache hits after first call: {cast(MemoryCache, CountryFlag._global_cache).get_hits()}")
+    print(
+        f"Global cache hits after first call: {cast(MemoryCache, CountryFlag._global_cache).get_hits()}"
+    )
 
     # SECOND CALL using convenience function
     print("\nSECOND CALL: getflag('FR')")
