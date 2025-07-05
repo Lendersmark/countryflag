@@ -7,37 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.1] - 2025-07-05
 
-### Added / Improved
+### Added
 - Enhanced error handling and ASCII art support
-- Improved CLI error handling and stdout/stderr separation
+- Improved CLI error handling with stdout/stderr separation
 - Documentation reorganization with MkDocs
 - Examples restructuring and cleanup
 - Python 3.9 compatibility improvements
+- Enhanced version management and consistency across project files
+
+### Changed
+- Codebase reformatted with black and isort
+- Version bumped from 1.0.1 to 1.1.1 across all project files
+- Updated documentation and examples with current version
 
 ### Fixed
 - TTL cache deadlock resolved with RLock
-- Windows compatibility issues fixed
-- Test suite reliability; coverage raised
+- Windows compatibility issues
+- Test suite reliability and coverage improvements
+- Consistent version numbering across configuration files
 - Various bug fixes and CI improvements
-
-### Changed
-- Codebase reformatted (black, isort) and lint issues resolved
-
-## [1.1.1] - 2025-01-08
-
-### Added
-- Enhanced version management and consistency across project files
-- Improved build system configuration
-- Updated documentation with version-specific references
-
-### Changed
-- Version bumped from 1.0.1 to 1.1.1 across all project files
-- Updated pyproject.toml, setup.py, setup.cfg, and __init__.py versions
-- Refreshed documentation and examples with current version
-
-### Fixed
-- Consistent version numbering across all project configuration files
-- Updated Docker and deployment configurations
 
 ## [1.0.1] - YYYY-MM-DD
 
