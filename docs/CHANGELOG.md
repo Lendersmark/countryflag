@@ -5,7 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.0] - 2025-01-08
+## [1.1.1] - 2025-07-05
+
+### Added / Improved
+- Enhanced error handling and ASCII art support
+- Improved CLI error handling and stdout/stderr separation
+- Documentation reorganization with MkDocs
+- Examples restructuring and cleanup
+- Python 3.9 compatibility improvements
+
+### Fixed
+- TTL cache deadlock resolved with RLock
+- Windows compatibility issues fixed
+- Test suite reliability; coverage raised
+- Various bug fixes and CI improvements
+
+### Changed
+- Codebase reformatted (black, isort) and lint issues resolved
+
+## [1.1.1] - 2025-01-08
 
 ### Added
 - Enhanced version management and consistency across project files
@@ -13,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated documentation with version-specific references
 
 ### Changed
-- Version bumped from 1.0.1 to 1.1.0 across all project files
+- Version bumped from 1.0.1 to 1.1.1 across all project files
 - Updated pyproject.toml, setup.py, setup.cfg, and __init__.py versions
 - Refreshed documentation and examples with current version
 
@@ -100,7 +118,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Simple command-line interface
 - Python API with `getflag()` function
 
-[1.1.0]: https://github.com/Lendersmark/countryflag/compare/v1.0.1...v1.1.0
+[1.1.1]: https://github.com/Lendersmark/countryflag/compare/v1.1.1...v1.1.1
+[1.1.1]: https://github.com/Lendersmark/countryflag/compare/v1.0.1...v1.1.1
 [1.0.1]: https://github.com/Lendersmark/countryflag/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/Lendersmark/countryflag/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/Lendersmark/countryflag/compare/v0.1.2b4...v0.2.0

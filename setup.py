@@ -23,7 +23,7 @@ def load_pyproject_metadata():
         # Basic fallback - return hardcoded values as a last resort
         return {
             "name": "countryflag",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "description": "A Python package for converting country names into emoji flags",
             "author": "Lendersmark",
             "author_email": "author@example.com",

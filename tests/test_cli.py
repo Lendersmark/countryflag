@@ -681,7 +681,7 @@ def test_cli_invalid_country_code():
     [
         ("--help", "usage:"),
         ("-h", "usage:"),
-        ("--version", "1.1.0"),
+        ("--version", "1.1.1"),
     ],
 )
 def test_cli_help_and_version_options(option, expected_content):

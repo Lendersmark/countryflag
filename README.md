@@ -164,7 +164,7 @@ CountryFlag includes automatic cache sharing for improved performance:
 from countryflag.core import CountryFlag
 from countryflag.cache import MemoryCache, DiskCache
 
-# Automatic cache sharing (new in v1.0.1, enhanced in v1.1.0)
+# Automatic cache sharing (new in v1.0.1, enhanced in v1.1.1)
 cf1 = CountryFlag()  # Uses global shared cache
 cf2 = CountryFlag()  # Shares same cache as cf1
 
