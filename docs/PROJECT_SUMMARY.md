@@ -20,7 +20,7 @@ Python library that converts country names to emoji flags (🇺🇸 🇩🇪 �
 
 ## Important Files Added/Modified
 - `platform_timing_logic.py` - Core timing logic
-- `example_timing_test.py` - Usage examples  
+|- `examples/example_timing_test.py` - Usage examples  
 - `README_TIMING_LOGIC.md` - Comprehensive docs
 - `windows_verification_results.md` - Testing verification
 - `tests/stress/test_large_datasets.py` - Updated with conditional timing
@@ -40,7 +40,7 @@ tox -e flake8,mypy
 tox -e docs
 
 # Platform timing test
-python example_timing_test.py
+python examples/example_timing_test.py
 ```
 
 ## For Next Session

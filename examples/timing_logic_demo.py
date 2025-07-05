@@ -1,21 +1,27 @@
 #!/usr/bin/env python3
 """
-Demo script for Step 8: Call get_flag("FR") twice; assert that the second call is served from an internal cache.
+Demo script showing caching/memoisation behavior.
 
 This script demonstrates that:
 1. The first call to get_flag("FR") populates the cache
 2. The second call to get_flag("FR") is served from the internal cache
 3. The underlying loader is not re-invoked on the second call
 4. Cache hit counter increments to verify memoisation
+
+To run this example from the repo root:
+    python examples/timing_logic_demo.py
 """
 
+from typing import cast
 from unittest.mock import patch
 
 from countryflag import getflag
+from countryflag.cache.memory import MemoryCache
 from countryflag.core.flag import CountryFlag
 
 
 def main():
+    """Demonstrate caching/memoisation behavior of CountryFlag."""
     print("=" * 80)
     print("STEP 8 DEMO: get_flag('FR') called twice - Caching/Memoisation Test")
     print("=" * 80)
@@ -28,24 +34,26 @@ def main():
 
     cf = CountryFlag()
 
-    print(f"Initial cache hits: {cf._cache.get_hits()}")
+    print(f"Initial cache hits: {cast(MemoryCache, cf._cache).get_hits()}")
 
     # FIRST CALL - populate cache
     print("\nFIRST CALL: cf.get_flag(['FR'])")
     flags1, pairs1 = cf.get_flag(["FR"])
     print(f"Result: flags='{flags1}', pairs={pairs1}")
-    print(f"Cache hits after first call: {cf._cache.get_hits()}")
+    print(f"Cache hits after first call: {cast(MemoryCache, cf._cache).get_hits()}")
 
     # SECOND CALL - should be served from cache
     print("\nSECOND CALL: cf.get_flag(['FR'])")
     flags2, pairs2 = cf.get_flag(["FR"])
     print(f"Result: flags='{flags2}', pairs={pairs2}")
-    print(f"Cache hits after second call: {cf._cache.get_hits()}")
+    print(f"Cache hits after second call: {cast(MemoryCache, cf._cache).get_hits()}")
 
     # Verify results
-    print(f"\nVerification:")
+    print("\nVerification:")
     print(f"- Results identical: {flags1 == flags2 and pairs1 == pairs2}")
-    print(f"- Second call was served from cache: {cf._cache.get_hits() > 0}")
+    print(
+        f"- Second call was served from cache: {cast(MemoryCache, cf._cache).get_hits() > 0}"
+    )
 
     print("\n" + "=" * 80)
     print("2. Testing with getflag() convenience function:")
@@ -54,27 +62,31 @@ def main():
     # Clear cache again
     CountryFlag.clear_global_cache()
 
-    print(f"Initial global cache hits: {CountryFlag._global_cache.get_hits()}")
+    print(
+        f"Initial global cache hits: {cast(MemoryCache, CountryFlag._global_cache).get_hits()}"
+    )
 
     # FIRST CALL using convenience function
     print("\nFIRST CALL: getflag('FR')")
     result1 = getflag("FR")
     print(f"Result: '{result1}'")
-    print(f"Global cache hits after first call: {CountryFlag._global_cache.get_hits()}")
+    print(
+        f"Global cache hits after first call: {cast(MemoryCache, CountryFlag._global_cache).get_hits()}"
+    )
 
     # SECOND CALL using convenience function
     print("\nSECOND CALL: getflag('FR')")
     result2 = getflag("FR")
     print(f"Result: '{result2}'")
     print(
-        f"Global cache hits after second call: {CountryFlag._global_cache.get_hits()}"
+        f"Global cache hits after second call: {cast(MemoryCache, CountryFlag._global_cache).get_hits()}"
     )
 
     # Verify results
-    print(f"\nVerification:")
+    print("\nVerification:")
     print(f"- Results identical: {result1 == result2}")
     print(
-        f"- Second call was served from cache: {CountryFlag._global_cache.get_hits() > 0}"
+        f"- Second call was served from cache: {cast(MemoryCache, CountryFlag._global_cache).get_hits() > 0}"
     )
 
     print("\n" + "=" * 80)
@@ -105,10 +117,10 @@ def main():
         print(f"Mock call count after second call: {mock_convert.call_count}")
 
         # Verify mock behavior
-        print(f"\nMock Verification:")
+        print("\nMock Verification:")
         print(f"- Converter called exactly once: {mock_convert.call_count == 1}")
         print(f"- Results identical: {flags1 == flags2 and pairs1 == pairs2}")
-        print(f"- Cache hit occurred: {cf._cache.get_hits() == 1}")
+        print(f"- Cache hit occurred: {cast(MemoryCache, cf._cache).get_hits() == 1}")
         print(
             f"- Underlying loader NOT re-invoked on second call: {mock_convert.call_count == 1}"
         )
