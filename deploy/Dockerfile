@@ -2,7 +2,7 @@ FROM python:3.9-slim
 
 LABEL maintainer="Countryflag Team <admin@countryflag.example.com>"
 LABEL description="Countryflag API service container"
-LABEL version="1.1.0"
+LABEL version="1.1.1"
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
