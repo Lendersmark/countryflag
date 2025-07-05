@@ -12,8 +12,8 @@ To run this example from the repo root:
     python examples/timing_logic_demo.py
 """
 
-from unittest.mock import patch
 from typing import cast
+from unittest.mock import patch
 
 from countryflag import getflag
 from countryflag.cache.memory import MemoryCache

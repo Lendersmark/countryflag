@@ -10,9 +10,10 @@ To run this example from the repo root:
     python examples/cache_sharing_demo.py
 """
 
+from typing import cast
+
 from countryflag.cache.memory import MemoryCache
 from countryflag.core.flag import CountryFlag
-from typing import cast
 
 
 def main():
