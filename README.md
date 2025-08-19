@@ -223,6 +223,8 @@ For complete documentation, visit [countryflag.readthedocs.io](https://countryfl
 
 Contributions are welcome! Please read our [Contributing Guide](docs/CONTRIBUTING.md) for details on how to submit pull requests, report issues, and contribute to the project.
 
+For Warp users and repository-specific development commands/architecture, see WARP.md.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -64,6 +64,13 @@ Commands
   - Timing example
     - python examples/example_timing_test.py
 
+- CLI smoke tests (quick manual checks)
+  - After editable install (pip install -e .):
+    - countryflag Germany BE 'United States of America'
+    - countryflag --format json Italy France
+    - countryflag --reverse 🇩🇪 🇺🇸
+    - python -m countryflag --list-countries | head -n 5
+
 High-level architecture
 - Package layout (src/countryflag)
   - cli/
