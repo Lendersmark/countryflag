@@ -168,22 +168,18 @@ class CountryFlag:
                 if cached_result is not None:
                     return cached_result
 
-            # Convert to all possible codes and validate the length
-            valid_result = False
-            iso_codes = [code.strip() for code in country_name.split()]
-
-            if len(iso_codes) > 1:  # Handle cases with multi-word countries
-                with silence_coco_warnings():
+            with silence_coco_warnings():
+                # Convert the complete name before treating words as codes.
+                code = self._converter.convert(country_name)
+                valid_result = (
+                    isinstance(code, str) and code != "not found" and len(code) <= 3
+                )
+                # Preserve support for legacy space-separated code lists.
+                iso_codes = country_name.split()
+                if not valid_result and len(iso_codes) > 1:
                     valid_result = all(
                         self._converter.convert(name) != "not found"
                         for name in iso_codes
-                    )
-            else:
-                # Single country validation
-                with silence_coco_warnings():
-                    code = self._converter.convert(country_name)
-                    valid_result = (
-                        isinstance(code, str) and code != "not found" and len(code) <= 3
                     )
 
             # Cache the result if cache is available
