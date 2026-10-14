@@ -8,21 +8,11 @@ country names to emoji flags and vice versa.
 import csv
 import json
 import logging
+from importlib import resources as importlib_resources
 from io import StringIO
 from typing import Dict, List, Literal, Optional, Tuple
 
 import flag
-
-# Import resource loading modules
-try:
-    import importlib.resources as importlib_resources  # type: ignore
-except ImportError:
-    importlib_resources = None  # type: ignore
-
-try:
-    import pkg_resources  # type: ignore
-except ImportError:
-    pkg_resources = None  # type: ignore
 
 from countryflag.cache.base import Cache
 from countryflag.cache.memory import MemoryCache
@@ -563,42 +553,19 @@ class CountryFlag:
 
         # Try to load ASCII art from embedded resources
         try:
-            # Try different resource loading approaches
-            ascii_art = None
-
-            # Method 1: importlib.resources (Python 3.9+)
-            if importlib_resources and hasattr(importlib_resources, "open_binary"):
-                try:
-                    # This will raise FileNotFoundError if resource is missing
-                    with importlib_resources.open_binary(
-                        "countryflag.assets", f"{iso_code.lower()}.txt"
-                    ) as f:
-                        ascii_art = f.read().decode("utf-8")
-                except FileNotFoundError:
-                    logger.debug(
-                        f"ASCII art resource not found for {iso_code} (importlib.resources)"
-                    )
-                    ascii_art = None
-
-            # Method 2: pkg_resources (legacy)
-            elif pkg_resources and hasattr(pkg_resources, "resource_stream"):
-                try:
-                    # This will raise FileNotFoundError if resource is missing
-                    with pkg_resources.resource_stream(
-                        "countryflag.assets", f"{iso_code.lower()}.txt"
-                    ) as f:
-                        ascii_art = f.read().decode("utf-8")
-                except FileNotFoundError:
-                    logger.debug(
-                        f"ASCII art resource not found for {iso_code} (pkg_resources)"
-                    )
-                    ascii_art = None
+            ascii_art = (
+                importlib_resources.files("countryflag")
+                .joinpath("assets", f"{iso_code.lower()}.txt")
+                .read_text(encoding="utf-8")
+            )
 
             # If ASCII art was successfully loaded, return it
             if ascii_art:
                 logger.debug(f"Loaded ASCII art for {iso_code}")
                 return ascii_art
 
+        except FileNotFoundError:
+            logger.debug(f"ASCII art resource not found for {iso_code}")
         except Exception as e:
             # Log the error but don't crash
             logger.debug(f"Error loading ASCII art for {iso_code}: {e}")

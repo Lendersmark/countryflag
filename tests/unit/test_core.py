@@ -2,6 +2,7 @@
 
 import pytest
 
+import countryflag.core.flag as flag_module
 from countryflag.core import CountryFlag
 from countryflag.core.exceptions import InvalidCountryError
 
@@ -85,3 +86,25 @@ def test_reverse_lookup():
     result = cf.reverse_lookup(flags)
     assert len(result) == 2
     assert all(country for _, country in result)
+
+
+def test_get_ascii_flag_loads_ascii_asset(monkeypatch):
+    """Test ASCII art loading through importlib.resources."""
+
+    class FakeResource:
+        def joinpath(self, *parts):
+            assert parts == ("assets", "de.txt")
+            return self
+
+        def read_text(self, encoding):
+            assert encoding == "utf-8"
+            return "ASCII DE"
+
+    monkeypatch.setattr(
+        flag_module.importlib_resources,
+        "files",
+        lambda package_name: FakeResource(),
+    )
+
+    cf = CountryFlag()
+    assert cf.get_ascii_flag("DE") == "ASCII DE"
